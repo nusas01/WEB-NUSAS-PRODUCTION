@@ -4,6 +4,7 @@ import {
     logoutSlice,
     storesVerificationSlice,
     accessKeySlice,
+    accountTestingCustomerStoreSlice,
 } from '../reducers/get'
 
 const {setLoginStatus} = loginStatusSlice.actions
@@ -57,18 +58,36 @@ export const fetchStoresVerificationRequired = () => {
 }
 
 const { setAccessKeyData, setAccessKeyError, setLoadingAccessKey } = accessKeySlice.actions
-export const createAccessKeyStore = () => {
+export const createAccessKeyStore = (data) => {
     return async (dispatch) => {
         dispatch(setLoadingAccessKey(true))
         try {
             const response = await axios.get(`${process.env.REACT_APP_CREATE_ACCESS_KEY_STORE}`, {
-                withCredentials: true
+                withCredentials: true,
+                params: data,
             })
             dispatch(setAccessKeyData(response?.data))
         } catch (error) {
             dispatch(setAccessKeyError(error.response?.data?.error))
         } finally {
             dispatch(setLoadingAccessKey(false))
+        }
+    }
+}
+
+const { setAccountTestingCustomerStoreData, setAccountTestingCustomerStoreError, setLoadingAccountTestingCustomerStore } = accountTestingCustomerStoreSlice.actions
+export const fetchAccountTestingCustomerStore = () => {
+    return async (dispatch) => {
+        dispatch(setLoadingAccountTestingCustomerStore(true))
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_ACCOUNT_TESTING_CUSTOMER_STORE}`, {
+                withCredentials: true
+            })
+            dispatch(setAccountTestingCustomerStoreData(response?.data))
+        } catch (error) {
+            dispatch(setAccountTestingCustomerStoreError(error.response?.data?.error))
+        } finally {
+            dispatch(setLoadingAccountTestingCustomerStore(false))
         }
     }
 }

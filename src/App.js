@@ -1,6 +1,5 @@
 import { BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 import './App.css';
-import UserHome from './user/home';
 import PrivateRoute from './reducers/privateRoute';
 import { ScrollToTop } from './components/helper';
 import StoreDeploymentDashboard from './components/storeRequiredDeploy'
@@ -9,6 +8,9 @@ import {
 } from './actions/get'
 import { useDispatch, useSelector } from 'react-redux';
 import LoginComponent from './components/login';
+import { useEffect } from 'react';
+import PaymentGatewayDashboard from './components/submissionChangePaymentGateway'
+import TransactionDashboard from './components/transaction';
 
 function App() {
   const dispatch = useDispatch()
@@ -20,18 +22,22 @@ function App() {
     }
   }, [loggedIn])
 
+  console.log("status login: ", loggedIn)
 
   return (
     <Router>
-      <ScrollToTop>
-        <Routes>
-          <Route path="/login" element={<LoginComponent/>}/>
+      <div>
+        <ScrollToTop/>
+          <Routes>
+            <Route path="/login" element={<LoginComponent/>}/>
+            <Route path="/submission/change/payment/gateway" element={<PaymentGatewayDashboard/>}/>
+            <Route path='/transactions' element={<TransactionDashboard/>}/>
 
-          <Route element={<PrivateRoute/>}>
-            <Route path='/store/required/deploy' element={<StoreDeploymentDashboard/>}/>
-          </Route>
-        </Routes>
-      </ScrollToTop>
+            <Route element={<PrivateRoute/>}>
+              <Route path='/store/required/deploy' element={<StoreDeploymentDashboard/>}/>
+            </Route>
+          </Routes>
+      </div>
     </Router>
   );
 }

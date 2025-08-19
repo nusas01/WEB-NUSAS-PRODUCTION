@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
-import { loginSlice } from '../reducers/get'
-import { login } from '../actions/get'
+import { Mail, Lock, Eye, EyeOff, LogIn, Hourglass } from 'lucide-react';
+import { loginSlice } from '../reducers/post'
+import { login } from '../actions/post'
 import {
     Toast, 
     ToastPortal
@@ -15,7 +15,10 @@ const LoginComponent = () => {
     const navigate = useNavigate();
 
     const { resetLogin } = loginSlice.actions
-    const { loadingLogin, errorLogin, errorField, successLogin } = useSelector(state => state.login);
+    const { loadingLogin, errorLogin, errorField, successLogin } = useSelector(state => state.loginState);
+
+    // Local errors state to manage field errors
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
         if (errorLogin) {
@@ -32,10 +35,34 @@ const LoginComponent = () => {
             dispatch(resetLogin())
         }
     }, [successLogin])
-    
+
+    // Unified error field handling mechanism
+    useEffect(() => {
+        if (errorField && Object.keys(errorField).length > 0) {
+            const mergedErrors = errorField.reduce((acc, curr) => {
+                return { ...acc, ...curr };
+            }, {});
+            
+            // Convert server errors (uppercase) to match formData keys (lowercase)
+            const normalizedErrors = {};
+            Object.keys(mergedErrors).forEach(key => {
+                const lowerKey = key.toLowerCase();
+                normalizedErrors[lowerKey] = mergedErrors[key];
+                // Keep original key as well for backward compatibility
+                normalizedErrors[key] = mergedErrors[key];
+            });
+            
+            setErrors(prev => ({
+                ...prev,
+                ...normalizedErrors
+            }));
+        }
+    }, [errorField])
+
+    console.log("error field adalah: ", errorField)
     const [formData, setFormData] = useState({
-        Email: '',
-        Password: ''
+        email: '',
+        password: ''
     });
     
     const [showPassword, setShowPassword] = useState(false);
@@ -49,7 +76,11 @@ const LoginComponent = () => {
         }));
         
         // Clear field-specific errors when user starts typing
-        if (errorField && errorField[name]) {
+        if (errors && errors[name]) {
+            setErrors(prev => ({
+                ...prev,
+                [name]: null
+            }));
             dispatch(resetLogin());
         }
     };
@@ -62,12 +93,13 @@ const LoginComponent = () => {
     };
 
     const getFieldError = (field) => {
-        return errorField && errorField[field] ? errorField[field] : null;
+        return errors && errors[field] ? errors[field] : null;
     };
 
     const isFieldInvalid = (field) => {
         const hasError = getFieldError(field);
-        const isEmpty = !formData[field].trim();
+        const formField = formData[field.toLowerCase()]; // Handle case mismatch
+        const isEmpty = !formField || !formField.trim();
         const isTouched = touched[field];
         
         return hasError || (isTouched && isEmpty);
@@ -78,22 +110,17 @@ const LoginComponent = () => {
         
         // Mark all fields as touched
         setTouched({
-        Email: true,
-        Password: true
+        email: true,
+        password: true
         });
 
         // Basic validation
-        if (!formData.Email.trim() || !formData.Password.trim()) {
+        if (!formData.email.trim() || !formData.password.trim()) {
         return;
         }
 
-        // Create FormData for multipart/form-data
-        const submitData = new FormData();
-        submitData.append('Email', formData.Email);
-        submitData.append('Password', formData.Password);
-
         // Dispatch login action
-        dispatch(login(submitData));
+        dispatch(login(formData));
     };
 
     const togglePasswordVisibility = () => {
@@ -137,27 +164,27 @@ const LoginComponent = () => {
                 <div className="space-y-6">
                     {/* Email Field */}
                     <div>
-                    <label htmlFor="Email" className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
                         Email
                     </label>
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Mail className={`h-5 w-5 ${isFieldInvalid('Email') ? 'text-red-400' : 'text-gray-400'}`} />
+                        <Mail className={`h-5 w-5 ${isFieldInvalid('email') ? 'text-red-400' : 'text-gray-400'}`} />
                         </div>
                         <input
-                        id="Email"
-                        name="Email"
+                        id="email"
+                        name="email"
                         type="email"
                         autoComplete="email"
                         required
-                        value={formData.Email}
+                        value={formData.email}
                         onChange={handleInputChange}
-                        onBlur={() => handleBlur('Email')}
+                        onBlur={() => handleBlur('email')}
                         className={`
                             w-full pl-10 pr-4 py-3 border rounded-xl text-gray-900 placeholder-gray-500 
                             focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent
                             transition-all duration-200 ease-in-out
-                            ${isFieldInvalid('Email') 
+                            ${isFieldInvalid('email') 
                             ? 'border-red-300 bg-red-50 focus:ring-red-500' 
                             : 'border-gray-300 bg-white hover:border-gray-400'
                             }
@@ -165,36 +192,36 @@ const LoginComponent = () => {
                         placeholder="Masukkan email Anda"
                         />
                     </div>
-                    {(getFieldError('Email') || (touched.Email && !formData.Email.trim())) && (
+                    {(getFieldError('email') || getFieldError('Email') || (touched.email && !formData.email.trim())) && (
                         <p className="mt-2 text-sm text-red-600 font-medium">
-                        {getFieldError('Email') || 'Email wajib diisi'}
+                        {getFieldError('email') || getFieldError('Email') || 'Email wajib diisi'}
                         </p>
                     )}
                     </div>
 
                     {/* Password Field */}
                     <div>
-                    <label htmlFor="Password" className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
                         Password
                     </label>
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Lock className={`h-5 w-5 ${isFieldInvalid('Password') ? 'text-red-400' : 'text-gray-400'}`} />
+                        <Lock className={`h-5 w-5 ${isFieldInvalid('password') ? 'text-red-400' : 'text-gray-400'}`} />
                         </div>
                         <input
-                        id="Password"
-                        name="Password"
+                        id="password"
+                        name="password"
                         type={showPassword ? 'text' : 'password'}
                         autoComplete="current-password"
                         required
-                        value={formData.Password}
+                        value={formData.password}
                         onChange={handleInputChange}
-                        onBlur={() => handleBlur('Password')}
+                        onBlur={() => handleBlur('password')}
                         className={`
                             w-full pl-10 pr-12 py-3 border rounded-xl text-gray-900 placeholder-gray-500 
                             focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent
                             transition-all duration-200 ease-in-out
-                            ${isFieldInvalid('Password') 
+                            ${isFieldInvalid('password') 
                             ? 'border-red-300 bg-red-50 focus:ring-red-500' 
                             : 'border-gray-300 bg-white hover:border-gray-400'
                             }
@@ -213,9 +240,9 @@ const LoginComponent = () => {
                         )}
                         </button>
                     </div>
-                    {(getFieldError('Password') || (touched.Password && !formData.Password.trim())) && (
+                    {(getFieldError('password') || getFieldError('Password') || (touched.password && !formData.password.trim())) && (
                         <p className="mt-2 text-sm text-red-600 font-medium">
-                        {getFieldError('Password') || 'Password wajib diisi'}
+                        {getFieldError('password') || getFieldError('Password') || 'Password wajib diisi'}
                         </p>
                     )}
                     </div>

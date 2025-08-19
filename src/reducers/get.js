@@ -8,7 +8,7 @@ export const loginStatusSlice = createSlice({
     initialState: initialLoginStatusState,
     reducers: {
         setLoginStatus: (state, action) => {
-            state.loggedIn = action.payload
+            state.loggedIn = action.payload || false
         }
     }
 })
@@ -39,7 +39,7 @@ export const logoutSlice = createSlice({
 })
 
 const initialStoresVerificationState = {
-    storesVerificationData: null,
+    storesVerificationData: [],
     storesVerificationError: null,
     loadingStoresVerification: false
 }
@@ -51,14 +51,19 @@ export const storesVerificationSlice = createSlice({
             state.loadingStoresVerification = action.payload
         },
         setStoresVerificationData: (state, action) => {
-            state.storesVerificationData = action.payload
+            state.storesVerificationData = action.payload || []
         },
         setStoresVerificationError: (state, action) => {
             state.storesVerificationError = action.payload || null
         },
-        resetStoresVerification: (state) => {
-            state.storesVerificationData = null
+        resetErrorStoresVerification: (state) => {
             state.storesVerificationError = null
+        },
+        removeStoresVerificationById: (state, action) => {
+            const idToRemove = action.payload
+            state.storesVerificationData = state.storesVerificationData.filter(
+                item => item.id !== idToRemove
+            )
         }
     }
 })
@@ -84,6 +89,31 @@ export const accessKeySlice = createSlice({
         resetAccessKey: (state) => {
             state.accessKeyData = null
             state.accessKeyError = null
+        }
+    }
+})
+
+
+const initialAccountTestingCustomerStoreState = {
+    dataAccountTestingCustomerStore: null,
+    errorAccountTestingCustomerStore: null,
+    loadingAccountTestingCustomerStore: false
+}
+export const accountTestingCustomerStoreSlice = createSlice({
+    name: "accountTestingCustomerStore",
+    initialState: initialAccountTestingCustomerStoreState,
+    reducers: {
+        setLoadingAccountTestingCustomerStore: (state, action) => {
+            state.loadingAccountTestingCustomerStore = action.payload
+        },
+        setAccountTestingCustomerStoreData: (state, action) => {
+            state.dataAccountTestingCustomerStore = action.payload
+        },
+        setAccountTestingCustomerStoreError: (state, action) => {
+            state.errorAccountTestingCustomerStore = action.payload || null
+        },
+        resetErrorAccountTestingCustomerStore: (state) => {
+            state.errorAccountTestingCustomerStore = null
         }
     }
 })

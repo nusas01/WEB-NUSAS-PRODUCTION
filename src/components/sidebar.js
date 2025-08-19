@@ -6,8 +6,8 @@ import {
   Menu, 
   X,
   Home,
-  Settings,
-  Hourglass,
+  User2,
+  WalletCards,
 } from "lucide-react"
 import { useNavigate } from "react-router-dom";
 import { useDeviceDetection } from "./helper";
@@ -17,11 +17,13 @@ import { fetchLogout } from "../actions/get";
 import { logoutSlice } from "../reducers/get";
 import { 
   Toast,
-  ToastPortal
+  ToastPortal, 
 } from './alert'
 
 const menuItems = [
-  { Icon: Store, title: "Store Required Deploy", path: '/store', key: 'Store Required Deploy' },
+  { Icon: Store, title: "Store Required Deploy", path: '/store', key: 'Store Required Deploy'},
+  { Icon: User2, title:"Submission Change Credentials", path: '/submission/change/payment/gateway', key:'Submission Change Credentials'},
+  { Icon: WalletCards, title:"Transactions", path: '/transactions', key: 'Transactions'}
 ];
 
 const Sidebar = ({activeMenu}) => {

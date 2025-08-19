@@ -155,3 +155,28 @@ export const deployAppTestingSlice = createSlice({
         }
     }
 })
+
+const initialAccountCustomerStoreTestingState = {
+    accountCustomerStoreTestingSuccess: false,
+    accountCustomerStoreTestingError: null,
+    loadingAccountCustomerStoreTesting: false
+}
+export const createAccountCustomerStoreTestingSlice = createSlice({
+    name: "accountCustomerStoreTesting",
+    initialState: initialAccountCustomerStoreTestingState,
+    reducers: {
+        setLoadingAccountCustomerStoreTesting: (state, action) => {
+            state.loadingAccountCustomerStoreTesting = action.payload
+        },
+        setAccountCustomerStoreTestingSuccess: (state, action) => {
+            state.accountCustomerStoreTestingSuccess = action.payload
+        },
+        setAccountCustomerStoreTestingError: (state, action) => {
+            state.accountCustomerStoreTestingError = action.payload || null
+        },
+        resetAccountCustomerStoreTesting: (state) => {
+            state.accountCustomerStoreTestingSuccess = false
+            state.accountCustomerStoreTestingError = null
+        }
+    }
+})

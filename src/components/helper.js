@@ -1,5 +1,9 @@
 import { useDispatch } from "react-redux"
 import { navbarSlice } from "../reducers/reducers";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { useState,useRef,useLayoutEffect } from "react";
+
 
 export const useDeviceDetection = () => {
   const dispatch = useDispatch();
@@ -39,3 +43,55 @@ export const ScrollToTop = () => {
 
   return null;
 };
+
+export function useElementHeight() {
+  const elementRef = useRef(null);
+  const [height, setHeight] = useState(0);
+
+  useLayoutEffect(() => {
+    if (!elementRef.current) return;
+
+    const updateHeight = () => {
+      setHeight(elementRef.current.offsetHeight || 0);
+    };
+
+    updateHeight(); // Set awal
+
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(elementRef.current);
+
+    return () => observer.disconnect();
+  }, []);
+
+  return { ref: elementRef, height };
+}
+
+export const useOutsideClick = ({ref, callback, isActive = true}) => {
+    useEffect(() => {
+        if (!isActive) return;
+
+        function handleClickOutside(event) {
+            if (ref.current && !ref.current.contains(event.target)) {
+                callback();
+            }
+        }
+
+        function handleTouchOutside(event) {
+            if (ref.current && !ref.current.contains(event.target)) {
+                callback();
+            }
+        }
+
+        // Delay untuk mencegah immediate trigger
+        const timeoutId = setTimeout(() => {
+            document.addEventListener("mousedown", handleClickOutside);
+            document.addEventListener("touchstart", handleTouchOutside, { passive: true });
+        }, 100);
+
+        return () => {
+            clearTimeout(timeoutId);
+            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener("touchstart", handleTouchOutside);
+        };
+    }, [ref, callback, isActive]);
+}

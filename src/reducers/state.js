@@ -9,6 +9,7 @@ import {
     logoutSlice,
     storesVerificationSlice,
     accessKeySlice,
+    accountTestingCustomerStoreSlice,
 } from './get'
 import {
     loginSlice,
@@ -16,6 +17,7 @@ import {
     deployAppSlice,
     deployFinishedSlice,
     deployAppTestingSlice,
+    createAccountCustomerStoreTestingSlice,
 } from './post'
 
 // 1. Reducer yang dipersist
@@ -23,6 +25,7 @@ const persistedReducers = combineReducers({
   navbar: navbarSlice.reducer,
   loginStatus: loginStatusSlice.reducer,
   storesVerification: storesVerificationSlice.reducer,
+  accountTestingCustomerStore: accountTestingCustomerStoreSlice.reducer,
 })
 
 // 2. Konfigurasi persist
@@ -40,6 +43,7 @@ const nonPersistedReducers = {
   deployFinishedState: deployFinishedSlice.reducer,
   accessKeyState: accessKeySlice.reducer,
   deployAppTestingState: deployAppTestingSlice.reducer,
+  createAccountCustomerStoreTestingState: createAccountCustomerStoreTestingSlice.reducer,
 }
 
 const rootReducer = combineReducers({
