@@ -27,17 +27,56 @@ import {
 } from '../reducers/reducers'
 import { useElementHeight } from './helper';
 import Sidebar from './sidebar';
+import {
+    Toast, 
+    ToastPortal,
+} from './alert'
+import {
+    AccessKeyModal,
+    ConfirmationModal,
+} from './model'
+import {
+    deployAppTestingSlice,
+    startChangePaymentGatewaySlice,
+    finishedChangePaymentGatewaySlice,
+} from '../reducers/post'
+import {
+    deployAppTesting,
+    startChangePaymentGatewayTenant,
+    finishedChangePaymentGatewayTenant,
+} from '../actions/post'
+import {
+    storeRequiredVerifiedSlice,
+    accessKeyStoreTestingSlice,
+    accessKeySlice,
+    sendEmailPaymentVerificationSlice,
+} from '../reducers/get'
+import {
+    getAllStoreRequiredVerified,
+    createAccessKeyMaintananceTenant,
+    createAccessKeyStore,
+    sendEmailRequiredCredentialPaymentGateway,
+} from '../actions/get'
+import { useEffect } from 'react';
 
 const PaymentGatewayDashboard = () => {
     const dispatch = useDispatch()
     const [expandedRows, setExpandedRows] = useState(new Set());
+    const [toast, setToast] = useState(null);
+    const [confirmModal, setConfirmModal] = useState({ isOpen: false });
+    const [accessKeyModal, setAccessKeyModal] = useState({ isOpen: false, data: null, accessKey: null });
 
     const { setIsOpen } = navbarSlice.actions
-    const { isOpen, isMobileDeviceType } = useSelector((state) => state.persisted.navbar)
+    const { isOpen, isMobileDeviceType } = useSelector((state) => state.persisted?.navbar || {})
 
     const { ref: headerRef, height: headerHeight } = useElementHeight();
   
-    // Sample data berdasarkan struktur yang diberikan
+    
+    // Mock state management (replace with actual Redux selectors)
+    const [storeData, setStoreData] = useState([]);
+    const [loading, setLoading] = useState({});
+
+    // Sample data
     const sampleData = [
         {
         id: "req_001",
@@ -86,6 +125,211 @@ const PaymentGatewayDashboard = () => {
         }
     ];
 
+    // Mock API functions (replace with actual API calls)
+    const mockApiCall = (action, data = null, shouldFail = false) => {
+        return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            if (shouldFail) {
+            reject(new Error(`Failed to ${action}. Please try again.`));
+            } else {
+            resolve({
+                success: true,
+                data: data || { message: `${action} completed successfully` },
+                access_key_maintanance: action === 'createAccessKeyMaintananceTenant' ? 'ak_test_maintenance_' + Math.random().toString(36).substr(2, 9) : undefined
+            });
+            }
+        }, 1000);
+        });
+    };
+
+    // Toast helper functions
+    const showToast = (message, type) => {
+        setToast({ message, type, id: Date.now() });
+    };
+
+    const closeToast = () => {
+        setToast(null);
+    };
+
+    // API Action handlers
+    const handleGetAllStoreRequiredVerified = async () => {
+        if (storeData.length > 0) return; // Don't fetch if data already exists
+
+        setLoading({ ...loading, getAllStore: true });
+        try {
+        const response = await mockApiCall('getAllStoreRequiredVerified', sampleData);
+        setStoreData(response.data);
+        } catch (error) {
+        showToast(error.message, 'error');
+        } finally {
+        setLoading({ ...loading, getAllStore: false });
+        }
+    };
+
+    const handleCreateAccessKeyMaintananceTenant = async (storeId, item) => {
+        setConfirmModal({
+        isOpen: true,
+        title: 'Create Testing Key',
+        message: 'Are you sure you want to create a testing access key for this tenant?',
+        type: 'info',
+        onConfirm: async () => {
+            setConfirmModal({ isOpen: false });
+            setLoading({ ...loading, [`createTesting_${item.tenant.id}`]: true });
+            
+            try {
+            const response = await mockApiCall('createAccessKeyMaintananceTenant', { tenant_id: item.tenant.id, store_id: storeId });
+            showToast('Testing access key created successfully!', 'success');
+            
+            // Show access key in modal
+            setAccessKeyModal({
+                isOpen: true,
+                data: item,
+                accessKey: response.access_key_maintanance
+            });
+            } catch (error) {
+            showToast(error.message, 'error');
+            } finally {
+            setLoading({ ...loading, [`createTesting_${item.tenant.id}`]: false });
+            }
+        }
+        });
+    };
+
+    const handleCreateAccessKeyStore = async (storeId, item) => {
+        setConfirmModal({
+        isOpen: true,
+        title: 'Create Store Access Key',
+        message: 'Are you sure you want to create an access key for this store?',
+        type: 'info',
+        onConfirm: async () => {
+            setConfirmModal({ isOpen: false });
+            setLoading({ ...loading, [`createAccess_${storeId}`]: true });
+            
+            try {
+            const response = await mockApiCall('createAccessKeyStore', { store_id: storeId, tenant_id: item.tenant.id });
+            const mockAccessKey = 'ak_store_' + Math.random().toString(36).substr(2, 20);
+            
+            // Show access key in modal
+            setAccessKeyModal({
+                isOpen: true,
+                data: item,
+                accessKey: mockAccessKey
+            });
+            } catch (error) {
+            showToast(error.message, 'error');
+            } finally {
+            setLoading({ ...loading, [`createAccess_${storeId}`]: false });
+            }
+        }
+        });
+    };
+
+    const handleSendEmailRequiredCredentialPaymentGateway = async (email) => {
+        setConfirmModal({
+        isOpen: true,
+        title: 'Send Email',
+        message: `Are you sure you want to send credential requirement email to ${email}?`,
+        type: 'info',
+        onConfirm: async () => {
+            setConfirmModal({ isOpen: false });
+            setLoading({ ...loading, [`sendEmail_${email}`]: true });
+            
+            try {
+            await mockApiCall('sendEmailRequiredCredentialPaymentGateway', { email });
+            showToast(`Email sent successfully to ${email}!`, 'success');
+            } catch (error) {
+            showToast(error.message, 'error');
+            } finally {
+            setLoading({ ...loading, [`sendEmail_${email}`]: false });
+            }
+        }
+        });
+    };
+
+    const handleStartChangePaymentGatewayTenant = async (id, tenantId) => {
+        setConfirmModal({
+        isOpen: true,
+        title: 'Start Payment Gateway Change',
+        message: 'Are you sure you want to start the payment gateway change process for this tenant?',
+        type: 'info',
+        onConfirm: async () => {
+            setConfirmModal({ isOpen: false });
+            setLoading({ ...loading, [`start_${id}`]: true });
+            
+            try {
+            await mockApiCall('startChangePaymentGatewayTenant', { id, tenant_id: tenantId });
+            showToast('Payment gateway change process started successfully!', 'success');
+            } catch (error) {
+            showToast(error.message, 'error');
+            } finally {
+            setLoading({ ...loading, [`start_${id}`]: false });
+            }
+        }
+        });
+    };
+
+    const handleFinishedChangePaymentGatewayTenant = async (id, tenantId) => {
+        setConfirmModal({
+        isOpen: true,
+        title: 'Finish Payment Gateway Change',
+        message: 'Are you sure you want to mark the payment gateway change as finished for this tenant?',
+        type: 'success',
+        onConfirm: async () => {
+            setConfirmModal({ isOpen: false });
+            setLoading({ ...loading, [`finish_${id}`]: true });
+            
+            try {
+            await mockApiCall('finishedChangePaymentGatewayTenant', { id, tenant_id: tenantId });
+            showToast('Payment gateway change completed successfully!', 'success');
+            } catch (error) {
+            showToast(error.message, 'error');
+            } finally {
+            setLoading({ ...loading, [`finish_${id}`]: false });
+            }
+        }
+        });
+    };
+
+    const handleDeployAppTesting = async () => {
+        setConfirmModal({
+        isOpen: true,
+        title: 'Deploy Test Application',
+        message: 'Are you sure you want to deploy the testing application? This process may take a few minutes.',
+        type: 'info',
+        onConfirm: async () => {
+            setConfirmModal({ isOpen: false });
+            setLoading({ ...loading, deployTesting: true });
+            
+            try {
+            await mockApiCall('deployAppTesting');
+            showToast('Test application deployed successfully!', 'success');
+            } catch (error) {
+            showToast(error.message, 'error');
+            } finally {
+            setLoading({ ...loading, deployTesting: false });
+            }
+        }
+        });
+    };
+
+    const handleRefresh = async () => {
+        setLoading({ ...loading, refresh: true });
+        try {
+            const response = await mockApiCall('getAllStoreRequiredVerified', sampleData);
+            setStoreData(response.data);
+            showToast('Data refreshed successfully!', 'success');
+        } catch (error) {
+            showToast(error.message, 'error');
+        } finally {
+            setLoading({ ...loading, refresh: false });
+        }
+    };
+
+    // Load data on component mount
+    useEffect(() => {
+        handleGetAllStoreRequiredVerified();
+    }, []);
+
     const toggleRow = (id) => {
         const newExpanded = new Set(expandedRows);
         if (newExpanded.has(id)) {
@@ -119,14 +363,16 @@ const PaymentGatewayDashboard = () => {
 
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('id-ID', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
         });
     };
 
+    const dataToDisplay = storeData.length > 0 ? storeData : sampleData;
+    
     return (
         <div className='flex'>
             {((isMobileDeviceType && isOpen) || !isMobileDeviceType) && (
@@ -158,21 +404,27 @@ const PaymentGatewayDashboard = () => {
                                         </div>
                                         <div className="min-w-0 flex-1">
                                             <h1 className="text-sm sm:text-base lg:text-lg xl:text-xl font-bold text-gray-800 truncate">Submission Change Credentials</h1>
-                                            <p className='text-xs taxt-gray-400'>List of tenant submission change payment gateway</p>
+                                            <p className='text-xs text-gray-400'>List of tenant submission change payment gateway</p>
                                         </div>
                                     </div>
                                 )}
 
                                 <div className="flex items-center space-x-4">
                                     <button
-                                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors">
-                                        <RefreshCcw className="w-4 h-4 mr-2" />
-                                        Refresh
+                                        onClick={handleRefresh}
+                                        disabled={loading.refresh}
+                                        className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors disabled:opacity-50"
+                                    >
+                                        <RefreshCcw className={`w-4 h-4 mr-2 ${loading.refresh ? 'animate-spin' : ''}`} />
+                                        {loading.refresh ? 'Refreshing...' : 'Refresh'}
                                     </button>
                                     <button
-                                        className="inline-flex items-center px-4 py-2 border border-gray-900 rounded-lg text-sm font-medium text-gray-900 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors"
+                                        onClick={handleDeployAppTesting}
+                                        disabled={loading.deployTesting}
+                                        className="inline-flex items-center px-4 py-2 border border-gray-900 rounded-lg text-sm font-medium text-gray-900 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors disabled:opacity-50"
                                     >
-                                        Test Deploy
+                                        <TestTube className="w-4 h-4 mr-2" />
+                                        {loading.deployTesting ? 'Deploying...' : 'Test Deploy'}
                                     </button>
                                     <button className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors">
                                         <Settings className="w-4 h-4 mr-2" />
@@ -198,276 +450,304 @@ const PaymentGatewayDashboard = () => {
                     {/* Main Content */}
                     <div className="max-w-7xl mx-auto" style={{marginTop: headerHeight}}>
                         {/* Stats Cards */}
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
                             <div className="flex items-center justify-between">
-                            <div>
+                                <div>
                                 <p className="text-sm font-medium text-gray-600">Total Requests</p>
-                                <p className="text-2xl font-bold text-gray-900">{sampleData.length}</p>
-                            </div>
-                            <div className="bg-blue-100 p-3 rounded-lg">
+                                <p className="text-2xl font-bold text-gray-900">{dataToDisplay.length}</p>
+                                </div>
+                                <div className="bg-blue-100 p-3 rounded-lg">
                                 <CreditCard className="w-6 h-6 text-blue-600" />
+                                </div>
                             </div>
                             </div>
-                        </div>
-                        
-                        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+                            
+                            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
                             <div className="flex items-center justify-between">
-                            <div>
+                                <div>
                                 <p className="text-sm font-medium text-gray-600">Complete Credentials</p>
                                 <p className="text-2xl font-bold text-green-600">
-                                {sampleData.filter(isCredentialsComplete).length}
+                                    {dataToDisplay.filter(isCredentialsComplete).length}
                                 </p>
-                            </div>
-                            <div className="bg-green-100 p-3 rounded-lg">
+                                </div>
+                                <div className="bg-green-100 p-3 rounded-lg">
                                 <CheckCircle2 className="w-6 h-6 text-green-600" />
+                                </div>
                             </div>
                             </div>
-                        </div>
-                        
-                        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+                            
+                            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
                             <div className="flex items-center justify-between">
-                            <div>
+                                <div>
                                 <p className="text-sm font-medium text-gray-600">Pending Credentials</p>
                                 <p className="text-2xl font-bold text-amber-600">
-                                {sampleData.filter(item => !isCredentialsComplete(item)).length}
+                                    {dataToDisplay.filter(item => !isCredentialsComplete(item)).length}
                                 </p>
-                            </div>
-                            <div className="bg-amber-100 p-3 rounded-lg">
+                                </div>
+                                <div className="bg-amber-100 p-3 rounded-lg">
                                 <AlertCircle className="w-6 h-6 text-amber-600" />
+                                </div>
                             </div>
                             </div>
-                        </div>
-                        
-                        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+                            
+                            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
                             <div className="flex items-center justify-between">
-                            <div>
+                                <div>
                                 <p className="text-sm font-medium text-gray-600">Total Stores</p>
                                 <p className="text-2xl font-bold text-gray-900">
-                                {sampleData.reduce((acc, item) => acc + item.tenant.stores.length, 0)}
+                                    {dataToDisplay.reduce((acc, item) => acc + item.tenant.stores.length, 0)}
                                 </p>
-                            </div>
-                            <div className="bg-purple-100 p-3 rounded-lg">
+                                </div>
+                                <div className="bg-purple-100 p-3 rounded-lg">
                                 <Store className="w-6 h-6 text-purple-600" />
+                                </div>
                             </div>
                             </div>
-                        </div>
                         </div>
 
-                        {/* Quick Actions Panel */}
-                        <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 my-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                            <ExternalLink className="w-5 h-5 text-gray-600" />
-                            Quick Actions
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <button className="flex items-center gap-3 p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-200 hover:from-blue-100 hover:to-blue-200 transition-all">
-                            <div className="bg-blue-600 p-2 rounded-lg">
-                                <Send className="w-4 h-4 text-white" />
-                            </div>
-                            <div className="text-left">
-                                <div className="font-medium text-gray-900">Bulk Send Email</div>
-                                <div className="text-sm text-gray-600">Kirim email ke semua yang belum lengkap</div>
-                            </div>
-                            </button>
-                        </div>
-                        </div>
-
+                        {/* Main Table */}
                         <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-                        <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+                            <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
                             <h2 className="text-xl font-semibold text-gray-900">Data Perubahan Account Payment Gateway</h2>
                             <p className="text-gray-600 mt-1">Klik pada baris untuk melihat detail stores</p>
-                        </div>
+                            </div>
 
-                        <div className="overflow-x-auto">
+                            <div className="overflow-x-auto">
                             <table className="w-full">
-                            <thead className="bg-gray-50 border-b border-gray-200">
+                                <thead className="bg-gray-50 border-b border-gray-200">
                                 <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Request Info
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Tenant Details
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Credentials Status
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Transaction
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Actions
-                                </th>
-                                <th className="w-12"></th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Request Info</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tenant Details</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Credentials Status</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transaction</th>
+                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    <th className="w-12"></th>
                                 </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {sampleData.map((item) => (
-                                <React.Fragment key={item.id}>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                {dataToDisplay.map((item) => (
+                                    <React.Fragment key={item.id}>
                                     {/* Main Row */}
                                     <tr 
-                                    className="hover:bg-gray-50 cursor-pointer transition-colors"
-                                    onClick={() => toggleRow(item.id)}
+                                        className="hover:bg-gray-50 cursor-pointer transition-colors"
+                                        onClick={() => toggleRow(item.id)}
                                     >
-                                    <td className="px-6 py-4">
+                                        <td className="px-6 py-4">
                                         <div className="space-y-1">
-                                        <div className="font-medium text-gray-900">{item.id}</div>
-                                        <div className="flex items-center gap-2">
+                                            <div className="font-medium text-gray-900">{item.id}</div>
+                                            <div className="flex items-center gap-2">
                                             {getStatusBadge(item.status)}
-                                        </div>
-                                        <div className="text-sm text-gray-500 flex items-center gap-1">
+                                            </div>
+                                            <div className="text-sm text-gray-500 flex items-center gap-1">
                                             <Calendar className="w-3 h-3" />
                                             {formatDate(item.created_at)}
+                                            </div>
                                         </div>
-                                        </div>
-                                    </td>
-                                    
-                                    <td className="px-6 py-4">
+                                        </td>
+                                        
+                                        <td className="px-6 py-4">
                                         <div className="space-y-1">
-                                        <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-2">
                                             <User className="w-4 h-4 text-gray-400" />
                                             <span className="font-medium text-gray-900">{item.tenant.email}</span>
-                                        </div>
-                                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                                            </div>
+                                            <div className="flex items-center gap-2 text-sm text-gray-500">
                                             <Phone className="w-3 h-3" />
                                             {item.tenant.phone_number}
-                                        </div>
-                                        <div className="flex items-center gap-2 text-sm text-gray-500">
+                                            </div>
+                                            <div className="flex items-center gap-2 text-sm text-gray-500">
                                             <Store className="w-3 h-3" />
                                             {item.tenant.stores.length} Store(s)
+                                            </div>
                                         </div>
-                                        </div>
-                                    </td>
-                                    
-                                    <td className="px-6 py-4">
+                                        </td>
+                                        
+                                        <td className="px-6 py-4">
                                         <div className="space-y-2">
-                                        {isCredentialsComplete(item) ? (
+                                            {isCredentialsComplete(item) ? (
                                             <div className="flex items-center gap-2 text-green-600">
-                                            <CheckCircle2 className="w-4 h-4" />
-                                            <span className="text-sm font-medium">Complete</span>
+                                                <CheckCircle2 className="w-4 h-4" />
+                                                <span className="text-sm font-medium">Complete</span>
                                             </div>
-                                        ) : (
+                                            ) : (
                                             <div className="flex items-center gap-2 text-amber-600">
-                                            <AlertCircle className="w-4 h-4" />
-                                            <span className="text-sm font-medium">Incomplete</span>
+                                                <AlertCircle className="w-4 h-4" />
+                                                <span className="text-sm font-medium">Incomplete</span>
                                             </div>
-                                        )}
-                                        <div className="text-xs text-gray-500">
+                                            )}
+                                            <div className="text-xs text-gray-500">
                                             Business ID: {item.business_id ? '✓' : '✗'}<br />
                                             API Key: {item.api_key ? '✓' : '✗'}<br />
                                             Webhook Secret: {item.secret_key_webhook ? '✓' : '✗'}
+                                            </div>
                                         </div>
-                                        </div>
-                                    </td>
-                                    
-                                    <td className="px-6 py-4">
+                                        </td>
+                                        
+                                        <td className="px-6 py-4">
                                         <div className="space-y-1">
-                                        <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-2">
                                             <CreditCard className="w-4 h-4 text-gray-400" />
                                             <span className="font-medium text-gray-900">{item.transaction.id}</span>
-                                        </div>
-                                        {getStatusBadge(item.transaction.status)}
-                                        <div className="text-xs text-gray-500">
+                                            </div>
+                                            {getStatusBadge(item.transaction.status)}
+                                            <div className="text-xs text-gray-500">
                                             Xendit: {item.transaction.xendit_transaction_id}
+                                            </div>
                                         </div>
-                                        </div>
-                                    </td>
-                                    
-                                    <td className="px-6 py-4">
+                                        </td>
+                                        
+                                        <td className="px-6 py-4" onClick={(e) => e.stopPropagation()}>
                                         <div className="flex gap-2">
-                                        {!isCredentialsComplete(item) ? (
-                                            <button className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
-                                            <Send className="w-3 h-3" />
-                                            Send Email
+                                            {!isCredentialsComplete(item) ? (
+                                            <button 
+                                                onClick={() => handleSendEmailRequiredCredentialPaymentGateway(item.tenant.email)}
+                                                disabled={loading[`sendEmail_${item.tenant.email}`]}
+                                                className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
+                                            >
+                                                <Send className="w-3 h-3" />
+                                                {loading[`sendEmail_${item.tenant.email}`] ? 'Sending...' : 'Send Email'}
                                             </button>
-                                        ) : (
-                                            <div className="flex flex-col gap-2">
-                                            <button className="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
-                                                <Key className="w-4 h-4" />
-                                                Create Testing Key
-                                            </button>
-                                            <button className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
-                                                <Play className="w-3 h-3" />
-                                                Start
-                                            </button>
-                                            <button className="flex items-center gap-1 bg-gray-600 hover:bg-gray-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors">
-                                                <Check className="w-3 h-3" />
-                                                Finished
-                                            </button>
-                                            </div>
-                                        )}
-                                        </div>
-                                    </td>
-                                    
-                                    <td className="px-6 py-4">
-                                        <button className="text-gray-400 hover:text-gray-600">
-                                        {expandedRows.has(item.id) ? 
-                                            <ChevronDown className="w-4 h-4" /> : 
-                                            <ChevronRight className="w-4 h-4" />
-                                        }
-                                        </button>
-                                    </td>
-                                    </tr>
-                                    
-                                    {/* Expanded Stores Row */}
-                                    {expandedRows.has(item.id) && (
-                                    <tr>
-                                        <td colSpan="6" className="px-6 py-4 bg-gray-50">
-                                        <div className="bg-white rounded-lg border border-gray-200 p-4">
-                                            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                            <Store className="w-5 h-5 text-gray-600" />
-                                            Stores untuk {item.tenant.email}
-                                            </h3>
-                                            
-                                            {item.tenant.stores.length > 0 ? (
-                                            <div className="grid gap-3">
-                                                {item.tenant.stores.map((store, index) => (
-                                                <div key={store.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors">
-                                                    <div className="flex items-center gap-3">
-                                                    <div className="bg-gray-900 text-white p-2 rounded-lg">
-                                                        <Store className="w-4 h-4" />
-                                                    </div>
-                                                    <div>
-                                                        <div className="font-medium text-gray-900">Store ID: {store.id}</div>
-                                                        <div className="flex items-center gap-2 text-sm">
-                                                        {store.expiration_access ? (
-                                                            <span className="flex items-center gap-1 text-green-600">
-                                                            <CheckCircle2 className="w-3 h-3" />
-                                                            Access Valid
-                                                            </span>
-                                                        ) : (
-                                                            <span className="flex items-center gap-1 text-red-600">
-                                                            <AlertCircle className="w-3 h-3" />
-                                                            Access Expired
-                                                            </span>
-                                                        )}
-                                                        </div>
-                                                    </div>
-                                                    </div>
-                                                    
-                                                    <button className="flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                                                    <Key className="w-4 h-4" />
-                                                    Create Access Key
-                                                    </button>
-                                                </div>
-                                                ))}
-                                            </div>
                                             ) : (
-                                            <div className="text-center py-8 text-gray-500">
-                                                <Store className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                                                <p>Tidak ada store yang tersedia</p>
+                                            <div className="flex gap-2">
+                                                <button 
+                                                onClick={() => handleStartChangePaymentGatewayTenant(item.id, item.tenant.id)}
+                                                disabled={loading[`start_${item.id}`]}
+                                                className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
+                                                >
+                                                <Play className="w-3 h-3" />
+                                                {loading[`start_${item.id}`] ? 'Starting...' : 'Start'}
+                                                </button>
+                                                <button 
+                                                onClick={() => handleFinishedChangePaymentGatewayTenant(item.id, item.tenant.id)}
+                                                disabled={loading[`finish_${item.id}`]}
+                                                className="flex items-center gap-1 bg-gray-600 hover:bg-gray-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
+                                                >
+                                                <Check className="w-3 h-3" />
+                                                {loading[`finish_${item.id}`] ? 'Processing...' : 'Finished'}
+                                                </button>
                                             </div>
                                             )}
                                         </div>
                                         </td>
+                                        
+                                        <td className="px-6 py-4">
+                                        <button className="text-gray-400 hover:text-gray-600">
+                                            {expandedRows.has(item.id) ? 
+                                            <ChevronDown className="w-4 h-4" /> : 
+                                            <ChevronRight className="w-4 h-4" />
+                                            }
+                                        </button>
+                                        </td>
                                     </tr>
+                                    
+                                    {/* Expanded Stores Row */}
+                                    {expandedRows.has(item.id) && (
+                                        <tr>
+                                        <td colSpan="6" className="px-6 py-4 bg-gray-50">
+                                            <div className="bg-white rounded-lg border border-gray-200 p-4">
+                                            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                                <Store className="w-5 h-5 text-gray-600" />
+                                                Stores untuk {item.tenant.email}
+                                            </h3>
+                                            
+                                            {item.tenant.stores.length > 0 ? (
+                                                <div className="grid gap-3">
+                                                {item.tenant.stores.map((store, index) => (
+                                                    <div key={store.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="bg-gray-900 text-white p-2 rounded-lg">
+                                                            <Store className="w-4 h-4" />
+                                                            </div>
+                                                            <div>
+                                                            <div className="font-medium text-gray-900">Store ID: {store.id}</div>
+                                                            <div className="flex items-center gap-2 text-sm">
+                                                                {store.expiration_access ? (
+                                                                <span className="flex items-center gap-1 text-green-600">
+                                                                    <CheckCircle2 className="w-3 h-3" />
+                                                                    Access Valid
+                                                                </span>
+                                                                ) : (
+                                                                <span className="flex items-center gap-1 text-red-600">
+                                                                    <AlertCircle className="w-3 h-3" />
+                                                                    Access Expired
+                                                                </span>
+                                                                )}
+                                                            </div>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div className='flex gap-2'>
+
+                                                            <button 
+                                                                onClick={() => handleCreateAccessKeyMaintananceTenant(store.id, item)}
+                                                                disabled={loading[`createTesting_${item.tenant.id}`]}
+                                                                className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
+                                                            >
+                                                                <Key className="w-4 h-4" />
+                                                                {loading[`createTesting_${item.tenant.id}`] ? 'Creating...' : 'Create Testing Key'}
+                                                            </button>
+
+                                                            <button 
+                                                                onClick={() => handleCreateAccessKeyStore(store.id, item)}
+                                                                disabled={loading[`createAccess_${store.id}`]}
+                                                                className="flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                                                            >
+                                                                <Key className="w-4 h-4" />
+                                                                {loading[`createAccess_${store.id}`] ? 'Creating...' : 'Create Access Key'}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                                </div>
+                                            ) : (
+                                                <div className="text-center py-8 text-gray-500">
+                                                <Store className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                                                <p>Tidak ada store yang tersedia</p>
+                                                </div>
+                                            )}
+                                            </div>
+                                        </td>
+                                        </tr>
                                     )}
-                                </React.Fragment>
+                                    </React.Fragment>
                                 ))}
-                            </tbody>
+                                </tbody>
                             </table>
+                            </div>
                         </div>
-                        </div>
+
+                        {/* Toast Notifications */}
+                        <ToastPortal> 
+                            <div className='fixed top-8 left-1/2 transform -translate-x-1/2 z-[9999]'>
+                                {toast && (
+                                    <Toast
+                                        message={toast.message}
+                                        type={toast.type}
+                                        onClose={closeToast}
+                                        duration={toast.type === 'success' ? 5000 : 0}
+                                    />
+                                )}
+                            </div>
+                        </ToastPortal>
+
+                        {/* Confirmation Modal */}
+                        <ConfirmationModal
+                            isOpen={confirmModal.isOpen}
+                            onClose={() => setConfirmModal({ isOpen: false })}
+                            onConfirm={confirmModal.onConfirm}
+                            title={confirmModal.title}
+                            message={confirmModal.message}
+                            type={confirmModal.type}
+                        />
+
+                        {/* Access Key Modal */}
+                        <AccessKeyModal
+                            isOpen={accessKeyModal.isOpen}
+                            onClose={() => setAccessKeyModal({ isOpen: false, data: null, accessKey: null })}
+                            data={accessKeyModal.data}
+                            accessKey={accessKeyModal.accessKey}
+                        />
                     </div>
                 </div>
             </div>

@@ -180,3 +180,103 @@ export const createAccountCustomerStoreTestingSlice = createSlice({
         }
     }
 })
+
+const initialSendEmailCredentialPaymentState = {
+    sendEmailCredentialPaymentSuccess: null,
+    sendEmailCredentialPaymentError: null,
+    loadingSendEmailCredentialPayment: false
+}
+export const sendEmailCredentialPaymentSlice = createSlice({
+    name: "sendEmailCredentialPayment",
+    initialState: initialSendEmailCredentialPaymentState,
+    reducers: {
+        setLoadingSendEmailCredentialPayment: (state, action) => {
+            state.loadingSendEmailCredentialPayment = action.payload
+        },
+        setSendEmailCredentialPaymentSuccess: (state, action) => {
+            state.sendEmailCredentialPaymentSuccess = action.payload
+        },
+        setSendEmailCredentialPaymentError: (state, action) => {
+            state.sendEmailCredentialPaymentError = action.payload || null
+        },
+        resetSendEmailCredentialPayment: (state) => {
+            state.sendEmailCredentialPaymentSuccess = null
+            state.sendEmailCredentialPaymentError = null
+        }
+    }
+})
+
+const initialStartChangePaymentGatewayState = {
+    startChangePaymentGatewaySuccess: null,
+    startChangePaymentGatewayError: null,
+    loadingStartChangePaymentGateway: false
+}
+export const startChangePaymentGatewaySlice = createSlice({
+    name: "startChangePaymentGateway",
+    initialState: initialStartChangePaymentGatewayState,
+    reducers: {
+        setLoadingStartChangePaymentGateway: (state, action) => {
+            state.loadingStartChangePaymentGateway = action.payload
+        },
+        setStartChangePaymentGatewaySuccess: (state, action) => {
+            state.startChangePaymentGatewaySuccess = action.payload
+        },
+        setStartChangePaymentGatewayError: (state, action) => {
+            state.startChangePaymentGatewayError = action.payload || null
+        },
+        resetStartChangePaymentGateway: (state) => {
+            state.startChangePaymentGatewaySuccess = null
+            state.startChangePaymentGatewayError = null
+        }
+    }
+})
+
+const initialFinishedChangePaymentGatewayState = {
+    finishedChangePaymentGatewaySuccess: null,
+    finishedChangePaymentGatewayError: null,
+    loadingFinishedChangePaymentGateway: false
+}
+export const finishedChangePaymentGatewaySlice = createSlice({
+    name: "finishedChangePaymentGateway",
+    initialState: initialFinishedChangePaymentGatewayState,
+    reducers: {
+        setLoadingFinishedChangePaymentGateway: (state, action) => {
+            state.loadingFinishedChangePaymentGateway = action.payload
+        },
+        setFinishedChangePaymentGatewaySuccess: (state, action) => {
+            state.finishedChangePaymentGatewaySuccess = action.payload
+        },
+        setFinishedChangePaymentGatewayError: (state, action) => {
+            state.finishedChangePaymentGatewayError = action.payload || null
+        },
+        resetFinishedChangePaymentGateway: (state) => {
+            state.finishedChangePaymentGatewaySuccess = null
+            state.finishedChangePaymentGatewayError = null
+        }
+    }
+})
+
+const initialCheckPendingTransactionState = {
+    checkPendingTransactionSuccess: null,
+    checkPendingTransactionError: null,
+    loadingCheckPendingTransaction: false
+}
+export const checkPendingTransactionSlice = createSlice({
+    name: "checkPendingTransaction",
+    initialState: initialCheckPendingTransactionState,
+    reducers: {
+        setLoadingCheckPendingTransaction: (state, action) => {
+            state.loadingCheckPendingTransaction = action.payload
+        },
+        setCheckPendingTransactionSuccess: (state, action) => {
+            state.checkPendingTransactionSuccess = action.payload
+        },
+        setCheckPendingTransactionError: (state, action) => {
+            state.checkPendingTransactionError = action.payload || null
+        },
+        resetCheckPendingTransaction: (state) => {
+            state.checkPendingTransactionSuccess = null
+            state.checkPendingTransactionError = null
+        }
+    }
+})

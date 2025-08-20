@@ -6,6 +6,10 @@ import {
     deployFinishedSlice,
     deployAppTestingSlice,
     createAccountCustomerStoreTestingSlice,
+    sendEmailCredentialPaymentSlice,
+    startChangePaymentGatewaySlice,
+    finishedChangePaymentGatewaySlice,
+    checkPendingTransactionSlice,
 } from "../reducers/post"
 import {
     loginStatusSlice,
@@ -143,6 +147,74 @@ export const createAccountTestingCustomerStore = (data) => {
             dispatch(setAccountCustomerStoreTestingError(error.response?.data?.error))
         } finally {
             dispatch(setLoadingAccountCustomerStoreTesting(false))
+        }
+    }
+}
+
+const { setSendEmailCredentialPaymentSuccess, setSendEmailCredentialPaymentError, setLoadingSendEmailCredentialPayment } = sendEmailCredentialPaymentSlice.actions
+export const sendEmailRequiredCredentialPayment = (data) => {
+    return async (dispatch) => {
+        dispatch(setLoadingSendEmailCredentialPayment(true))
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_BASE_URL}/tenant/store/deploy/email-required-credentials-payment-gateway`, data, {
+                withCredentials: true
+            })
+            dispatch(setSendEmailCredentialPaymentSuccess(response?.data?.message || 'Email berhasil dikirim'))
+        } catch (error) {
+            dispatch(setSendEmailCredentialPaymentError(error.response?.data?.error || 'Terjadi kesalahan'))
+        } finally {
+            dispatch(setLoadingSendEmailCredentialPayment(false))
+        }
+    }
+}
+
+const { setStartChangePaymentGatewaySuccess, setStartChangePaymentGatewayError, setLoadingStartChangePaymentGateway } = startChangePaymentGatewaySlice.actions
+export const startChangePaymentGatewayTenant = (data) => {
+    return async (dispatch) => {
+        dispatch(setLoadingStartChangePaymentGateway(true))
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_BASE_URL}/tenant/submission/change-payment-gateway/start`, data, {
+                withCredentials: true
+            })
+            dispatch(setStartChangePaymentGatewaySuccess(response?.data?.message || 'Perubahan payment gateway dimulai'))
+        } catch (error) {
+            dispatch(setStartChangePaymentGatewayError(error.response?.data?.error || 'Terjadi kesalahan'))
+        } finally {
+            dispatch(setLoadingStartChangePaymentGateway(false))
+        }
+    }
+}
+
+const { setFinishedChangePaymentGatewaySuccess, setFinishedChangePaymentGatewayError, setLoadingFinishedChangePaymentGateway } = finishedChangePaymentGatewaySlice.actions
+export const finishedChangePaymentGatewayTenant = (data) => {
+    return async (dispatch) => {
+        dispatch(setLoadingFinishedChangePaymentGateway(true))
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_BASE_URL}/tenant/submission/change-payment-gateway/finished`, data, {
+                withCredentials: true
+            })
+            dispatch(setFinishedChangePaymentGatewaySuccess(response?.data?.message || 'Perubahan payment gateway selesai'))
+        } catch (error) {
+            dispatch(setFinishedChangePaymentGatewayError(error.response?.data?.error || 'Terjadi kesalahan'))
+        } finally {
+            dispatch(setLoadingFinishedChangePaymentGateway(false))
+        }
+    }
+}
+
+const { setCheckPendingTransactionSuccess, setCheckPendingTransactionError, setLoadingCheckPendingTransaction } = checkPendingTransactionSlice.actions
+export const checkPendingTransactionPaymentGateway = (data) => {
+    return async (dispatch) => {
+        dispatch(setLoadingCheckPendingTransaction(true))
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_BASE_URL}/transaction/pending/check`, data, {
+                withCredentials: true
+            })
+            dispatch(setCheckPendingTransactionSuccess(response?.data?.message || 'Check pending transaction berhasil'))
+        } catch (error) {
+            dispatch(setCheckPendingTransactionError(error.response?.data?.error || 'Terjadi kesalahan'))
+        } finally {
+            dispatch(setLoadingCheckPendingTransaction(false))
         }
     }
 }

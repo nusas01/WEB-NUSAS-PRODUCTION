@@ -118,3 +118,148 @@ export const accountTestingCustomerStoreSlice = createSlice({
     }
 })
 
+const initialStoreRequiredVerifiedState = {
+    dataStoreRequiredVerified: [],
+    errorStoreRequiredVerified: null,
+    loadingStoreRequiredVerified: false
+}
+export const storeRequiredVerifiedSlice = createSlice({
+    name: "storeRequiredVerified",
+    initialState: initialStoreRequiredVerifiedState,
+    reducers: {
+        setLoadingStoreRequiredVerified: (state, action) => {
+            state.loadingStoreRequiredVerified = action.payload
+        },
+        setStoreRequiredVerifiedData: (state, action) => {
+            state.dataStoreRequiredVerified = action.payload || []
+        },
+        setStoreRequiredVerifiedError: (state, action) => {
+            state.errorStoreRequiredVerified = action.payload || null
+        },
+        resetErrorStoreRequiredVerified: (state) => {
+            state.errorStoreRequiredVerified = null
+        }
+    }
+})
+
+const initialTenantSubmissionChangePaymentState = {
+    dataTenantSubmissionChangePayment: null,
+    errorTenantSubmissionChangePayment: null,
+    loadingTenantSubmissionChangePayment: false
+}
+export const tenantSubmissionChangePaymentSlice = createSlice({
+    name: "tenantSubmissionChangePayment",
+    initialState: initialTenantSubmissionChangePaymentState,
+    reducers: {
+        setLoadingTenantSubmissionChangePayment: (state, action) => {
+            state.loadingTenantSubmissionChangePayment = action.payload
+        },
+        setTenantSubmissionChangePaymentData: (state, action) => {
+            state.dataTenantSubmissionChangePayment = action.payload
+        },
+        setTenantSubmissionChangePaymentError: (state, action) => {
+            state.errorTenantSubmissionChangePayment = action.payload || null
+        },
+        resetErrorTenantSubmissionChangePayment: (state) => {
+            state.errorTenantSubmissionChangePayment = null
+        }
+    }
+})
+
+const initialSendEmailPaymentVerificationState = {
+    successSendEmailPaymentVerification: false,
+    errorSendEmailPaymentVerification: null,
+    loadingSendEmailPaymentVerification: false
+}
+export const sendEmailPaymentVerificationSlice = createSlice({
+    name: "sendEmailPaymentVerification",
+    initialState: initialSendEmailPaymentVerificationState,
+    reducers: {
+        setLoadingSendEmailPaymentVerification: (state, action) => {
+            state.loadingSendEmailPaymentVerification = action.payload
+        },
+        setSendEmailPaymentVerificationData: (state, action) => {
+            state.successSendEmailPaymentVerification = action.payload || false
+        },
+        setSendEmailPaymentVerificationError: (state, action) => {
+            state.errorSendEmailPaymentVerification = action.payload || null
+        },
+        resetSendEmailPaymentVerification: (state) => {
+            state.errorSendEmailPaymentVerification = null
+            state.successSendEmailPaymentVerification = false
+        }
+    }
+})
+
+const initialTransactionPaidState = {
+    dataTransactionPaid: null,
+    errorTransactionPaid: null,
+    loadingTransactionPaid: false
+}
+export const transactionPaidSlice = createSlice({
+    name: "transactionPaid",
+    initialState: initialTransactionPaidState,
+    reducers: {
+        setLoadingTransactionPaid: (state, action) => {
+            state.loadingTransactionPaid = action.payload
+        },
+        setTransactionPaidData: (state, action) => {
+            state.dataTransactionPaid = action.payload
+        },
+        setTransactionPaidError: (state, action) => {
+            state.errorTransactionPaid = action.payload || null
+        },
+        resetErrorTransactionPaid: (state) => {
+            state.errorTransactionPaid = null
+        }
+    }
+})
+
+const initialTransactionPendingState = {
+    dataTransactionPending: null,
+    errorTransactionPending: null,
+    loadingTransactionPending: false
+}
+export const transactionPendingSlice = createSlice({
+    name: "transactionPending",
+    initialState: initialTransactionPendingState,
+    reducers: {
+        setLoadingTransactionPending: (state, action) => {
+            state.loadingTransactionPending = action.payload
+        },
+        setTransactionPendingData: (state, action) => {
+            state.dataTransactionPending = action.payload
+        },
+        setTransactionPendingError: (state, action) => {
+            state.errorTransactionPending = action.payload || null
+        },
+        resetErrorTransactionPending: (state) => {
+            state.errorTransactionPending = null
+        }
+    }
+})
+
+const initialAccessKeyStoreTestingState = {
+    dataAccessKeyStoreTesting: null,
+    errorAccessKeyStoreTesting: null,
+    loadingAccessKeyStoreTesting: false
+}
+export const accessKeyStoreTestingSlice = createSlice({
+    name: "accessKeyStoreTesting",
+    initialState: initialAccessKeyStoreTestingState,
+    reducers: {
+        setLoadingAccessKeyStoreTesting: (state, action) => {
+            state.loadingAccessKeyStoreTesting = action.payload
+        },
+        setAccessKeyStoreTestingData: (state, action) => {
+            state.dataAccessKeyStoreTesting = action.payload
+        },
+        setAccessKeyStoreTestingError: (state, action) => {
+            state.errorAccessKeyStoreTesting = action.payload || null
+        },
+        resetErrorAccessKeyStoreTesting: (state) => {
+            state.errorAccessKeyStoreTesting = null
+        }
+    }
+})
+

@@ -1,6 +1,15 @@
 import React, { useState, useRef } from 'react';
 import { 
-  Key, Copy, Check, X, Eye, EyeOff, Shield, AlertTriangle
+  Key, 
+  Copy, 
+  Check, 
+  X, 
+  Eye, 
+  EyeOff, 
+  Shield, 
+  AlertTriangle,
+  AlertCircle, 
+  CheckCircle2,
 } from 'lucide-react';
 import { useOutsideClick } from './helper';
 
@@ -172,6 +181,72 @@ export const AccessKeyModal = ({
               <Copy className="h-4 w-4" />
               <span>Copy Access Key</span>
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, type = "info" }) => {
+  if (!isOpen) return null;
+
+  const getTypeStyles = () => {
+    switch (type) {
+      case "danger":
+        return {
+          iconBg: "bg-red-100",
+          iconColor: "text-red-600",
+          confirmBg: "bg-red-600 hover:bg-red-700",
+          icon: AlertCircle
+        };
+      case "success":
+        return {
+          iconBg: "bg-green-100", 
+          iconColor: "text-green-600",
+          confirmBg: "bg-green-600 hover:bg-green-700",
+          icon: CheckCircle2
+        };
+      default:
+        return {
+          iconBg: "bg-blue-100",
+          iconColor: "text-blue-600", 
+          confirmBg: "bg-blue-600 hover:bg-blue-700",
+          icon: AlertCircle
+        };
+    }
+  };
+
+  const styles = getTypeStyles();
+  const IconComponent = styles.icon;
+
+  return (
+    <div className="fixed inset-0 z-[999999] overflow-y-auto">
+      <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" />
+      <div className="flex min-h-full items-center justify-center p-4">
+        <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md transform transition-all">
+          <div className="p-6">
+            <div className="flex items-center space-x-3 mb-4">
+              <div className={`p-2 ${styles.iconBg} rounded-lg`}>
+                <IconComponent className={`h-6 w-6 ${styles.iconColor}`} />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+            </div>
+            <p className="text-gray-600 mb-6">{message}</p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={onClose}
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={onConfirm}
+                className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors ${styles.confirmBg}`}
+              >
+                Confirm
+              </button>
+            </div>
           </div>
         </div>
       </div>
