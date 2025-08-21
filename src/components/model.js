@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   AlertCircle, 
   CheckCircle2,
+  CheckCircle,
 } from 'lucide-react';
 import { useOutsideClick } from './helper';
 
@@ -253,3 +254,152 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, 
     </div>
   );
 };
+
+
+export const SuccessModal = ({ isOpen, onClose, transactionId, status }) => {
+  if (!isOpen) return null;
+
+  // Determine status configuration
+  const getStatusConfig = (status) => {
+    switch (status?.toUpperCase()) {
+      case 'PAID':
+        return {
+          bgColor: 'bg-green-100',
+          iconColor: 'text-green-600',
+          buttonColor: 'bg-green-600 hover:bg-green-700 focus:ring-green-500',
+          title: 'Payment Verified Successfully!',
+          message: 'has been successfully verified and marked as PAID.',
+          icon: CheckCircle2
+        };
+      case 'PENDING':
+        return {
+          bgColor: 'bg-yellow-100',
+          iconColor: 'text-yellow-600',
+          buttonColor: 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500',
+          title: 'Transaction Status Updated!',
+          message: 'has been checked and remains in PENDING status.',
+          icon: Clock
+        };
+      default:
+        return {
+          bgColor: 'bg-blue-100',
+          iconColor: 'text-blue-600',
+          buttonColor: 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500',
+          title: 'Transaction Updated!',
+          message: 'has been successfully processed.',
+          icon: CheckCircle2
+        };
+    }
+  };
+
+  const config = getStatusConfig(status);
+  const IconComponent = config.icon;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]">
+      <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 transform transition-all animate-in fade-in duration-200">
+        {/* Close button */}
+        <div className="flex justify-end p-4 pb-0">
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 transition-colors"
+            aria-label="Close modal"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="px-6 pb-6">
+          <div className="flex items-center justify-center mb-4">
+            <div className={`w-16 h-16 ${config.bgColor} rounded-full flex items-center justify-center`}>
+              <IconComponent className={`w-8 h-8 ${config.iconColor}`} />
+            </div>
+          </div>
+          
+          <div className="text-center mb-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              {config.title}
+            </h3>
+            <p className="text-gray-600">
+              Transaction{' '}
+              <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
+                {transactionId}
+              </span>{' '}
+              {config.message}
+            </p>
+            
+            {status && (
+              <div className="mt-3">
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                  status?.toUpperCase() === 'PAID' 
+                    ? 'bg-green-100 text-green-800' 
+                    : status?.toUpperCase() === 'PENDING'
+                    ? 'bg-yellow-100 text-yellow-800'
+                    : 'bg-gray-100 text-gray-800'
+                }`}>
+                  {status?.toUpperCase() === 'PAID' && <CheckCircle className="w-3 h-3 mr-1" />}
+                  {status?.toUpperCase() === 'PENDING' && <Clock className="w-3 h-3 mr-1" />}
+                  Status: {status?.toUpperCase()}
+                </span>
+              </div>
+            )}
+          </div>
+          
+          <div className="flex justify-center space-x-3">
+            <button
+              onClick={onClose}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Close
+            </button>
+            <button
+              onClick={onClose}
+              className={`inline-flex items-center px-6 py-2 border border-transparent rounded-lg text-sm font-medium text-white ${config.buttonColor} transition-colors`}
+            >
+              {status?.toUpperCase() === 'PAID' && <CheckCircle className="w-4 h-4 mr-2" />}
+              {status?.toUpperCase() === 'PENDING' && <Clock className="w-4 h-4 mr-2" />}
+              {!status && <CheckCircle2 className="w-4 h-4 mr-2" />}
+              Continue
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const LoadingSpinner = () => (
+  <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-300 border-t-blue-600"></div>
+);
+
+export const TableLoadingSkeleton = () => (
+  <div className="animate-pulse">
+    {[...Array(5)].map((_, index) => (
+      <div key={index} className="px-6 py-4 border-b border-gray-200">
+        <div className="flex items-center space-x-4">
+          <div className="flex-1 space-y-2">
+            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+          </div>
+          <div className="flex-1 space-y-2">
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+          </div>
+          <div className="flex-1 space-y-2">
+            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+            <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+          </div>
+          <div className="flex-1 space-y-2">
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+          </div>
+          <div className="flex space-x-2">
+            <div className="h-8 bg-gray-200 rounded w-20"></div>
+            <div className="h-8 bg-gray-200 rounded w-10"></div>
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+);

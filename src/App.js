@@ -11,6 +11,7 @@ import LoginComponent from './components/login';
 import { useEffect } from 'react';
 import PaymentGatewayDashboard from './components/submissionChangePaymentGateway'
 import TransactionDashboard from './components/transaction';
+import TransactionSubmissionChangePaymentGatewayDashboard from './components/transactionChangePaymentGateway';
 
 function App() {
   const dispatch = useDispatch()
@@ -30,10 +31,11 @@ function App() {
         <ScrollToTop/>
           <Routes>
             <Route path="/login" element={<LoginComponent/>}/>
-            <Route path="/submission/change/payment/gateway" element={<PaymentGatewayDashboard/>}/>
-            <Route path='/transactions' element={<TransactionDashboard/>}/>
 
             <Route element={<PrivateRoute/>}>
+              <Route path="/submission/change/payment/gateway" element={<PaymentGatewayDashboard/>}/>
+              <Route path='/transactions' element={<TransactionDashboard/>}/>
+              <Route path='/transactions/submission/change/payment/gateway' element={<TransactionSubmissionChangePaymentGatewayDashboard/>}/>
               <Route path='/store/required/deploy' element={<StoreDeploymentDashboard/>}/>
             </Route>
           </Routes>

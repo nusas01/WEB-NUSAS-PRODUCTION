@@ -143,7 +143,7 @@ export const storeRequiredVerifiedSlice = createSlice({
 })
 
 const initialTenantSubmissionChangePaymentState = {
-    dataTenantSubmissionChangePayment: null,
+    dataTenantSubmissionChangePayment: [],
     errorTenantSubmissionChangePayment: null,
     loadingTenantSubmissionChangePayment: false
 }
@@ -155,7 +155,7 @@ export const tenantSubmissionChangePaymentSlice = createSlice({
             state.loadingTenantSubmissionChangePayment = action.payload
         },
         setTenantSubmissionChangePaymentData: (state, action) => {
-            state.dataTenantSubmissionChangePayment = action.payload
+            state.dataTenantSubmissionChangePayment = action.payload || []
         },
         setTenantSubmissionChangePaymentError: (state, action) => {
             state.errorTenantSubmissionChangePayment = action.payload || null
@@ -166,33 +166,8 @@ export const tenantSubmissionChangePaymentSlice = createSlice({
     }
 })
 
-const initialSendEmailPaymentVerificationState = {
-    successSendEmailPaymentVerification: false,
-    errorSendEmailPaymentVerification: null,
-    loadingSendEmailPaymentVerification: false
-}
-export const sendEmailPaymentVerificationSlice = createSlice({
-    name: "sendEmailPaymentVerification",
-    initialState: initialSendEmailPaymentVerificationState,
-    reducers: {
-        setLoadingSendEmailPaymentVerification: (state, action) => {
-            state.loadingSendEmailPaymentVerification = action.payload
-        },
-        setSendEmailPaymentVerificationData: (state, action) => {
-            state.successSendEmailPaymentVerification = action.payload || false
-        },
-        setSendEmailPaymentVerificationError: (state, action) => {
-            state.errorSendEmailPaymentVerification = action.payload || null
-        },
-        resetSendEmailPaymentVerification: (state) => {
-            state.errorSendEmailPaymentVerification = null
-            state.successSendEmailPaymentVerification = false
-        }
-    }
-})
-
 const initialTransactionPaidState = {
-    dataTransactionPaid: null,
+    dataTransactionPaid: [],
     errorTransactionPaid: null,
     loadingTransactionPaid: false
 }
@@ -204,7 +179,7 @@ export const transactionPaidSlice = createSlice({
             state.loadingTransactionPaid = action.payload
         },
         setTransactionPaidData: (state, action) => {
-            state.dataTransactionPaid = action.payload
+            state.dataTransactionPaid = action.payload || []
         },
         setTransactionPaidError: (state, action) => {
             state.errorTransactionPaid = action.payload || null
@@ -235,7 +210,15 @@ export const transactionPendingSlice = createSlice({
         },
         resetErrorTransactionPending: (state) => {
             state.errorTransactionPending = null
-        }
+        },
+        deleteTransactionPendingById: (state, action) => {
+            const id = action.payload
+            if (Array.isArray(state.dataTransactionPending)) {
+                state.dataTransactionPending = state.dataTransactionPending.filter(
+                    item => item.id !== id
+                )
+            }
+        },
     }
 })
 
@@ -259,7 +242,68 @@ export const accessKeyStoreTestingSlice = createSlice({
         },
         resetErrorAccessKeyStoreTesting: (state) => {
             state.errorAccessKeyStoreTesting = null
+        },
+        resetAccessKeyStoreTesting: (state) => {
+            state.dataAccessKeyStoreTesting = null
+        },
+    }
+})
+
+
+const initialTransactionSubmissionPaidState = {
+    dataTransactionSubmissionPaid: [],
+    errorTransactionSubmissionPaid: null,
+    loadingTransactionSubmissionPaid: false
+}
+export const transactionSubmissionPaidSlice = createSlice({
+    name: "transactionPaidSubmission",
+    initialState: initialTransactionSubmissionPaidState,
+    reducers: {
+        setLoadingTransactionSubmissionPaid: (state, action) => {
+            state.loadingTransactionSubmissionPaid = action.payload
+        },
+        setTransctionSubmissionPaidData: (state, action) => {
+            state.dataTransactionSubmissionPaid = action.payload || []
+        },
+        setTransctionSubmissionPaidError: (state, action) => {
+            state.errorTransactionSubmissionPaid = action.payload || null
+        },
+        resetErrorTransctionSubmissionPaid: (state) => {
+            state.errorTransactionSubmissionPaid = null
+        },
+    }
+})
+
+const initialTransctionSubmissionPendingState = {
+    dataTransctionSubmissionPending: [],
+    errorTransctionSubmissionPending: null,
+    loadingTransctionSubmissionPending: false
+}
+export const transactionSubmissionPendingSlice = createSlice({
+    name: "transactionSubmissionPending",
+    initialState: initialTransctionSubmissionPendingState,
+    reducers: {
+        setLoadingTransactionSubmissionPending: (state, action) => {
+            state.loadingTransctionSubmissionPending = action.payload
+        },
+        setTransctionSubmissionPendingData: (state, action) => {
+            state.dataTransctionSubmissionPending = action.payload || []
+        },
+        setTransctionSubmissionPendingError: (state, action) => {
+            state.errorTransctionSubmissionPending = action.payload || null
+        },
+        resetErrorTransctionSubmissionPending: (state) => {
+            state.errorTransctionSubmissionPending = null
+        },
+        deleteTransactionSubmissionPendingById: (state, action) => {
+            const id = action.payload
+            if (Array.isArray(state.dataTransctionSubmissionPending)) {
+                state.dataTransctionSubmissionPending = state.dataTransctionSubmissionPending.filter(
+                    item => item.id !== id
+                )
+            }
         }
     }
 })
+
 

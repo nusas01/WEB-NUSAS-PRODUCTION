@@ -33,18 +33,18 @@ import {
     ToastPortal,
 } from './alert';
 import {
-    transactionPaidSlice,
-    transactionPendingSlice,
+    transactionSubmissionPaidSlice,
+    transactionSubmissionPendingSlice,
 } from '../reducers/get'
 import {
-    fetchTransactionPaid,
-    fetchTransactionPending,
+    fetchTransactionSubmissionPaid,
+    fetchTransactionSubmissionPending,
 } from '../actions/get'
 import {
-    checkPendingTransactionSlice
+    checkPendingSubmissionTransactionSlice
 } from '../reducers/post'
 import {
-    checkPendingTransactionPaymentGateway,
+    checkPendingTransactionSubmissionPaymentGateway,
 } from '../actions/post'
 import { 
     SuccessModal,
@@ -52,7 +52,7 @@ import {
     TableLoadingSkeleton,
 } from './model';
 
-const TransactionDashboard = () => {
+const TransactionSubmissionChangePaymentGatewayDashboard = () => {
     const dispatch = useDispatch()
     const { setIsOpen } = navbarSlice.actions
     const { isOpen, isMobileDeviceType } = useSelector((state) => state.persisted.navbar)
@@ -61,69 +61,68 @@ const TransactionDashboard = () => {
     const { ref: headerRef, height: headerHeight } = useElementHeight();
 
     // Sample data untuk PAID transactions
-    const {resetErrorTransctionPaid} = transactionPaidSlice.actions
+    const {resetErrorTransctionSubmissionPaid} = transactionSubmissionPaidSlice.actions
     const {
-        dataTransctionPaid: paidTransactions,
-        errorTransctionPaid,
-        loadingTransctionPaid,
-    } = useSelector((state) => state.persisted.transactionPaid)
+        dataTransactionSubmissionPaid: paidTransactions,
+        errorTransactionSubmissionPaid,
+        loadingTransactionSubmissionPaid,
+    } = useSelector((state) => state.persisted.transactionSubmissionPaid)
 
     useEffect(() => {
-        if (errorTransctionPaid) {
+        if (errorTransactionSubmissionPaid) {
             setError({
                 type: 'error',
-                message: errorTransctionPaid,
+                message: errorTransactionSubmissionPaid,
             })
         }
-    }, [errorTransctionPaid])
+    }, [errorTransactionSubmissionPaid])
 
 
     // Sample data untuk PENDING transactions
-    const {resetErrorTransctionPending} = transactionPendingSlice.actions
+    const {resetErrorTransctionSubmissionPending} = transactionSubmissionPendingSlice.actions
     const {
-        dataTransctionPending: pendingTransactions,
-        errorTransctionPending,
-        loadingTransctionPending,
-    } = useSelector((state) => state.persisted.transactionPending)
+        dataTransctionSubmissionPending: pendingTransactions,
+        errorTransctionSubmissionPending,
+        loadingTransctionSubmissionPending,
+    } = useSelector((state) => state.persisted.transactionSubmissionPending)
 
     useEffect(() => {
-        if (errorTransctionPending) {
+        if (errorTransctionSubmissionPending) {
             setError({
                 type: 'error',
-                message: errorTransctionPending,
+                message: errorTransctionSubmissionPending,
             })
         }
-    }, [errorTransctionPending])
+    }, [errorTransctionSubmissionPending])
 
 
     // handle checkPendingTransactionPaymentGateway
     const [modelSuccessCheckTransaction, setModelSuccessCheckTransaction] = useState(false);
-    const {resetCheckPendingTransaction} = checkPendingTransactionSlice.actions
+    const {resetCheckPendingSubmissionTransaction} = checkPendingSubmissionTransactionSlice.actions
     const {
-        checkPendingTransactionSuccess,
-        checkPendingTransactionError,
-        loadingCheckPendingTransaction,
-    } = useSelector((state) => state.persisted.checkPendingTransaction)
+        checkPendingSubmissionTransactionSuccess,
+        checkPendingSubmissionTransactionError,
+        loadingCheckPendingSubmissionTransaction,
+    } = useSelector((state) => state.persisted.checkPendingSubmissionTransactionState)
 
     useEffect(() => {
-        if (checkPendingTransactionSuccess) {
+        if (checkPendingSubmissionTransactionSuccess) {
             setModelSuccessCheckTransaction(true);
         }
-    }, [checkPendingTransactionSuccess])
+    }, [checkPendingSubmissionTransactionSuccess])
 
     useEffect(() => {
-        if (checkPendingTransactionError) {
+        if (checkPendingSubmissionTransactionError) {
             setError({
                 type: 'error',
-                message: checkPendingTransactionError,
+                message: checkPendingSubmissionTransactionError,
             })
         }
-    }, [checkPendingTransactionError])
+    }, [checkPendingSubmissionTransactionError])
 
     const handleCheckPayment = (transaction) => {
-        dispatch(checkPendingTransactionPaymentGateway({
+        dispatch(checkPendingTransactionSubmissionPaymentGateway({
             transaction_id: transaction.id,
-            tenant_id: transaction.tenant_id,
             store_id: transaction.store_tenant_id,
         }))
     }    
@@ -135,11 +134,11 @@ const TransactionDashboard = () => {
 
     useEffect(() => {
         if (activeTab === 'pending' && pendingTransactions.length === 0) {
-            dispatch(fetchTransactionPending())
+            dispatch(fetchTransactionSubmissionPending())
         }
 
         if (activeTab === 'paid' && paidTransactions.length === 0) {
-            dispatch(fetchTransactionPaid())
+            dispatch(fetchTransactionSubmissionPaid())
         }
     }, [activeTab])
 
@@ -176,14 +175,14 @@ const TransactionDashboard = () => {
             <SuccessModal
                 isOpen={modelSuccessCheckTransaction}
                 onClose={() => setModelSuccessCheckTransaction(false)}
-                transactionId={checkPendingTransactionSuccess?.transaction_id}
-                status={checkPendingTransactionSuccess?.status}
+                transactionId={checkPendingSubmissionTransactionSuccess?.transaction_id}
+                status={checkPendingSubmissionTransactionSuccess?.status}
             />
 
             {((isMobileDeviceType && isOpen) || !isMobileDeviceType) && (
                 <div className='w-1/10 z-50 min-w-[290px]'>
                 <Sidebar
-                activeMenu={"Transactions"}
+                activeMenu={"Transactions Change Payment Gateway"}
                 />
                 </div>
             )}
@@ -198,9 +197,9 @@ const TransactionDashboard = () => {
                             type={error.type} 
                             onClose={() => { 
                                 setError(null)
-                                dispatch(resetErrorTransctionPaid())
-                                dispatch(resetErrorTransctionPending())
-                                dispatch(resetCheckPendingTransaction())
+                                dispatch(resetErrorTransctionSubmissionPaid())
+                                dispatch(resetErrorTransctionSubmissionPending())
+                                dispatch(resetCheckPendingSubmissionTransaction())
                             }} 
                             duration={0}
                             />
@@ -226,8 +225,8 @@ const TransactionDashboard = () => {
                                             <Hourglass className="w-5 h-5 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white" />
                                         </div>
                                         <div className="min-w-0 flex-1">
-                                            <h1 className="text-sm sm:text-base lg:text-lg xl:text-xl font-bold text-gray-800 truncate">Transactions</h1>
-                                            <p className='text-xs taxt-gray-400'>List of transactions tenant</p>
+                                            <h1 className="text-sm sm:text-base lg:text-lg xl:text-xl font-bold text-gray-800 truncate">Transactions Submission Change Payment Gateway</h1>
+                                            <p className='text-xs taxt-gray-400'>List of transactions Submission Change Payment Gateway</p>
                                         </div>
                                     </div>
                                 )}
@@ -360,7 +359,7 @@ const TransactionDashboard = () => {
                             <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                                 <Clock className="w-5 h-5 text-yellow-500" />
                                 Pending Transactions
-                                {loadingTransctionPending && (
+                                {loadingTransctionSubmissionPending && (
                                 <LoadingSpinner />
                                 )}
                             </h2>
@@ -378,7 +377,7 @@ const TransactionDashboard = () => {
                                 </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200">
-                                {loadingTransctionPending ? (
+                                {loadingTransctionSubmissionPending ? (
                                     <tr>
                                     <td colSpan="5" className="p-0">
                                         <TableLoadingSkeleton />
@@ -455,17 +454,17 @@ const TransactionDashboard = () => {
                                         <td className="px-6 py-4">
                                         <div className="flex gap-2">
                                             <button 
-                                            disabled={loadingCheckPendingTransaction}
+                                            disabled={loadingCheckPendingSubmissionTransaction}
                                             onClick={() => handleCheckPayment(transaction)}
                                             className="inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors shadow-md hover:shadow-lg"
                                             >
-                                            {loadingCheckPendingTransaction ? <LoadingSpinner /> : <RefreshCw className="w-4 h-4 mr-2" />}
-                                            {loadingCheckPendingTransaction ? 'Checking...' : 'Check Payment'}
+                                            {loadingCheckPendingSubmissionTransaction ? <LoadingSpinner /> : <RefreshCw className="w-4 h-4 mr-2" />}
+                                            {loadingCheckPendingSubmissionTransaction ? 'Checking...' : 'Check Payment'}
                                             </button>
                                             <button 
                                             onClick={() => alert(`Viewing details for ${transaction.id}`)}
                                             className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                                            disabled={loadingTransctionPending}
+                                            disabled={loadingTransctionSubmissionPending}
                                             >
                                             <Eye className="w-4 h-4" />
                                             </button>
@@ -478,7 +477,7 @@ const TransactionDashboard = () => {
                             </table>
                             </div>
                             
-                            {!loadingTransctionPending && filteredPendingTransactions.length === 0 && (
+                            {!loadingTransctionSubmissionPending && filteredPendingTransactions.length === 0 && (
                             <div className="text-center py-8">
                                 <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                                 <p className="text-gray-500">No pending transactions found</p>
@@ -494,7 +493,7 @@ const TransactionDashboard = () => {
                             <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                                 <CheckCircle className="w-5 h-5 text-green-500" />
                                 Paid Transactions
-                                {loadingTransctionPaid && (
+                                {loadingTransactionSubmissionPaid && (
                                 <LoadingSpinner />
                                 )}
                             </h2>
@@ -513,7 +512,7 @@ const TransactionDashboard = () => {
                                 </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200">
-                                {loadingTransctionPaid ? (
+                                {loadingTransactionSubmissionPaid ? (
                                     <tr>
                                     <td colSpan="6" className="p-0">
                                         <TableLoadingSkeleton />
@@ -575,7 +574,7 @@ const TransactionDashboard = () => {
                                             <button 
                                             onClick={() => alert(`Opening Xendit transaction: ${transaction.xendit_transaction_id}`)}
                                             className="text-gray-500 hover:text-gray-700 transition-colors"
-                                            disabled={loadingTransctionPaid}
+                                            disabled={loadingTransactionSubmissionPaid}
                                             >
                                             <ExternalLink className="w-4 h-4" />
                                             </button>
@@ -586,7 +585,7 @@ const TransactionDashboard = () => {
                                         <button 
                                             onClick={() => alert(`Viewing details for ${transaction.id}`)}
                                             className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed transition-colors"
-                                            disabled={loadingTransctionPaid}
+                                            disabled={loadingTransactionSubmissionPaid}
                                         >
                                             <Eye className="w-4 h-4 mr-2" />
                                             View Details
@@ -599,7 +598,7 @@ const TransactionDashboard = () => {
                             </table>
                             </div>
                             
-                            {!loadingTransctionPaid && filteredPaidTransactions.length === 0 && (
+                            {!loadingTransactionSubmissionPaid && filteredPaidTransactions.length === 0 && (
                             <div className="text-center py-8">
                                 <CheckCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                                 <p className="text-gray-500">No paid transactions found</p>
@@ -688,4 +687,4 @@ const TransactionDashboard = () => {
     );
 };
 
-export default TransactionDashboard;
+export default TransactionSubmissionChangePaymentGatewayDashboard;

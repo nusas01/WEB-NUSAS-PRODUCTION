@@ -12,7 +12,11 @@ import {
     accountTestingCustomerStoreSlice,
     accessKeyStoreTestingSlice,
     storeRequiredVerifiedSlice,
-    sendEmailPaymentVerificationSlice,
+    tenantSubmissionChangePaymentSlice,
+    transactionPendingSlice, 
+    transactionPaidSlice, 
+    transactionSubmissionPendingSlice,
+    transactionSubmissionPaidSlice,
 } from './get'
 import {
     loginSlice,
@@ -23,6 +27,9 @@ import {
     createAccountCustomerStoreTestingSlice,
     startChangePaymentGatewaySlice,
     finishedChangePaymentGatewaySlice,
+    sendEmailUpdateChangePaymentGatewaySlice,
+    checkPendingTransactionSlice,
+    checkPendingSubmissionTransactionSlice,
 } from './post'
 
 // 1. Reducer yang dipersist
@@ -32,7 +39,11 @@ const persistedReducers = combineReducers({
   storesVerification: storesVerificationSlice.reducer,
   accountTestingCustomerStore: accountTestingCustomerStoreSlice.reducer,
   storeRequiredVerified: storeRequiredVerifiedSlice.reducer,
-
+  tenantSubmissionChangePayment: tenantSubmissionChangePaymentSlice.reducer,
+  transactionPaid: transactionPaidSlice.reducer,
+  transactionPending: transactionPendingSlice.reducer,
+  transactionSubmissionPending: transactionSubmissionPendingSlice.reducer,
+  transactionSubmissionPaid: transactionSubmissionPaidSlice.reducer,
 })
 
 // 2. Konfigurasi persist
@@ -54,7 +65,9 @@ const nonPersistedReducers = {
   accessKeyStoreTestingState: accessKeyStoreTestingSlice.reducer,
   startChangePaymentGatewayState: startChangePaymentGatewaySlice.reducer,
   finishedChangePaymentGatewayState: finishedChangePaymentGatewaySlice.reducer,
-  sendEmailPaymentVerificationState: sendEmailPaymentVerificationSlice.reducer,
+  sendEmailUpdateChangePaymentGatewayState: sendEmailUpdateChangePaymentGatewaySlice.reducer,
+  checkPendingTransactionState: checkPendingTransactionSlice.reducer,
+  checkPendingSubmissionTransactionState: checkPendingSubmissionTransactionSlice.reducer,
 }
 
 const rootReducer = combineReducers({

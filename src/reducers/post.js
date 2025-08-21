@@ -181,27 +181,27 @@ export const createAccountCustomerStoreTestingSlice = createSlice({
     }
 })
 
-const initialSendEmailCredentialPaymentState = {
-    sendEmailCredentialPaymentSuccess: null,
-    sendEmailCredentialPaymentError: null,
-    loadingSendEmailCredentialPayment: false
+const initialSendEmailUpdateChangePaymentGatewayState = {
+    sendEmailUpdateChangePaymentGatewaySuccess: null,
+    sendEmailUpdateChangePaymentGatewayError: null,
+    loadingSendEmailUpdateChangePaymentGateway: false
 }
-export const sendEmailCredentialPaymentSlice = createSlice({
-    name: "sendEmailCredentialPayment",
-    initialState: initialSendEmailCredentialPaymentState,
+export const sendEmailUpdateChangePaymentGatewaySlice = createSlice({
+    name: "sendEmailUpdateChangePaymentGateway",
+    initialState: initialSendEmailUpdateChangePaymentGatewayState,
     reducers: {
-        setLoadingSendEmailCredentialPayment: (state, action) => {
-            state.loadingSendEmailCredentialPayment = action.payload
+        setLoadingSendEmailUpdateChangePaymentGateway: (state, action) => {
+            state.loadingSendEmailUpdateChangePaymentGateway = action.payload
         },
-        setSendEmailCredentialPaymentSuccess: (state, action) => {
-            state.sendEmailCredentialPaymentSuccess = action.payload
+        setSendEmailUpdateChangePaymentGatewaySuccess: (state, action) => {
+            state.sendEmailUpdateChangePaymentGatewaySuccess = action.payload
         },
-        setSendEmailCredentialPaymentError: (state, action) => {
-            state.sendEmailCredentialPaymentError = action.payload || null
+        setSendEmailUpdateChangePaymentGatewayError: (state, action) => {
+            state.sendEmailUpdateChangePaymentGatewayError = action.payload || null
         },
-        resetSendEmailCredentialPayment: (state) => {
-            state.sendEmailCredentialPaymentSuccess = null
-            state.sendEmailCredentialPaymentError = null
+        resetSendEmailUpdateChangePaymentGateway: (state) => {
+            state.sendEmailUpdateChangePaymentGatewaySuccess = null
+            state.sendEmailUpdateChangePaymentGatewayError = null
         }
     }
 })
@@ -277,6 +277,32 @@ export const checkPendingTransactionSlice = createSlice({
         resetCheckPendingTransaction: (state) => {
             state.checkPendingTransactionSuccess = null
             state.checkPendingTransactionError = null
+        }
+    }
+})
+
+
+const initialCheckSubmissionPendingTransactionState = {
+    checkPendingSubmissionTransactionSuccess: null,
+    checkPendingSubmissionTransactionError: null,
+    loadingCheckPendingSubmissionTransaction: false
+}
+export const checkPendingSubmissionTransactionSlice = createSlice({
+    name: "checkPendingSubmissionTransaction",
+    initialState: initialCheckSubmissionPendingTransactionState,
+    reducers: {
+        setLoadingCheckPendingSubmissionTransaction: (state, action) => {
+            state.loadingCheckPendingSubmissionTransaction = action.payload
+        },
+        setCheckPendingSubmissionTransactionSuccess: (state, action) => {
+            state.checkPendingSubmissionTransactionSuccess = action.payload
+        },
+        setCheckPendingSubmissionTransactionError: (state, action) => {
+            state.checkPendingSubmissionTransactionError = action.payload || null
+        },
+        resetCheckPendingSubmissionTransaction: (state) => {
+            state.checkPendingSubmissionTransactionSuccess = null
+            state.checkPendingSubmissionTransactionError = null
         }
     }
 })

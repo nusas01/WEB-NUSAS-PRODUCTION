@@ -7,10 +7,11 @@ import {
     accountTestingCustomerStoreSlice,
     storeRequiredVerifiedSlice,
     tenantSubmissionChangePaymentSlice,
-    sendEmailPaymentVerificationSlice,
     transactionPaidSlice,
     transactionPendingSlice,
     accessKeyStoreTestingSlice,
+    transactionSubmissionPaidSlice,
+    transactionSubmissionPendingSlice,
 } from '../reducers/get'
 
 const {setLoginStatus} = loginStatusSlice.actions
@@ -106,7 +107,7 @@ export const getAllStoreRequiredVerified = () => {
     return async (dispatch) => {
         dispatch(setLoadingStoreRequiredVerified(true))
         try {
-            const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/tenant/stores/deploy/verification-required`, {
+            const response = await axios.get(`${process.env.REACT_APP_GET_ALL_STORE_REQUIRED_VERIFIED}`, {
                 withCredentials: true
             })
             dispatch(setStoreRequiredVerifiedData(response?.data))
@@ -123,7 +124,7 @@ export const getTenantSubmissionChangePaymentGateway = () => {
     return async (dispatch) => {
         dispatch(setLoadingTenantSubmissionChangePayment(true))
         try {
-            const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/tenant/submission/change-payment-gateway`, {
+            const response = await axios.get(`${process.env.REACT_APP_GET_TENANT_SUBMISSION_CHANGE_PAYMENT_GATEWAY}`, {
                 withCredentials: true
             })
             dispatch(setTenantSubmissionChangePaymentData(response?.data))
@@ -135,32 +136,12 @@ export const getTenantSubmissionChangePaymentGateway = () => {
     }
 }
 
-const { setSendEmailPaymentVerificationData, setSendEmailPaymentVerificationError, setLoadingSendEmailPaymentVerification } = sendEmailPaymentVerificationSlice.actions
-export const sendEmailRequiredCredentialPaymentGateway = (email) => {
-    return async (dispatch) => {
-        dispatch(setLoadingSendEmailPaymentVerification(true))
-        try {
-            const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/tenant/store/send/email/payment-verification-requried`, {
-                withCredentials: true,
-                params: {
-                    email: email,
-                }
-            })
-            dispatch(setSendEmailPaymentVerificationData(response?.data))
-        } catch (error) {
-            dispatch(setSendEmailPaymentVerificationError(error.response?.data?.error || 'Terjadi kesalahan'))
-        } finally {
-            dispatch(setLoadingSendEmailPaymentVerification(false))
-        }
-    }
-}
-
 const { setTransactionPaidData, setTransactionPaidError, setLoadingTransactionPaid } = transactionPaidSlice.actions
-export const getAllTransactionPaid = () => {
+export const fetchTransactionPaid = () => {
     return async (dispatch) => {
         dispatch(setLoadingTransactionPaid(true))
         try {
-            const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/transaction/paid`, {
+            const response = await axios.get(`${process.env.REACT_APP_GET_ALL_TRANSACTION_PAID}`, {
                 withCredentials: true
             })
             dispatch(setTransactionPaidData(response?.data))
@@ -173,11 +154,11 @@ export const getAllTransactionPaid = () => {
 }
 
 const { setTransactionPendingData, setTransactionPendingError, setLoadingTransactionPending } = transactionPendingSlice.actions
-export const getAllTransactionPending = () => {
+export const fetchTransactionPending = () => {
     return async (dispatch) => {
         dispatch(setLoadingTransactionPending(true))
         try {
-            const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/transaction/pending`, {
+            const response = await axios.get(`${process.env.REACT_APP_GET_ALL_TRANSACTION_PENDING}`, {
                 withCredentials: true
             })
             dispatch(setTransactionPendingData(response?.data))
@@ -194,7 +175,7 @@ export const createAccessKeyMaintananceTenant = (tenant_id, store_id) => {
     return async (dispatch) => {
         dispatch(setLoadingAccessKeyStoreTesting(true))
         try {
-            const response = await axios.get(`${process.env.REACT_APP_BASE_URL}/create/access/key/store/testing`, {
+            const response = await axios.get(`${process.env.REACT_APP_CREATE_ACCESS_KEY_STORE}`, {
                 withCredentials: true,
                 params: {
                     tenant_id: tenant_id,
@@ -209,3 +190,38 @@ export const createAccessKeyMaintananceTenant = (tenant_id, store_id) => {
         }
     }
 }
+
+const { setTransctionSubmissionPaidData, setTransctionSubmissionPaidError, setLoadingTransactionSubmissionPaid } = transactionSubmissionPaidSlice.actions
+export const fetchTransactionSubmissionPaid = () => {
+    return async (dispatch) => {
+        dispatch(setLoadingTransactionSubmissionPaid(true))
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_GET_ALL_TRANSACTION_SUBMISSION_PAID}`, {
+                withCredentials: true,
+            })
+            dispatch(setTransctionSubmissionPaidData(response?.data))
+        } catch (error) {
+            dispatch(setTransctionSubmissionPaidError(error.response?.data?.error || 'Terjadi kesalahan'))
+        } finally {
+            dispatch(setLoadingTransactionSubmissionPaid(false))
+        }
+    }
+}
+
+const { setTransctionSubmissionPendingData, setTransctionSubmissionPendingError, setLoadingTransactionSubmissionPending } = transactionSubmissionPendingSlice.actions
+export const fetchTransactionSubmissionPending = () => {
+    return async (dispatch) => {
+        dispatch(setLoadingTransactionSubmissionPending(true))
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_GET_ALL_TRANSACTION_SUBMISSION_PENDING}`, {
+                withCredentials: true,
+            })
+            dispatch(setTransctionSubmissionPendingData(response?.data))
+        } catch (error) {
+            dispatch(setTransctionSubmissionPendingError(error.response?.data?.error || 'Terjadi kesalahan'))
+        } finally {
+            dispatch(setLoadingTransactionSubmissionPending(false))
+        }
+    }
+}
+

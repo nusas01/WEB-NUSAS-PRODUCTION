@@ -25,7 +25,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     navbarSlice
 } from '../reducers/reducers'
-import { useElementHeight } from './helper';
+import { 
+    useElementHeight,
+    formatDate,
+} from './helper';
 import Sidebar from './sidebar';
 import {
     Toast, 
@@ -39,23 +42,23 @@ import {
     deployAppTestingSlice,
     startChangePaymentGatewaySlice,
     finishedChangePaymentGatewaySlice,
+    sendEmailUpdateChangePaymentGatewaySlice,
 } from '../reducers/post'
 import {
     deployAppTesting,
     startChangePaymentGatewayTenant,
     finishedChangePaymentGatewayTenant,
+    sendEmailUpdateChangePaymentGateway,
 } from '../actions/post'
 import {
-    storeRequiredVerifiedSlice,
     accessKeyStoreTestingSlice,
     accessKeySlice,
-    sendEmailPaymentVerificationSlice,
+    tenantSubmissionChangePaymentSlice,
 } from '../reducers/get'
 import {
-    getAllStoreRequiredVerified,
     createAccessKeyMaintananceTenant,
     createAccessKeyStore,
-    sendEmailRequiredCredentialPaymentGateway,
+    getTenantSubmissionChangePaymentGateway,
 } from '../actions/get'
 import { useEffect } from 'react';
 
@@ -65,65 +68,110 @@ const PaymentGatewayDashboard = () => {
     const [toast, setToast] = useState(null);
     const [confirmModal, setConfirmModal] = useState({ isOpen: false });
     const [accessKeyModal, setAccessKeyModal] = useState({ isOpen: false, data: null, accessKey: null });
+    const [loading, setLoading] = useState({});
 
     const { setIsOpen } = navbarSlice.actions
     const { isOpen, isMobileDeviceType } = useSelector((state) => state.persisted?.navbar || {})
 
     const { ref: headerRef, height: headerHeight } = useElementHeight();
   
-    
-    // Mock state management (replace with actual Redux selectors)
-    const [storeData, setStoreData] = useState([]);
-    const [loading, setLoading] = useState({});
+    // Toast helper functions
+    const showToast = (message, type) => {
+        setToast({ message, type, id: Date.now() });
+    };
 
+    const closeToast = () => {
+        setToast(null);
+    };
+
+
+    // Mock state management (replace with actual Redux selectors)
+    const {resetErrorTenantSubmissionChangePayment} = tenantSubmissionChangePaymentSlice.actions
+    const {
+        dataTenantSubmissionChangePayment: storeData,
+        errorTenantSubmissionChangePayment, 
+        loadingTenantSubmissionChangePayment,
+    } = useSelector((state) => state.persisted.tenantSubmissionChangePayment)
+
+    useEffect(() => {
+        if (storeData.length === 0) {
+            dispatch(getTenantSubmissionChangePaymentGateway());
+        }
+    }, [])
+
+    useEffect(() => {
+        setLoading({ ...loading, getAllStore: loadingTenantSubmissionChangePayment });
+    }, [loadingTenantSubmissionChangePayment])
+
+    useEffect(() => {
+        if (errorTenantSubmissionChangePayment) {
+            showToast(errorTenantSubmissionChangePayment, 'error');
+            dispatch(resetErrorTenantSubmissionChangePayment())
+        }
+    }, [errorTenantSubmissionChangePayment])
+
+    // const handleGetAllStoreRequiredVerified = async () => {
+    //     if (storeData.length > 0) return; // Don't fetch if data already exists
+
+    //     setLoading({ ...loading, getAllStore: true });
+    //     try {
+    //     const response = await mockApiCall('getAllStoreRequiredVerified', sampleData);
+    //     setStoreData(response.data);
+    //     } catch (error) {
+    //     showToast(error.message, 'error');
+    //     } finally {
+    //     setLoading({ ...loading, getAllStore: false });
+    //     }
+    // };
+    
     // Sample data
-    const sampleData = [
-        {
-        id: "req_001",
-        status: "PROCESS",
-        created_at: "2025-01-15T10:30:00Z",
-        maintenance_time: "2025-01-20T02:00:00Z",
-        business_id: "BIZ_12345",
-        api_key: "ak_test_123456789",
-        secret_key_webhook: "sk_webhook_987654321",
-        tenant: {
-            id: "tenant_001",
-            email: "merchant@example.com",
-            phone_number: "+628123456789",
-            stores: [
-            { id: "store_001", expiration_access: true },
-            { id: "store_002", expiration_access: false }
-            ]
-        },
-        transaction: {
-            id: "txn_001",
-            status: "PAID",
-            xendit_transaction_id: "xendit_12345"
-        }
-        },
-        {
-        id: "req_002",
-        status: "PROCESS",
-        created_at: "2025-01-16T14:20:00Z",
-        maintenance_time: "2025-01-21T03:00:00Z",
-        business_id: "",
-        api_key: "",
-        secret_key_webhook: "",
-        tenant: {
-            id: "tenant_002",
-            email: "shop@example.com",
-            phone_number: "+628987654321",
-            stores: [
-            { id: "store_003", expiration_access: true }
-            ]
-        },
-        transaction: {
-            id: "txn_002",
-            status: "PAID",
-            xendit_transaction_id: "xendit_67890"
-        }
-        }
-    ];
+    // const sampleData = [
+    //     {
+    //     id: "req_001",
+    //     status: "PROCESS",
+    //     created_at: "2025-01-15T10:30:00Z",
+    //     maintenance_time: "2025-01-20T02:00:00Z",
+    //     business_id: "BIZ_12345",
+    //     api_key: "ak_test_123456789",
+    //     secret_key_webhook: "sk_webhook_987654321",
+    //     tenant: {
+    //         id: "tenant_001",
+    //         email: "merchant@example.com",
+    //         phone_number: "+628123456789",
+    //         stores: [
+    //         { id: "store_001", expiration_access: true },
+    //         { id: "store_002", expiration_access: false }
+    //         ]
+    //     },
+    //     transaction: {
+    //         id: "txn_001",
+    //         status: "PAID",
+    //         xendit_transaction_id: "xendit_12345"
+    //     }
+    //     },
+    //     {
+    //     id: "req_002",
+    //     status: "PROCESS",
+    //     created_at: "2025-01-16T14:20:00Z",
+    //     maintenance_time: "2025-01-21T03:00:00Z",
+    //     business_id: "",
+    //     api_key: "",
+    //     secret_key_webhook: "",
+    //     tenant: {
+    //         id: "tenant_002",
+    //         email: "shop@example.com",
+    //         phone_number: "+628987654321",
+    //         stores: [
+    //         { id: "store_003", expiration_access: true }
+    //         ]
+    //     },
+    //     transaction: {
+    //         id: "txn_002",
+    //         status: "PAID",
+    //         xendit_transaction_id: "xendit_67890"
+    //     }
+    //     }
+    // ];
 
     // Mock API functions (replace with actual API calls)
     const mockApiCall = (action, data = null, shouldFail = false) => {
@@ -142,133 +190,219 @@ const PaymentGatewayDashboard = () => {
         });
     };
 
-    // Toast helper functions
-    const showToast = (message, type) => {
-        setToast({ message, type, id: Date.now() });
-    };
+    // handle create access key for maintenance tenant
+    const [itemCreateAccessKey, setItemCreateAccessKey] = useState(null);
+    const [storeIdCreateAccessKey, setStoreIdCreateAccessKey] = useState(null);
+    const { resetErrorAccessKeyStoreTesting, resetAccessKeyStoreTesting } = accessKeyStoreTestingSlice.actions
+    const { 
+        dataAccessKeyStoreTesting,
+        errorAccessKeyStoreTesting,
+        loadingAccessKeyStoreTesting,
+    } = useSelector((state) => state.accessKeyStoreTestingState)
 
-    const closeToast = () => {
-        setToast(null);
-    };
-
-    // API Action handlers
-    const handleGetAllStoreRequiredVerified = async () => {
-        if (storeData.length > 0) return; // Don't fetch if data already exists
-
-        setLoading({ ...loading, getAllStore: true });
-        try {
-        const response = await mockApiCall('getAllStoreRequiredVerified', sampleData);
-        setStoreData(response.data);
-        } catch (error) {
-        showToast(error.message, 'error');
-        } finally {
-        setLoading({ ...loading, getAllStore: false });
-        }
-    };
-
-    const handleCreateAccessKeyMaintananceTenant = async (storeId, item) => {
-        setConfirmModal({
-        isOpen: true,
-        title: 'Create Testing Key',
-        message: 'Are you sure you want to create a testing access key for this tenant?',
-        type: 'info',
-        onConfirm: async () => {
-            setConfirmModal({ isOpen: false });
-            setLoading({ ...loading, [`createTesting_${item.tenant.id}`]: true });
-            
-            try {
-            const response = await mockApiCall('createAccessKeyMaintananceTenant', { tenant_id: item.tenant.id, store_id: storeId });
-            showToast('Testing access key created successfully!', 'success');
-            
-            // Show access key in modal
+    useEffect(() => {
+        if (dataAccessKeyStoreTesting) {
             setAccessKeyModal({
                 isOpen: true,
-                data: item,
-                accessKey: response.access_key_maintanance
+                data: itemCreateAccessKey,
+                accessKey: dataAccessKeyStoreTesting,
             });
-            } catch (error) {
-            showToast(error.message, 'error');
-            } finally {
-            setLoading({ ...loading, [`createTesting_${item.tenant.id}`]: false });
-            }
         }
+    }, [dataAccessKeyStoreTesting])
+
+    useEffect(() => {
+        if (errorAccessKeyStoreTesting) {
+            showToast(errorAccessKeyStoreTesting, 'error');
+            dispatch(resetErrorAccessKeyStoreTesting());
+            setItemCreateAccessKey(null);
+            setStoreIdCreateAccessKey(null);
+        }
+    }, [errorAccessKeyStoreTesting])
+
+    useEffect(() => {
+        setLoading({ ...loading, [`createAccessKey_${storeIdCreateAccessKey}`]: loadingAccessKeyStoreTesting });
+    }, [loadingAccessKeyStoreTesting])
+
+    const handleCreateAccessKeyMaintananceTenant = async (storeId, item) => {
+        setItemCreateAccessKey(item);
+        setStoreIdCreateAccessKey(storeId);
+        setConfirmModal({
+            isOpen: true,
+            title: 'Create Testing Key',
+            message: 'Are you sure you want to create a testing access key for this tenant?',
+            type: 'info',
+            onConfirm: () => { 
+                dispatch(createAccessKeyMaintananceTenant(item.tenant.id, storeId))
+                setConfirmModal({ isOpen: false });
+            },
         });
     };
 
+
+    // Handle create access key for store
+    const {resetAccessKey} = accessKeySlice.actions
+    const {
+        accessKeyData, 
+        accessKeyError, 
+        loadingAccessKey
+    } = useSelector((state) => state.accessKeyState)
+
+    useEffect(() => {
+        if (accessKeyData) {
+            setAccessKeyModal({
+                isOpen: true,
+                data: itemCreateAccessKey,
+                accessKey: accessKeyData,
+            });
+        }
+    }, [accessKeyData])
+
+    useEffect(() => {
+        if (accessKeyError) {
+            showToast(accessKeyError, 'error');
+            dispatch(resetAccessKey());
+            setItemCreateAccessKey(null);
+        }
+    }, [accessKeyError])
+
+    useEffect(() => {
+        setLoading({ ...loading, [`createAccess_${storeIdCreateAccessKey}`]: loadingAccessKey });
+    }, [loadingAccessKey])
+
     const handleCreateAccessKeyStore = async (storeId, item) => {
+        setItemCreateAccessKey(item);
+        setStoreIdCreateAccessKey(storeId);
         setConfirmModal({
         isOpen: true,
         title: 'Create Store Access Key',
         message: 'Are you sure you want to create an access key for this store?',
         type: 'info',
-        onConfirm: async () => {
+        onConfirm: () => {
             setConfirmModal({ isOpen: false });
-            setLoading({ ...loading, [`createAccess_${storeId}`]: true });
-            
-            try {
-            const response = await mockApiCall('createAccessKeyStore', { store_id: storeId, tenant_id: item.tenant.id });
-            const mockAccessKey = 'ak_store_' + Math.random().toString(36).substr(2, 20);
-            
-            // Show access key in modal
-            setAccessKeyModal({
-                isOpen: true,
-                data: item,
-                accessKey: mockAccessKey
-            });
-            } catch (error) {
-            showToast(error.message, 'error');
-            } finally {
-            setLoading({ ...loading, [`createAccess_${storeId}`]: false });
-            }
+            dispatch(createAccessKeyStore(storeId, item.tenant.id))
         }
         });
     };
 
-    const handleSendEmailRequiredCredentialPaymentGateway = async (email) => {
+
+    // handle send email 
+    const [emailSendEmail, setEmailSendEmail] = useState(null)
+    const {resetSendEmailUpdateChangePaymentGateway} = sendEmailUpdateChangePaymentGatewaySlice.actions
+    const {
+        sendEmailUpdateChangePaymentGatewaySuccess, 
+        sendEmailUpdateChangePaymentGatewayError,
+        loadingSendEmailUpdateChangePaymentGateway,
+    } = useSelector((state) => state.sendEmailUpdateChangePaymentGatewayState)
+
+    useEffect(() => {
+        if (sendEmailUpdateChangePaymentGatewaySuccess) {
+            showToast('Email sent successfully!', 'success');
+            dispatch(resetSendEmailUpdateChangePaymentGateway());
+        }
+    }, [sendEmailUpdateChangePaymentGatewaySuccess])
+
+    useEffect(() => {
+        if (sendEmailUpdateChangePaymentGatewayError) {
+            showToast(sendEmailUpdateChangePaymentGatewayError, 'error');
+            dispatch(resetSendEmailUpdateChangePaymentGateway());
+        }
+    }, [sendEmailUpdateChangePaymentGatewayError])
+
+    useEffect(() => {
+        setLoading({ ...loading, [`sendEmail_${emailSendEmail}`]: loadingSendEmailUpdateChangePaymentGateway });
+        setEmailSendEmail(null);
+    }, [loadingSendEmailUpdateChangePaymentGateway])
+
+    const handleSendEmailRequiredCredentialPaymentGateway = (email) => {
+        setEmailSendEmail(email);
         setConfirmModal({
         isOpen: true,
         title: 'Send Email',
         message: `Are you sure you want to send credential requirement email to ${email}?`,
         type: 'info',
-        onConfirm: async () => {
+        onConfirm: () => {
             setConfirmModal({ isOpen: false });
-            setLoading({ ...loading, [`sendEmail_${email}`]: true });
-            
-            try {
-            await mockApiCall('sendEmailRequiredCredentialPaymentGateway', { email });
-            showToast(`Email sent successfully to ${email}!`, 'success');
-            } catch (error) {
-            showToast(error.message, 'error');
-            } finally {
-            setLoading({ ...loading, [`sendEmail_${email}`]: false });
-            }
-        }
+            dispatch(sendEmailUpdateChangePaymentGateway({email:email}));
+        },
         });
     };
 
-    const handleStartChangePaymentGatewayTenant = async (id, tenantId) => {
+
+    // handle start change payment gateway
+    const [startAndFinishId, setStartAndFinishId] = useState(null);
+    const {resetStartChangePaymentGateway} = startChangePaymentGatewaySlice.actions 
+    const {
+        startChangePaymentGatewaySuccess,
+        startChangePaymentGatewayError,
+        loadingStartChangePaymentGateway,
+    } = useSelector((state) => state.startChangePaymentGatewayState)
+
+    useEffect(() => {
+        if (startChangePaymentGatewaySuccess) {
+            showToast('Payment gateway change process started successfully!', 'success');
+            dispatch(resetStartChangePaymentGateway());
+        }
+    }, [startChangePaymentGatewaySuccess])
+
+    useEffect(() => {
+        if (startChangePaymentGatewayError) {
+            showToast(startChangePaymentGatewayError, 'error');
+            dispatch(resetStartChangePaymentGateway());
+        }
+    }, [startChangePaymentGatewayError])
+
+    useEffect(() => {
+        setLoading({ ...loading, [`start_${startAndFinishId}`]: loadingStartChangePaymentGateway });
+        setStartAndFinishId(null);
+    }, [loadingStartChangePaymentGateway])
+
+    const handleStartChangePaymentGatewayTenant = (id, tenantId) => {
+        setStartAndFinishId(id);
         setConfirmModal({
         isOpen: true,
         title: 'Start Payment Gateway Change',
         message: 'Are you sure you want to start the payment gateway change process for this tenant?',
         type: 'info',
-        onConfirm: async () => {
+        onConfirm: () => {
             setConfirmModal({ isOpen: false });
-            setLoading({ ...loading, [`start_${id}`]: true });
-            
-            try {
-            await mockApiCall('startChangePaymentGatewayTenant', { id, tenant_id: tenantId });
-            showToast('Payment gateway change process started successfully!', 'success');
-            } catch (error) {
-            showToast(error.message, 'error');
-            } finally {
-            setLoading({ ...loading, [`start_${id}`]: false });
-            }
+            dispatch(startChangePaymentGatewayTenant({
+                id: id, 
+                tenant_id: tenantId,
+            }))
         }
         });
     };
 
-    const handleFinishedChangePaymentGatewayTenant = async (id, tenantId) => {
+
+    // handle finished change payment gateway
+    const {resetFinishedChangePaymentGateway} = finishedChangePaymentGatewaySlice.actions
+    const {
+        finishedChangePaymentGatewaySuccess, 
+        finishedChangePaymentGatewayError, 
+        loadingFinishedChangePaymentGateway,
+    } = useSelector((state) => state.finishedChangePaymentGatewayState)
+
+    useEffect(() => {
+        if (finishedChangePaymentGatewaySuccess) {
+            showToast('Payment gateway change finished successfully!', 'success');
+            dispatch(resetFinishedChangePaymentGateway());
+        }
+    }, [finishedChangePaymentGatewaySuccess])
+
+    useEffect(() => {
+        if (finishedChangePaymentGatewayError) {
+            showToast(finishedChangePaymentGatewayError, 'error');
+            dispatch(resetFinishedChangePaymentGateway());
+        }
+    }, [finishedChangePaymentGatewayError])
+
+    useEffect(() => {
+        setLoading({ ...loading, [`finish_${startAndFinishId}`]: loadingFinishedChangePaymentGateway });
+        setStartAndFinishId(null);
+    }, [loadingFinishedChangePaymentGateway])
+
+    const handleFinishedChangePaymentGatewayTenant = (id, tenantId) => {
+        setStartAndFinishId(id);
         setConfirmModal({
         isOpen: true,
         title: 'Finish Payment Gateway Change',
@@ -276,59 +410,59 @@ const PaymentGatewayDashboard = () => {
         type: 'success',
         onConfirm: async () => {
             setConfirmModal({ isOpen: false });
-            setLoading({ ...loading, [`finish_${id}`]: true });
-            
-            try {
-            await mockApiCall('finishedChangePaymentGatewayTenant', { id, tenant_id: tenantId });
-            showToast('Payment gateway change completed successfully!', 'success');
-            } catch (error) {
-            showToast(error.message, 'error');
-            } finally {
-            setLoading({ ...loading, [`finish_${id}`]: false });
-            }
+            dispatch(finishedChangePaymentGatewayTenant({
+                id: startAndFinishId,
+                tenant_id: tenantId,
+            }))
         }
         });
     };
 
-    const handleDeployAppTesting = async () => {
+
+    // handle deploy app testing
+    const {resetDeployAppTesting} = deployAppTestingSlice.actions
+    const {
+        deployAppTestingSuccess,
+        deployAppTestingError,
+        loadingDeployAppTesting,
+    } = useSelector((state) => state.deployAppTestingState)
+
+    useEffect(() => {
+        if (deployAppTestingSuccess) {
+            showToast('Test application deployed successfully!', 'success');
+            dispatch(resetDeployAppTesting());
+        }
+    }, [deployAppTestingSuccess])
+
+    useEffect(() => {
+        if (deployAppTestingError) {
+            showToast(deployAppTestingError, 'error');
+            dispatch(resetDeployAppTesting());
+        }
+    }, [deployAppTestingError])
+
+    useEffect(() => {
+        setLoading({ ...loading, deployTesting: loadingDeployAppTesting });
+    }, [loadingDeployAppTesting])
+
+    const handleDeployAppTesting = () => {
         setConfirmModal({
         isOpen: true,
         title: 'Deploy Test Application',
         message: 'Are you sure you want to deploy the testing application? This process may take a few minutes.',
         type: 'info',
-        onConfirm: async () => {
+        onConfirm: () => {
             setConfirmModal({ isOpen: false });
-            setLoading({ ...loading, deployTesting: true });
-            
-            try {
-            await mockApiCall('deployAppTesting');
-            showToast('Test application deployed successfully!', 'success');
-            } catch (error) {
-            showToast(error.message, 'error');
-            } finally {
-            setLoading({ ...loading, deployTesting: false });
-            }
+            dispatch(deployAppTesting());
         }
         });
     };
 
-    const handleRefresh = async () => {
-        setLoading({ ...loading, refresh: true });
-        try {
-            const response = await mockApiCall('getAllStoreRequiredVerified', sampleData);
-            setStoreData(response.data);
-            showToast('Data refreshed successfully!', 'success');
-        } catch (error) {
-            showToast(error.message, 'error');
-        } finally {
-            setLoading({ ...loading, refresh: false });
-        }
-    };
 
-    // Load data on component mount
-    useEffect(() => {
-        handleGetAllStoreRequiredVerified();
-    }, []);
+
+    const handleRefresh = () => {
+        dispatch(getTenantSubmissionChangePaymentGateway());
+    };
 
     const toggleRow = (id) => {
         const newExpanded = new Set(expandedRows);
@@ -361,17 +495,7 @@ const PaymentGatewayDashboard = () => {
         );
     };
 
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('id-ID', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    };
-
-    const dataToDisplay = storeData.length > 0 ? storeData : sampleData;
+    const dataToDisplay = storeData;
     
     return (
         <div className='flex'>
@@ -744,7 +868,13 @@ const PaymentGatewayDashboard = () => {
                         {/* Access Key Modal */}
                         <AccessKeyModal
                             isOpen={accessKeyModal.isOpen}
-                            onClose={() => setAccessKeyModal({ isOpen: false, data: null, accessKey: null })}
+                            onClose={() => { 
+                                setAccessKeyModal({ isOpen: false, data: null, accessKey: null })
+                                setItemCreateAccessKey(null);
+                                setStoreIdCreateAccessKey(null);
+                                dispatch(resetAccessKeyStoreTesting())
+                                dispatch(resetAccessKey())
+                            }}
                             data={accessKeyModal.data}
                             accessKey={accessKeyModal.accessKey}
                         />

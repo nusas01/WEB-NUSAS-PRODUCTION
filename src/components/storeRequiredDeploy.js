@@ -46,7 +46,10 @@ import {
     navbarSlice
 } from '../reducers/reducers'
 import { useDispatch, useSelector } from 'react-redux';
-import { useElementHeight } from './helper';
+import { 
+    useElementHeight,
+    formatDate,
+} from './helper';
 import {
     fetchStoresVerificationRequired,
     createAccessKeyStore,
@@ -117,8 +120,11 @@ const StoreDeploymentDashboard = () => {
         }
     }, [sendEmailCredentialsError])
 
-    const handleSendEmailRequiredCredentials = (storeId) => {
-        dispatch(sendEmailRequiredCredentialsPayment({store_id: storeId}))
+    const handleSendEmailRequiredCredentials = (tenantId, storeId) => {
+        dispatch(sendEmailRequiredCredentialsPayment({
+            tenant_id: tenantId,
+            store_id: storeId,
+        }))
     };
 
 
@@ -293,16 +299,6 @@ const StoreDeploymentDashboard = () => {
             Ready
         </span>
         );
-    };
-
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-        });
     };
 
     const filteredData = storeData.filter(store => {
@@ -614,7 +610,7 @@ const StoreDeploymentDashboard = () => {
                                             {isCredentialsEmpty(store.tenant) && (
                                             <button
                                                 disabled={loadingSendEmailCredentials}
-                                                onClick={() => handleSendEmailRequiredCredentials(store.store_id)}
+                                                onClick={() => handleSendEmailRequiredCredentials(store.tenant_id, store.store_id)}
                                                 className="inline-flex items-center px-3 py-1.5 border border-red-300 rounded-md text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
                                                 title="Send Payment Gateway Credentials Email"
                                             >

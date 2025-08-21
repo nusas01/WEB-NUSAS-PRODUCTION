@@ -10,10 +10,13 @@ import {
     startChangePaymentGatewaySlice,
     finishedChangePaymentGatewaySlice,
     checkPendingTransactionSlice,
+    sendEmailUpdateChangePaymentGatewaySlice,
+    checkPendingSubmissionTransactionSlice,
 } from "../reducers/post"
 import {
     loginStatusSlice,
     storesVerificationSlice,
+    transactionSubmissionPendingSlice,
 } from "../reducers/get"
 
 const {setLoginStatus} = loginStatusSlice.actions
@@ -151,19 +154,23 @@ export const createAccountTestingCustomerStore = (data) => {
     }
 }
 
-const { setSendEmailCredentialPaymentSuccess, setSendEmailCredentialPaymentError, setLoadingSendEmailCredentialPayment } = sendEmailCredentialPaymentSlice.actions
-export const sendEmailRequiredCredentialPayment = (data) => {
+const { setSendEmailUpdateChangePaymentGatewaySuccess, setSendEmailUpdateChangePaymentGatewayError, setLoadingSendEmailUpdateChangePaymentGateway } = sendEmailUpdateChangePaymentGatewaySlice.actions
+export const sendEmailUpdateChangePaymentGateway = (data) => {
     return async (dispatch) => {
-        dispatch(setLoadingSendEmailCredentialPayment(true))
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            }, 
+            withCredentials: true,
+        }
+        dispatch(setLoadingSendEmailUpdateChangePaymentGateway(true))
         try {
-            const response = await axios.post(`${process.env.REACT_APP_BASE_URL}/tenant/store/deploy/email-required-credentials-payment-gateway`, data, {
-                withCredentials: true
-            })
-            dispatch(setSendEmailCredentialPaymentSuccess(response?.data?.message || 'Email berhasil dikirim'))
+            const response = await axios.post(`${process.env.REACT_APP_SEND_EMAIL_UPDATE_CHANGE_PAYMENT_GATEWAY}`, data, config)
+            dispatch(setSendEmailUpdateChangePaymentGatewaySuccess(response?.data?.message || 'Email berhasil dikirim'))
         } catch (error) {
-            dispatch(setSendEmailCredentialPaymentError(error.response?.data?.error || 'Terjadi kesalahan'))
+            dispatch(setSendEmailUpdateChangePaymentGatewayError(error.response?.data?.error || 'Terjadi kesalahan'))
         } finally {
-            dispatch(setLoadingSendEmailCredentialPayment(false))
+            dispatch(setLoadingSendEmailUpdateChangePaymentGateway(false))
         }
     }
 }
@@ -171,11 +178,15 @@ export const sendEmailRequiredCredentialPayment = (data) => {
 const { setStartChangePaymentGatewaySuccess, setStartChangePaymentGatewayError, setLoadingStartChangePaymentGateway } = startChangePaymentGatewaySlice.actions
 export const startChangePaymentGatewayTenant = (data) => {
     return async (dispatch) => {
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            }, 
+            withCredentials: true,
+        }
         dispatch(setLoadingStartChangePaymentGateway(true))
         try {
-            const response = await axios.post(`${process.env.REACT_APP_BASE_URL}/tenant/submission/change-payment-gateway/start`, data, {
-                withCredentials: true
-            })
+            const response = await axios.post(`${process.env.REACT_APP_START_CHANGE_PAYMENT_GATEWAY}`, data, config)
             dispatch(setStartChangePaymentGatewaySuccess(response?.data?.message || 'Perubahan payment gateway dimulai'))
         } catch (error) {
             dispatch(setStartChangePaymentGatewayError(error.response?.data?.error || 'Terjadi kesalahan'))
@@ -190,7 +201,7 @@ export const finishedChangePaymentGatewayTenant = (data) => {
     return async (dispatch) => {
         dispatch(setLoadingFinishedChangePaymentGateway(true))
         try {
-            const response = await axios.post(`${process.env.REACT_APP_BASE_URL}/tenant/submission/change-payment-gateway/finished`, data, {
+            const response = await axios.post(`${process.env.REACT_APP_FINISHED_CHANGE_PAYMENT_GATEWAY}`, data, {
                 withCredentials: true
             })
             dispatch(setFinishedChangePaymentGatewaySuccess(response?.data?.message || 'Perubahan payment gateway selesai'))
@@ -202,19 +213,41 @@ export const finishedChangePaymentGatewayTenant = (data) => {
     }
 }
 
+const {deleteTransactionPendingById} = transctionPendingSlice.actions
 const { setCheckPendingTransactionSuccess, setCheckPendingTransactionError, setLoadingCheckPendingTransaction } = checkPendingTransactionSlice.actions
 export const checkPendingTransactionPaymentGateway = (data) => {
     return async (dispatch) => {
         dispatch(setLoadingCheckPendingTransaction(true))
         try {
-            const response = await axios.post(`${process.env.REACT_APP_BASE_URL}/transaction/pending/check`, data, {
+            const response = await axios.post(`${process.env.REACT_APP_CHECK_PENDING_TRANSACTION_PAYMENT_GATEWAY}`, data, {
                 withCredentials: true
             })
-            dispatch(setCheckPendingTransactionSuccess(response?.data?.message || 'Check pending transaction berhasil'))
+            dispatch(setCheckPendingTransactionSuccess(response?.data))
+            dispatch(deleteTransactionPendingById(data.transaction_id))
         } catch (error) {
             dispatch(setCheckPendingTransactionError(error.response?.data?.error || 'Terjadi kesalahan'))
         } finally {
             dispatch(setLoadingCheckPendingTransaction(false))
+        }
+    }
+}
+
+
+const {deleteTransactionSubmissionPendingById} = transactionSubmissionPendingSlice.actions
+const {setCheckPendingSubmissionTransactionSuccess, setCheckPendingSubmissionTransactionError, setLoadingCheckPendingSubmissionTransaction} = checkPendingSubmissionTransactionSlice.actions
+export const checkPendingTransactionSubmissionPaymentGateway = (data) => {
+    return async (dispatch) => {
+        dispatch(setLoadingCheckPendingSubmissionTransaction(true))
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_CHECK_PENDING_SUBMISSION_TRANSACTION_PAYMENT_GATEWAY}`, data, {
+                withCredentials: true
+            })
+            dispatch(setCheckPendingSubmissionTransactionSuccess(response?.data))
+            dispatch(deleteTransactionSubmissionPendingById(data.transaction_id))
+        } catch (error) {
+            dispatch(setCheckPendingSubmissionTransactionError(error.response?.data?.error || 'Terjadi kesalahan'))
+        } finally {
+            dispatch(setLoadingCheckPendingSubmissionTransaction(false))
         }
     }
 }
