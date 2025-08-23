@@ -314,8 +314,6 @@ const StoreDeploymentDashboard = () => {
         return matchesSearch;
     });
 
-    console.log("data apa ini olee: ", dataStoreCreateAccessKey)
-
     return (
         <div className='flex'>
             {((isMobileDeviceType && isOpen) || !isMobileDeviceType) && (
