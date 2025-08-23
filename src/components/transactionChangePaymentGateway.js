@@ -103,7 +103,7 @@ const TransactionSubmissionChangePaymentGatewayDashboard = () => {
         checkPendingSubmissionTransactionSuccess,
         checkPendingSubmissionTransactionError,
         loadingCheckPendingSubmissionTransaction,
-    } = useSelector((state) => state.persisted.checkPendingSubmissionTransactionState)
+    } = useSelector((state) => state.checkPendingSubmissionTransactionState)
 
     useEffect(() => {
         if (checkPendingSubmissionTransactionSuccess) {
@@ -267,37 +267,37 @@ const TransactionSubmissionChangePaymentGatewayDashboard = () => {
                         <div>
                         {/* Stats Overview */}
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                            <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-4 text-white shadow-lg">
+                            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                <p className="text-green-100 text-sm">Total Paid</p>
+                                <p className="text-sm font-medium text-gray-600">Total Paid</p>
                                 <p className="text-xl font-bold">{formatCurrency(totalPaidAmount)}</p>
                                 </div>
                                 <CheckCircle className="w-8 h-8 text-green-200" />
                             </div>
                             </div>
-                            <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl p-4 text-white shadow-lg">
+                            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                <p className="text-yellow-100 text-sm">Total Pending</p>
+                                <p className="text-sm font-medium text-gray-600">Total Pending</p>
                                 <p className="text-xl font-bold">{formatCurrency(totalPendingAmount)}</p>
                                 </div>
                                 <Clock className="w-8 h-8 text-yellow-200" />
                             </div>
                             </div>
-                            <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-4 text-white shadow-lg">
+                            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                <p className="text-blue-100 text-sm">Paid Count</p>
+                                <p className="text-sm font-medium text-gray-600">Paid Count</p>
                                 <p className="text-2xl font-bold">{paidTransactions.length}</p>
                                 </div>
                                 <TrendingUp className="w-8 h-8 text-blue-200" />
                             </div>
                             </div>
-                            <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-4 text-white shadow-lg">
+                            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                <p className="text-purple-100 text-sm">Pending Count</p>
+                                <p className="text-sm font-medium text-gray-600">Pending Count</p>
                                 <p className="text-2xl font-bold">{pendingTransactions.length}</p>
                                 </div>
                                 <Activity className="w-8 h-8 text-purple-200" />
@@ -642,15 +642,15 @@ const TransactionSubmissionChangePaymentGatewayDashboard = () => {
                             <div className="space-y-2">
                             <div className="flex justify-between">
                                 <span className="text-gray-300">Paid Revenue:</span>
-                                <span className="font-bold text-green-400">{formatCurrency(totalPaidAmount)}</span>
+                                <span className="font-bold text-green-400">{formatCurrency(totalPaidAmount || 0)}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-gray-300">Pending Revenue:</span>
-                                <span className="font-bold text-yellow-400">{formatCurrency(totalPendingAmount)}</span>
+                                <span className="font-bold text-yellow-400">{formatCurrency(totalPendingAmount || 0)}</span>
                             </div>
                             <div className="border-t border-gray-700 pt-2 flex justify-between">
                                 <span className="text-white font-medium">Total:</span>
-                                <span className="font-bold text-xl text-white">{formatCurrency(totalPaidAmount + totalPendingAmount)}</span>
+                                <span className="font-bold text-xl text-white">{formatCurrency((totalPaidAmount || 0) + (totalPendingAmount || 0))}</span>
                             </div>
                             </div>
                         </div>
@@ -664,18 +664,18 @@ const TransactionSubmissionChangePaymentGatewayDashboard = () => {
                             <div className="flex justify-between">
                                 <span className="text-indigo-100">Success Rate:</span>
                                 <span className="font-bold text-white">
-                                {((paidTransactions.length / (paidTransactions.length + pendingTransactions.length)) * 100).toFixed(1)}%
+                                {(paidTransactions.length / (paidTransactions.length + pendingTransactions.length) * 100 || 0).toFixed(1)}%
                                 </span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-indigo-100">Avg. Amount:</span>
                                 <span className="font-bold text-white">
-                                {formatCurrency((totalPaidAmount + totalPendingAmount) / (paidTransactions.length + pendingTransactions.length))}
+                                {formatCurrency((totalPaidAmount + totalPendingAmount) / (paidTransactions.length + pendingTransactions.length) || 0)}
                                 </span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-indigo-100">Today's Transactions:</span>
-                                <span className="font-bold text-white">{paidTransactions.length + pendingTransactions.length}</span>
+                                <span className="font-bold text-white">{paidTransactions.length + pendingTransactions.length || 0}</span>
                             </div>
                             </div>
                         </div>

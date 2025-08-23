@@ -6,7 +6,6 @@ import {
     deployFinishedSlice,
     deployAppTestingSlice,
     createAccountCustomerStoreTestingSlice,
-    sendEmailCredentialPaymentSlice,
     startChangePaymentGatewaySlice,
     finishedChangePaymentGatewaySlice,
     checkPendingTransactionSlice,
@@ -17,6 +16,7 @@ import {
     loginStatusSlice,
     storesVerificationSlice,
     transactionSubmissionPendingSlice,
+    transactionPendingSlice,
 } from "../reducers/get"
 
 const {setLoginStatus} = loginStatusSlice.actions
@@ -25,6 +25,7 @@ export const login = (data) => async (dispatch) => {
     const config = {
         headers: {
             "Content-Type": "multipart/form-data",
+            "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
         }, 
         withCredentials: true,
     }
@@ -53,7 +54,8 @@ export const sendEmailRequiredCredentialsPayment = (data) => {
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
-            }, 
+                "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+            },
             withCredentials: true,
         }
         dispatch(setLoadingSendEmailCredentials(true))
@@ -74,7 +76,8 @@ export const deployApp = (data) => {
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
-            }, 
+                "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+            },
             withCredentials: true,
         }
         dispatch(setLoadingDeployApp(true))
@@ -96,7 +99,8 @@ export const deployFinished = (data) => {
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
-            }, 
+                "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+            },
             withCredentials: true,
         }
         dispatch(setLoadingDeployFinished(true))
@@ -118,7 +122,8 @@ export const deployAppTesting = (data) => {
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
-            }, 
+                "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+            },
             withCredentials: true,
         }
         dispatch(setLoadingDeployAppTesting(true))
@@ -139,7 +144,8 @@ export const createAccountTestingCustomerStore = (data) => {
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
-            }, 
+                "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+            },
             withCredentials: true,
         }
         dispatch(setLoadingAccountCustomerStoreTesting(true))
@@ -160,7 +166,8 @@ export const sendEmailUpdateChangePaymentGateway = (data) => {
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
-            }, 
+                "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+            },
             withCredentials: true,
         }
         dispatch(setLoadingSendEmailUpdateChangePaymentGateway(true))
@@ -181,7 +188,8 @@ export const startChangePaymentGatewayTenant = (data) => {
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
-            }, 
+                "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+            },
             withCredentials: true,
         }
         dispatch(setLoadingStartChangePaymentGateway(true))
@@ -202,6 +210,9 @@ export const finishedChangePaymentGatewayTenant = (data) => {
         dispatch(setLoadingFinishedChangePaymentGateway(true))
         try {
             const response = await axios.post(`${process.env.REACT_APP_FINISHED_CHANGE_PAYMENT_GATEWAY}`, data, {
+                headers: {
+                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                },
                 withCredentials: true
             })
             dispatch(setFinishedChangePaymentGatewaySuccess(response?.data?.message || 'Perubahan payment gateway selesai'))
@@ -213,13 +224,16 @@ export const finishedChangePaymentGatewayTenant = (data) => {
     }
 }
 
-const {deleteTransactionPendingById} = transctionPendingSlice.actions
+const {deleteTransactionPendingById} = transactionPendingSlice.actions
 const { setCheckPendingTransactionSuccess, setCheckPendingTransactionError, setLoadingCheckPendingTransaction } = checkPendingTransactionSlice.actions
 export const checkPendingTransactionPaymentGateway = (data) => {
     return async (dispatch) => {
         dispatch(setLoadingCheckPendingTransaction(true))
         try {
             const response = await axios.post(`${process.env.REACT_APP_CHECK_PENDING_TRANSACTION_PAYMENT_GATEWAY}`, data, {
+                headers: {
+                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                },
                 withCredentials: true
             })
             dispatch(setCheckPendingTransactionSuccess(response?.data))
@@ -240,6 +254,9 @@ export const checkPendingTransactionSubmissionPaymentGateway = (data) => {
         dispatch(setLoadingCheckPendingSubmissionTransaction(true))
         try {
             const response = await axios.post(`${process.env.REACT_APP_CHECK_PENDING_SUBMISSION_TRANSACTION_PAYMENT_GATEWAY}`, data, {
+                headers: {
+                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                },
                 withCredentials: true
             })
             dispatch(setCheckPendingSubmissionTransactionSuccess(response?.data))

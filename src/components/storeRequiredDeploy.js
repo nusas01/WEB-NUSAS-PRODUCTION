@@ -130,7 +130,7 @@ const StoreDeploymentDashboard = () => {
 
 
     // handle create access key app store
-    const {dataStoreCreateAccessKey, setDataStoreCreateAccessKey} = useState(null)
+    const [dataStoreCreateAccessKey, setDataStoreCreateAccessKey] = useState(null)
     const {resetAccessKey} = accessKeySlice.actions
     const {accessKeyData, accessKeyError, loadingAccessKey} = useSelector((state) => state.accessKeyState)
 
@@ -145,10 +145,10 @@ const StoreDeploymentDashboard = () => {
 
     const handleCreateAccessKey = (store, tenantId, storeId) => {
         setDataStoreCreateAccessKey(store)
-        dispatch(createAccessKeyStore({
-            tenant_id: tenantId,
-            store_id: storeId,
-        }))
+        dispatch(createAccessKeyStore(
+            storeId,
+            tenantId,
+        ))
     };
 
 
@@ -314,6 +314,8 @@ const StoreDeploymentDashboard = () => {
         return matchesSearch;
     });
 
+    console.log("data apa ini olee: ", dataStoreCreateAccessKey)
+
     return (
         <div className='flex'>
             {((isMobileDeviceType && isOpen) || !isMobileDeviceType) && (
@@ -356,7 +358,7 @@ const StoreDeploymentDashboard = () => {
                             dispatch(resetAccessKey())
                             setDataStoreCreateAccessKey(null)
                         }}
-                        accessKey={accessKeyData}
+                        accessKey={accessKeyData.secret_access_key}
                         data={dataStoreCreateAccessKey}
                         />
                     )}
