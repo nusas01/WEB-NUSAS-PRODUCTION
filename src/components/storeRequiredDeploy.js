@@ -27,6 +27,7 @@ import {
     storesVerificationSlice,
     accessKeySlice,
     accountTestingCustomerStoreSlice,
+    accessKeyStoreTestingSlice,
 } from '../reducers/get'
 import {
     sendEmailCredentialsSlice,
@@ -54,6 +55,7 @@ import {
     fetchStoresVerificationRequired,
     createAccessKeyStore,
     fetchAccountTestingCustomerStore,
+    createAccessKeyMaintananceTenant,
 } from '../actions/get'
 import { type } from '@testing-library/user-event/dist/type';
 import {
@@ -149,6 +151,30 @@ const StoreDeploymentDashboard = () => {
             storeId,
             tenantId,
         ))
+    };
+
+     // handle create access key for maintenance store
+    const {resetErrorAccessKeyStoreTesting, resetAccessKeyStoreTesting } = accessKeyStoreTestingSlice.actions
+    const { 
+        dataAccessKeyStoreTesting,
+        errorAccessKeyStoreTesting,
+        loadingAccessKeyStoreTesting,
+    } = useSelector((state) => state.accessKeyStoreTestingState)
+
+    useEffect(() => {
+        if (errorAccessKeyStoreTesting) {
+            setToast({
+                type: 'error',
+                message: 'Gagal membuat access key maintanance store, silahkan coba lagi nanti',
+            })
+            dispatch(resetErrorAccessKeyStoreTesting());
+            setDataStoreCreateAccessKey(null);
+        }
+    }, [errorAccessKeyStoreTesting])
+
+    const handleCreateAccessKeyMaintananceTenant = (storeId, item) => {
+        setDataStoreCreateAccessKey(item);
+        dispatch(createAccessKeyMaintananceTenant(item.tenant.id, storeId))
     };
 
 
@@ -349,14 +375,15 @@ const StoreDeploymentDashboard = () => {
                         </ToastPortal>
                     )}
 
-                    { accessKeyData && (
+                    { (accessKeyData || dataAccessKeyStoreTesting) && (
                         <AccessKeyModal 
-                        isOpen={accessKeyData} 
+                        isOpen={accessKeyData || dataAccessKeyStoreTesting} 
                         onClose={() => {
                             dispatch(resetAccessKey())
+                            dispatch(resetAccessKeyStoreTesting())
                             setDataStoreCreateAccessKey(null)
                         }}
-                        accessKey={accessKeyData.secret_access_key}
+                        accessKey={accessKeyData?.secret_access_key || dataAccessKeyStoreTesting?.secret_access_key}
                         data={dataStoreCreateAccessKey}
                         />
                     )}
@@ -622,6 +649,21 @@ const StoreDeploymentDashboard = () => {
                                                 { loadingSendEmailCredentials ? 'Sending...' : 'Email'}
                                             </button>
                                             )}
+
+                                             {/* Create Access Key maintanance store - always shows */}
+                                            <button
+                                            disabled={loadingAccessKeyStoreTesting}
+                                            onClick={() => handleCreateAccessKeyMaintananceTenant(store.store_id, store)}
+                                            className="inline-flex items-center px-3 py-1.5 border border-yellow-300 rounded-md text-xs font-medium text-yellow-700 bg-yellow-50 hover:bg-yellow-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors"
+                                            title="Create Access Key for Maintenance Store"
+                                            >
+                                            {loadingAccessKeyStoreTesting ? (
+                                                <span className="w-3 h-3 mr-1 border-2 border-gray-500 border-t-transparent rounded-full animate-spin" />
+                                            ) : (
+                                                <Key className="w-3 h-3 mr-1" />
+                                            )}
+                                            { loadingAccessKeyStoreTesting ? 'Creating...' : 'Access Key Testing'}
+                                            </button>
                                             
                                             {/* Create Access Key - always shows */}
                                             <button

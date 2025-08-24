@@ -31,6 +31,9 @@ import {
     checkPendingTransactionSlice,
     checkPendingSubmissionTransactionSlice,
 } from './post'
+import {
+  statusExpiredUserTokenSlice
+} from './expToken'
 
 // 1. Reducer yang dipersist
 const persistedReducers = combineReducers({
@@ -68,6 +71,7 @@ const nonPersistedReducers = {
   sendEmailUpdateChangePaymentGatewayState: sendEmailUpdateChangePaymentGatewaySlice.reducer,
   checkPendingTransactionState: checkPendingTransactionSlice.reducer,
   checkPendingSubmissionTransactionState: checkPendingSubmissionTransactionSlice.reducer,
+  statusExpiredUserTokenState: statusExpiredUserTokenSlice.reducer,
 }
 
 const rootReducer = combineReducers({

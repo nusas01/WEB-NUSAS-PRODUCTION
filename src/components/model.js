@@ -89,26 +89,26 @@ export const AccessKeyModal = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Store Subdomain</label>
-                  <p className="text-sm font-medium text-gray-900 mt-1">{data.subdomain}</p>
+                  <p className="text-sm font-medium text-gray-900 mt-1">{data?.subdomain}</p>
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Store domain</label>
-                  <p className="text-sm font-medium text-gray-900 mt-1">{data.domain}</p>
+                  <p className="text-sm font-medium text-gray-900 mt-1">{data?.domain}</p>
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Owner Email</label>
-                  <p className="text-sm font-medium text-gray-900 mt-1">{data.tenant.email}</p>
+                  <p className="text-sm font-medium text-gray-900 mt-1">{data?.tenant?.email}</p>
                 </div>
                 <div>
                   <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Phone</label>
-                  <p className="text-sm font-medium text-gray-900 mt-1">{data.tenant.phone_number}</p>
+                  <p className="text-sm font-medium text-gray-900 mt-1">{data?.tenant?.phone_number}</p>
                 </div>
               </div>
               <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-200">
                 <div className="flex items-center space-x-4">
                   <div>
                     <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Created</label>
-                    <p className="text-sm font-medium text-gray-900 mt-1">{data.created_at}</p>
+                    <p className="text-sm font-medium text-gray-900 mt-1">{data?.created_at}</p>
                   </div>
                 </div>
               </div>

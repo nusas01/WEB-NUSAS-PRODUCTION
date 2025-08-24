@@ -223,7 +223,7 @@ const PaymentGatewayDashboard = () => {
         setLoading({ ...loading, [`createAccessKey_${storeIdCreateAccessKey}`]: loadingAccessKeyStoreTesting });
     }, [loadingAccessKeyStoreTesting])
 
-    const handleCreateAccessKeyMaintananceTenant = async (storeId, item) => {
+    const handleCreateAccessKeyMaintananceTenant = (storeId, item) => {
         setItemCreateAccessKey(item);
         setStoreIdCreateAccessKey(storeId);
         setConfirmModal({
