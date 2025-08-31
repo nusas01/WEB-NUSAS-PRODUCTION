@@ -56,44 +56,44 @@ const TransactionDashboard = () => {
     const dispatch = useDispatch()
     const { setIsOpen } = navbarSlice.actions
     const { isOpen, isMobileDeviceType } = useSelector((state) => state.persisted.navbar)
-    const { error, setError } = useState(null);
+    const [ error, setError ] = useState(null);
 
     const { ref: headerRef, height: headerHeight } = useElementHeight();
 
     // Sample data untuk PAID transactions
-    const {resetErrorTransctionPaid} = transactionPaidSlice.actions
+    const {resetErrorTransactionPaid} = transactionPaidSlice.actions
     const {
-        dataTransctionPaid: paidTransactions,
-        errorTransctionPaid,
-        loadingTransctionPaid,
+        dataTransactionPaid,
+        errorTransactionPaid,
+        loadingTransactionPaid,
     } = useSelector((state) => state.persisted.transactionPaid)
 
     useEffect(() => {
-        if (errorTransctionPaid) {
+        if (errorTransactionPaid) {
             setError({
                 type: 'error',
-                message: errorTransctionPaid,
+                message: errorTransactionPaid,
             })
         }
-    }, [errorTransctionPaid])
+    }, [errorTransactionPaid])
 
 
     // Sample data untuk PENDING transactions
-    const {resetErrorTransctionPending} = transactionPendingSlice.actions
+    const {resetErrorTransactionPending} = transactionPendingSlice.actions
     const {
-        dataTransctionPending: pendingTransactions,
-        errorTransctionPending,
-        loadingTransctionPending,
+        dataTransactionPending,
+        errorTransactionPending,
+        loadingTransactionPending,
     } = useSelector((state) => state.persisted.transactionPending)
 
     useEffect(() => {
-        if (errorTransctionPending) {
+        if (errorTransactionPending) {
             setError({
                 type: 'error',
-                message: errorTransctionPending,
+                message: errorTransactionPending,
             })
         }
-    }, [errorTransctionPending])
+    }, [errorTransactionPending])
 
 
     // handle checkPendingTransactionPaymentGateway
@@ -128,17 +128,19 @@ const TransactionDashboard = () => {
         }))
     }    
 
-
     const [activeTab, setActiveTab] = useState('pending');
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
 
+    console.log("data status: ", activeTab) 
+    console.log("pending transaction length: ", dataTransactionPending?.length)
+
     useEffect(() => {
-        if (activeTab === 'pending' && pendingTransactions?.length === 0) {
+        if (activeTab === 'pending' && dataTransactionPending.length === 0) {
             dispatch(fetchTransactionPending())
         }
 
-        if (activeTab === 'paid' && paidTransactions?.length === 0) {
+        if (activeTab === 'paid' && !dataTransactionPaid) {
             dispatch(fetchTransactionPaid())
         }
     }, [activeTab])
@@ -155,22 +157,10 @@ const TransactionDashboard = () => {
         return colors[channel] || 'bg-gray-100 text-gray-800';
     };
 
-    const filteredPaidTransactions = paidTransactions?.filter(txn =>
-        txn.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        txn.xendit_transaction_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        txn.channel_code.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const totalPaidAmount = dataTransactionPaid?.reduce((sum, txn) => sum + txn.amount, 0);
+    const totalPendingAmount = dataTransactionPending?.reduce((sum, txn) => sum + txn.amount, 0);
 
-    const filteredPendingTransactions = pendingTransactions?.filter(txn =>
-        txn.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        txn.xendit_transaction_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        txn.channel_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        txn.product.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    const totalPaidAmount = paidTransactions?.reduce((sum, txn) => sum + txn.amount, 0);
-    const totalPendingAmount = pendingTransactions?.reduce((sum, txn) => sum + txn.amount, 0);
-
+    console.log("data transaction pending", dataTransactionPending)
     return (
         <div className='flex'>
             <SuccessModal
@@ -198,8 +188,8 @@ const TransactionDashboard = () => {
                             type={error.type} 
                             onClose={() => { 
                                 setError(null)
-                                dispatch(resetErrorTransctionPaid())
-                                dispatch(resetErrorTransctionPending())
+                                dispatch(resetErrorTransactionPaid())
+                                dispatch(resetErrorTransactionPending())
                                 dispatch(resetCheckPendingTransaction())
                             }} 
                             duration={0}
@@ -290,7 +280,7 @@ const TransactionDashboard = () => {
                             <div className="flex items-center justify-between">
                                 <div>
                                 <p className="text-sm font-medium text-gray-600">Paid Count</p>
-                                <p className="text-2xl font-bold">{paidTransactions?.length || 0}</p>
+                                <p className="text-2xl font-bold">{dataTransactionPaid?.length || 0}</p>
                                 </div>
                                 <TrendingUp className="w-8 h-8 text-blue-200" />
                             </div>
@@ -299,7 +289,7 @@ const TransactionDashboard = () => {
                             <div className="flex items-center justify-between">
                                 <div>
                                 <p className="text-sm font-medium text-gray-600">Pending Count</p>
-                                <p className="text-2xl font-bold">{pendingTransactions?.length || 0}</p>
+                                <p className="text-2xl font-bold">{dataTransactionPending?.length || 0}</p>
                                 </div>
                                 <Activity className="w-8 h-8 text-purple-200" />
                             </div>
@@ -333,7 +323,7 @@ const TransactionDashboard = () => {
                             >
                                 <div className="flex items-center gap-2">
                                 <Clock className="w-4 h-4" />
-                                Pending Transactions ({filteredPendingTransactions?.length || 0})
+                                Pending Transactions ({dataTransactionPending?.length || 0})
                                 </div>
                             </button>
                             <button
@@ -346,7 +336,7 @@ const TransactionDashboard = () => {
                             >
                                 <div className="flex items-center gap-2">
                                 <CheckCircle className="w-4 h-4" />
-                                Paid Transactions ({filteredPaidTransactions?.length || 0})
+                                Paid Transactions ({dataTransactionPaid?.length || 0})
                                 </div>
                             </button>
                             </nav>
@@ -360,7 +350,7 @@ const TransactionDashboard = () => {
                             <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                                 <Clock className="w-5 h-5 text-yellow-500" />
                                 Pending Transactions
-                                {loadingTransctionPending && (
+                                {loadingTransactionPending && (
                                 <LoadingSpinner />
                                 )}
                             </h2>
@@ -378,14 +368,14 @@ const TransactionDashboard = () => {
                                 </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200">
-                                {loadingTransctionPending ? (
+                                {loadingTransactionPending ? (
                                     <tr>
                                     <td colSpan="5" className="p-0">
                                         <TableLoadingSkeleton />
                                     </td>
                                     </tr>
                                 ) : (
-                                    filteredPendingTransactions?.map((transaction, index) => (
+                                    dataTransactionPending?.map((transaction, index) => (
                                     <tr key={transaction.id} className={`hover:bg-gray-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'}`}>
                                         <td className="px-6 py-4">
                                         <div className="space-y-1">
@@ -465,7 +455,7 @@ const TransactionDashboard = () => {
                                             <button 
                                             onClick={() => alert(`Viewing details for ${transaction.id}`)}
                                             className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                                            disabled={loadingTransctionPending}
+                                            disabled={loadingTransactionPending}
                                             >
                                             <Eye className="w-4 h-4" />
                                             </button>
@@ -477,8 +467,8 @@ const TransactionDashboard = () => {
                                 </tbody>
                             </table>
                             </div>
-                            
-                            {!loadingTransctionPending && filteredPendingTransactions?.length === 0 && (
+
+                            {!loadingTransactionPending && dataTransactionPending?.length === 0 && (
                             <div className="text-center py-8">
                                 <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                                 <p className="text-gray-500">No pending transactions found</p>
@@ -494,7 +484,7 @@ const TransactionDashboard = () => {
                             <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                                 <CheckCircle className="w-5 h-5 text-green-500" />
                                 Paid Transactions
-                                {loadingTransctionPaid && (
+                                {loadingTransactionPaid && (
                                 <LoadingSpinner />
                                 )}
                             </h2>
@@ -513,14 +503,14 @@ const TransactionDashboard = () => {
                                 </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200">
-                                {loadingTransctionPaid ? (
+                                {loadingTransactionPaid ? (
                                     <tr>
                                     <td colSpan="6" className="p-0">
                                         <TableLoadingSkeleton />
                                     </td>
                                     </tr>
                                 ) : (
-                                    filteredPaidTransactions?.map((transaction, index) => (
+                                    dataTransactionPaid?.map((transaction, index) => (
                                     <tr key={transaction.id} className={`hover:bg-gray-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-25'}`}>
                                         <td className="px-6 py-4">
                                         <div className="space-y-1">
@@ -575,7 +565,7 @@ const TransactionDashboard = () => {
                                             <button 
                                             onClick={() => alert(`Opening Xendit transaction: ${transaction.xendit_transaction_id}`)}
                                             className="text-gray-500 hover:text-gray-700 transition-colors"
-                                            disabled={loadingTransctionPaid}
+                                            disabled={loadingTransactionPaid}
                                             >
                                             <ExternalLink className="w-4 h-4" />
                                             </button>
@@ -586,7 +576,7 @@ const TransactionDashboard = () => {
                                         <button 
                                             onClick={() => alert(`Viewing details for ${transaction.id}`)}
                                             className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:bg-gray-50 disabled:cursor-not-allowed transition-colors"
-                                            disabled={loadingTransctionPaid}
+                                            disabled={loadingTransactionPaid}
                                         >
                                             <Eye className="w-4 h-4 mr-2" />
                                             View Details
@@ -598,8 +588,8 @@ const TransactionDashboard = () => {
                                 </tbody>
                             </table>
                             </div>
-                            
-                            {!loadingTransctionPaid && filteredPaidTransactions?.length === 0 && (
+
+                            {!loadingTransactionPaid && dataTransactionPaid?.length === 0 && (
                             <div className="text-center py-8">
                                 <CheckCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                                 <p className="text-gray-500">No paid transactions found</p>
@@ -611,7 +601,7 @@ const TransactionDashboard = () => {
                         {/* Pagination */}
                         <div className="mt-6 flex items-center justify-between">
                         <div className="flex items-center text-sm text-gray-700">
-                            Showing {activeTab === 'pending' ? filteredPendingTransactions?.length : filteredPaidTransactions?.length} results
+                            Showing {activeTab === 'pending' ? dataTransactionPending?.length : dataTransactionPaid?.length} results
                         </div>
                         <div className="flex items-center gap-2">
                             <button 
@@ -665,18 +655,18 @@ const TransactionDashboard = () => {
                             <div className="flex justify-between">
                                 <span className="text-indigo-100">Success Rate:</span>
                                 <span className="font-bold text-white">
-                                {(paidTransactions?.length / (paidTransactions?.length + pendingTransactions?.length) * 100 || 0).toFixed(1)}%
+                                {(dataTransactionPaid?.length / (dataTransactionPaid?.length + dataTransactionPending?.length) * 100 || 0).toFixed(1)}%
                                 </span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-indigo-100">Avg. Amount:</span>
                                 <span className="font-bold text-white">
-                                {formatCurrency((totalPaidAmount + totalPendingAmount) / (paidTransactions?.length + pendingTransactions?.length) || 0)}
+                                {formatCurrency((totalPaidAmount + totalPendingAmount) / (dataTransactionPending?.length + dataTransactionPending?.length) || 0)}
                                 </span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-indigo-100">Today's Transactions:</span>
-                                <span className="font-bold text-white">{paidTransactions?.length + pendingTransactions?.length || 0}</span>
+                                <span className="font-bold text-white">{dataTransactionPaid?.length + dataTransactionPending?.length || 0}</span>
                             </div>
                             </div>
                         </div>

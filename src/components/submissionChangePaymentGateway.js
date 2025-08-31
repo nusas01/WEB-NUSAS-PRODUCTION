@@ -20,6 +20,7 @@ import {
   TestTube,
   Hourglass, 
   RefreshCcw,
+  BadgeAlert,
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -43,12 +44,15 @@ import {
     startChangePaymentGatewaySlice,
     finishedChangePaymentGatewaySlice,
     sendEmailUpdateChangePaymentGatewaySlice,
+    transactionSubmissionPaidSlice,
+    changePaymentGatewayFailedSlice,
 } from '../reducers/post'
 import {
     deployAppTesting,
     startChangePaymentGatewayTenant,
     finishedChangePaymentGatewayTenant,
     sendEmailUpdateChangePaymentGateway,
+    changePaymentGatewayFailed,
 } from '../actions/post'
 import {
     accessKeyStoreTestingSlice,
@@ -107,6 +111,7 @@ const PaymentGatewayDashboard = () => {
         if (errorTenantSubmissionChangePayment) {
             showToast(errorTenantSubmissionChangePayment, 'error');
             dispatch(resetErrorTenantSubmissionChangePayment())
+            setLoading({})
         }
     }, [errorTenantSubmissionChangePayment])
 
@@ -207,6 +212,7 @@ const PaymentGatewayDashboard = () => {
                 data: itemCreateAccessKey,
                 accessKey: dataAccessKeyStoreTesting,
             });
+            setLoading({})
         }
     }, [dataAccessKeyStoreTesting])
 
@@ -216,6 +222,7 @@ const PaymentGatewayDashboard = () => {
             dispatch(resetErrorAccessKeyStoreTesting());
             setItemCreateAccessKey(null);
             setStoreIdCreateAccessKey(null);
+            setLoading({})
         }
     }, [errorAccessKeyStoreTesting])
 
@@ -244,7 +251,7 @@ const PaymentGatewayDashboard = () => {
     const {
         accessKeyData, 
         accessKeyError, 
-        loadingAccessKey
+        loadingAccessKey,
     } = useSelector((state) => state.accessKeyState)
 
     useEffect(() => {
@@ -254,6 +261,7 @@ const PaymentGatewayDashboard = () => {
                 data: itemCreateAccessKey,
                 accessKey: accessKeyData,
             });
+            setLoading({})
         }
     }, [accessKeyData])
 
@@ -262,6 +270,7 @@ const PaymentGatewayDashboard = () => {
             showToast(accessKeyError, 'error');
             dispatch(resetAccessKey());
             setItemCreateAccessKey(null);
+            setLoading({})
         }
     }, [accessKeyError])
 
@@ -298,6 +307,7 @@ const PaymentGatewayDashboard = () => {
         if (sendEmailUpdateChangePaymentGatewaySuccess) {
             showToast('Email sent successfully!', 'success');
             dispatch(resetSendEmailUpdateChangePaymentGateway());
+            setLoading({})
         }
     }, [sendEmailUpdateChangePaymentGatewaySuccess])
 
@@ -305,6 +315,7 @@ const PaymentGatewayDashboard = () => {
         if (sendEmailUpdateChangePaymentGatewayError) {
             showToast(sendEmailUpdateChangePaymentGatewayError, 'error');
             dispatch(resetSendEmailUpdateChangePaymentGateway());
+            setLoading({})
         }
     }, [sendEmailUpdateChangePaymentGatewayError])
 
@@ -341,6 +352,7 @@ const PaymentGatewayDashboard = () => {
         if (startChangePaymentGatewaySuccess) {
             showToast('Payment gateway change process started successfully!', 'success');
             dispatch(resetStartChangePaymentGateway());
+            setLoading({})
         }
     }, [startChangePaymentGatewaySuccess])
 
@@ -348,6 +360,7 @@ const PaymentGatewayDashboard = () => {
         if (startChangePaymentGatewayError) {
             showToast(startChangePaymentGatewayError, 'error');
             dispatch(resetStartChangePaymentGateway());
+            setLoading({})
         }
     }, [startChangePaymentGatewayError])
 
@@ -386,6 +399,7 @@ const PaymentGatewayDashboard = () => {
         if (finishedChangePaymentGatewaySuccess) {
             showToast('Payment gateway change finished successfully!', 'success');
             dispatch(resetFinishedChangePaymentGateway());
+            setLoading({})
         }
     }, [finishedChangePaymentGatewaySuccess])
 
@@ -393,6 +407,7 @@ const PaymentGatewayDashboard = () => {
         if (finishedChangePaymentGatewayError) {
             showToast(finishedChangePaymentGatewayError, 'error');
             dispatch(resetFinishedChangePaymentGateway());
+            setLoading({})
         }
     }, [finishedChangePaymentGatewayError])
 
@@ -408,15 +423,16 @@ const PaymentGatewayDashboard = () => {
         title: 'Finish Payment Gateway Change',
         message: 'Are you sure you want to mark the payment gateway change as finished for this tenant?',
         type: 'success',
-        onConfirm: async () => {
+        onConfirm: () => {
             setConfirmModal({ isOpen: false });
             dispatch(finishedChangePaymentGatewayTenant({
-                id: startAndFinishId,
+                id: id,
                 tenant_id: tenantId,
             }))
         }
         });
     };
+
 
 
     // handle deploy app testing
@@ -431,6 +447,7 @@ const PaymentGatewayDashboard = () => {
         if (deployAppTestingSuccess) {
             showToast('Test application deployed successfully!', 'success');
             dispatch(resetDeployAppTesting());
+            setLoading({})
         }
     }, [deployAppTestingSuccess])
 
@@ -438,12 +455,77 @@ const PaymentGatewayDashboard = () => {
         if (deployAppTestingError) {
             showToast(deployAppTestingError, 'error');
             dispatch(resetDeployAppTesting());
+            setLoading({})
         }
     }, [deployAppTestingError])
 
     useEffect(() => {
         setLoading({ ...loading, deployTesting: loadingDeployAppTesting });
     }, [loadingDeployAppTesting])
+
+
+    // handle submission change payment gateway failed
+    const {resetChangePaymentGatewayFailed} = changePaymentGatewayFailedSlice.actions
+    const {
+        changePaymentGatewayFailedSuccess,
+        changePaymentGatewayFailedError,
+        loadingChangePaymentGatewayFailed,
+    } = useSelector((state) => state.changePaymentGatewayFailedState)
+
+    useEffect(() => {
+        if (changePaymentGatewayFailedSuccess) {
+            showToast(changePaymentGatewayFailedSuccess, 'success');
+            dispatch(getTenantSubmissionChangePaymentGateway());
+        }
+    }, [changePaymentGatewayFailedSuccess])
+
+    useEffect(() => {
+        if (changePaymentGatewayFailedError) {
+            showToast(changePaymentGatewayFailedError, 'error');
+        }
+    }, [changePaymentGatewayFailedError])
+
+    useEffect(() => {
+        setLoading({ ...loading, [`changePaymentGatewayFailed_${startAndFinishId}`]: loadingSendEmailUpdateChangePaymentGateway });
+    }, [loadingChangePaymentGatewayFailed])
+
+    const handleChangePaymentGatewayFailed = (tenantId, email) => {
+        setStartAndFinishId(tenantId)
+        dispatch(changePaymentGatewayFailed({
+            tenant_id: tenantId,
+            email: email,
+        }))
+    }
+
+
+    const dataToDisplay = storeData;
+
+
+    // handle loading false 
+    useEffect(() => {
+        if (
+            !loadingTenantSubmissionChangePayment 
+            || !loadingAccessKey
+            || !loadingAccessKeyStoreTesting
+            || !loadingSendEmailUpdateChangePaymentGateway
+            || !loadingStartChangePaymentGateway
+            || !loadingFinishedChangePaymentGateway 
+            || !loadingDeployAppTesting
+            || !loadingChangePaymentGatewayFailed
+        ) {
+            setLoading({})
+        }
+    }, [
+        loadingTenantSubmissionChangePayment,
+        loadingAccessKeyStoreTesting,
+        loadingAccessKey,
+        loadingSendEmailUpdateChangePaymentGateway,
+        loadingStartChangePaymentGateway,
+        loadingFinishedChangePaymentGateway,
+        loadingDeployAppTesting,
+        loadingChangePaymentGatewayFailed,
+    ])
+    
 
     const handleDeployAppTesting = () => {
         setConfirmModal({
@@ -457,8 +539,6 @@ const PaymentGatewayDashboard = () => {
         }
         });
     };
-
-
 
     const handleRefresh = () => {
         dispatch(getTenantSubmissionChangePaymentGateway());
@@ -494,8 +574,6 @@ const PaymentGatewayDashboard = () => {
         </span>
         );
     };
-
-    const dataToDisplay = storeData;
     
     return (
         <div className='flex'>
@@ -726,29 +804,37 @@ const PaymentGatewayDashboard = () => {
                                             {!isCredentialsComplete(item) ? (
                                             <button 
                                                 onClick={() => handleSendEmailRequiredCredentialPaymentGateway(item.tenant.email)}
-                                                disabled={loading[`sendEmail_${item.tenant.email}`]}
+                                                disabled={!!loading[`sendEmail_${item.tenant.email}`]}
                                                 className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
                                             >
                                                 <Send className="w-3 h-3" />
-                                                {loading[`sendEmail_${item.tenant.email}`] ? 'Sending...' : 'Send Email'}
+                                                {!!loading[`sendEmail_${item.tenant.email}`] ? 'Sending...' : 'Send Email'}
                                             </button>
                                             ) : (
                                             <div className="flex gap-2">
                                                 <button 
                                                 onClick={() => handleStartChangePaymentGatewayTenant(item.id, item.tenant.id)}
-                                                disabled={loading[`start_${item.id}`]}
+                                                disabled={!!loading[`start_${item.id}`]}
                                                 className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
                                                 >
                                                 <Play className="w-3 h-3" />
-                                                {loading[`start_${item.id}`] ? 'Starting...' : 'Start'}
+                                                {!!loading[`start_${item.id}`] ? 'Starting...' : 'Start'}
+                                                </button>
+                                                <button 
+                                                onClick={() => handleChangePaymentGatewayFailed(item.tenant.id, item.tenant.email)}
+                                                disabled={!!loading[`changePaymentGatewayFailed_${item.tenant.id}`]}
+                                                className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
+                                                >
+                                                <BadgeAlert className="w-3 h-3" />
+                                                {!!loading[`changePaymentGatewayFailed_${item.tenant.id}`] ? 'Sending...' : 'Credentials Failed'}
                                                 </button>
                                                 <button 
                                                 onClick={() => handleFinishedChangePaymentGatewayTenant(item.id, item.tenant.id)}
-                                                disabled={loading[`finish_${item.id}`]}
+                                                disabled={!!loading[`finish_${item.id}`]}
                                                 className="flex items-center gap-1 bg-gray-600 hover:bg-gray-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
                                                 >
                                                 <Check className="w-3 h-3" />
-                                                {loading[`finish_${item.id}`] ? 'Processing...' : 'Finished'}
+                                                {!!loading[`finish_${item.id}`] ? 'Processing...' : 'Finished'}
                                                 </button>
                                             </div>
                                             )}
@@ -805,20 +891,20 @@ const PaymentGatewayDashboard = () => {
 
                                                             <button 
                                                                 onClick={() => handleCreateAccessKeyMaintananceTenant(store.id, item)}
-                                                                disabled={loading[`createTesting_${item.tenant.id}`]}
+                                                                disabled={!!loading[`createTesting_${item.tenant.id}`]}
                                                                 className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
                                                             >
                                                                 <Key className="w-4 h-4" />
-                                                                {loading[`createTesting_${item.tenant.id}`] ? 'Creating...' : 'Create Testing Key'}
+                                                                {!!loading[`createTesting_${item.tenant.id}`] ? 'Creating...' : 'Create Testing Key'}
                                                             </button>
 
                                                             <button 
                                                                 onClick={() => handleCreateAccessKeyStore(store.id, item)}
-                                                                disabled={loading[`createAccess_${store.id}`]}
+                                                                disabled={!!loading[`createAccess_${store.id}`]}
                                                                 className="flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
                                                             >
                                                                 <Key className="w-4 h-4" />
-                                                                {loading[`createAccess_${store.id}`] ? 'Creating...' : 'Create Access Key'}
+                                                                {!!loading[`createAccess_${store.id}`] ? 'Creating...' : 'Create Access Key'}
                                                             </button>
                                                         </div>
                                                     </div>
@@ -874,6 +960,7 @@ const PaymentGatewayDashboard = () => {
                                 setStoreIdCreateAccessKey(null);
                                 dispatch(resetAccessKeyStoreTesting())
                                 dispatch(resetAccessKey())
+                                dispatch(resetChangePaymentGatewayFailed())
                             }}
                             data={accessKeyModal.data}
                             accessKey={accessKeyModal.accessKey}

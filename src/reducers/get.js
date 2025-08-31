@@ -191,7 +191,7 @@ export const transactionPaidSlice = createSlice({
 })
 
 const initialTransactionPendingState = {
-    dataTransactionPending: null,
+    dataTransactionPending: [],
     errorTransactionPending: null,
     loadingTransactionPending: false
 }
@@ -203,7 +203,7 @@ export const transactionPendingSlice = createSlice({
             state.loadingTransactionPending = action.payload
         },
         setTransactionPendingData: (state, action) => {
-            state.dataTransactionPending = action.payload
+            state.dataTransactionPending = action.payload || []
         },
         setTransactionPendingError: (state, action) => {
             state.errorTransactionPending = action.payload || null

@@ -306,3 +306,55 @@ export const checkPendingSubmissionTransactionSlice = createSlice({
         }
     }
 })
+
+
+const initialPaymentGatewayFailedState = {
+    paymentGatewayFailedSuccess: null,
+    paymentGatewayFailedError: null,
+    loadingPaymentGatewayFailed: false
+}
+export const paymentGatewayFailedSlice = createSlice({
+    name: "paymentGatewayFailed",
+    initialState: initialPaymentGatewayFailedState,
+    reducers: {
+        setLoadingPaymentGatewayFailed: (state, action) => {
+            state.loadingPaymentGatewayFailed = action.payload
+        },
+        setPaymentGatewaySuccess: (state, action) => {
+            state.paymentGatewayFailedSuccess = action.payload
+        },
+        setPaymentGatewayFailedError: (state, action) => {
+            state.paymentGatewayFailedError = action.payload || null
+        },
+        resetPaymentGatewayFailed: (state) => {
+            state.paymentGatewayFailedSuccess = null
+            state.paymentGatewayFailedError = null
+        }
+    }
+})
+
+
+const initialChangePaymentGatewayFailedState = {
+    changePaymentGatewayFailedSuccess: null,
+    changePaymentGatewayFailedError: null,
+    loadingChangePaymentGatewayFailed: false
+}
+export const changePaymentGatewayFailedSlice = createSlice({
+    name: "changePaymentGatewayFailed",
+    initialState: initialChangePaymentGatewayFailedState,
+    reducers: {
+        setLoadingChangePaymentGatewayFailed: (state, action) => {
+            state.loadingChangePaymentGatewayFailed = action.payload
+        },
+        setChangePaymentGatewaySuccess: (state, action) => {
+            state.changePaymentGatewayFailedSuccess = action.payload
+        },
+        setChangePaymentGatewayFailedError: (state, action) => {
+            state.changePaymentGatewayFailedError = action.payload || null
+        },
+        resetChangePaymentGatewayFailed: (state) => {
+            state.changePaymentGatewayFailedSuccess = null
+            state.changePaymentGatewayFailedError = null
+        }
+    }
+})

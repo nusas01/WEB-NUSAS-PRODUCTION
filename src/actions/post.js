@@ -11,6 +11,8 @@ import {
     checkPendingTransactionSlice,
     sendEmailUpdateChangePaymentGatewaySlice,
     checkPendingSubmissionTransactionSlice,
+    paymentGatewayFailedSlice,
+    changePaymentGatewayFailedSlice,
 } from "../reducers/post"
 import {
     loginStatusSlice,
@@ -38,9 +40,6 @@ export const login = (data) => async (dispatch) => {
         dispatch(loginSuccess(response?.data?.success));
         dispatch(setLoginStatus(true))
     } catch(error) {
-        if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
-            dispatch(setStatusExpiredUserToken(true));
-        }
         const errorData = error.response?.data || {};
 
         const response = {
@@ -239,6 +238,7 @@ export const finishedChangePaymentGatewayTenant = (data) => {
         try {
             const response = await axiosInstance.post(`${process.env.REACT_APP_FINISHED_CHANGE_PAYMENT_GATEWAY}`, data, {
                 headers: {
+                    "Content-Type": "multipart/form-data",
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true
@@ -302,6 +302,56 @@ export const checkPendingTransactionSubmissionPaymentGateway = (data) => {
             dispatch(setCheckPendingSubmissionTransactionError(error.response?.data?.error || 'Terjadi kesalahan'))
         } finally {
             dispatch(setLoadingCheckPendingSubmissionTransaction(false))
+        }
+    }
+}
+
+
+const {setPaymentGatewaySuccess, setPaymentGatewayFailedError, setLoadingPaymentGatewayFailed} = paymentGatewayFailedSlice.actions
+export const paymentGatewayFailed = (data) => {
+    return async (dispatch) => {
+        dispatch(setLoadingPaymentGatewayFailed(true))
+        try {
+            const response = await axiosInstance.post(`${process.env.REACT_APP_PAYMENT_GATEWAY_FAILED}`, data, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                },
+                withCredentials: true
+            })
+            dispatch(setPaymentGatewaySuccess(response?.data?.success))
+        } catch (error) {
+            if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
+                dispatch(setStatusExpiredUserToken(true));
+            }
+            dispatch(setPaymentGatewayFailedError(error.response?.data?.error || 'Terjadi kesalahan'))
+        } finally {
+            dispatch(setLoadingPaymentGatewayFailed(false))
+        }
+    }
+}
+
+
+const {setChangePaymentGatewaySuccess, setChangePaymentGatewayFailedError, setLoadingChangePaymentGatewayFailed} = changePaymentGatewayFailedSlice.actions
+export const changePaymentGatewayFailed = (data) => {
+    return async (dispatch) => {
+        dispatch(setLoadingChangePaymentGatewayFailed(true))
+        try {
+            const response = await axiosInstance.post(`${process.env.REACT_APP_SUBMISSION_CHANGE_PAYMENT_GATEWAY}`, data, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                },
+                withCredentials: true
+            })
+            dispatch(setChangePaymentGatewaySuccess(response?.data?.success))
+        } catch (error) {
+            if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
+                dispatch(setStatusExpiredUserToken(true));
+            }
+            dispatch(setChangePaymentGatewayFailedError(error.response?.data?.error || 'Terjadi kesalahan'))
+        } finally {
+            dispatch(setLoadingChangePaymentGatewayFailed(false))
         }
     }
 }

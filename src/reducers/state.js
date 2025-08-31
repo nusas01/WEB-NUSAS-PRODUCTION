@@ -30,6 +30,8 @@ import {
     sendEmailUpdateChangePaymentGatewaySlice,
     checkPendingTransactionSlice,
     checkPendingSubmissionTransactionSlice,
+    paymentGatewayFailedSlice,
+    changePaymentGatewayFailedSlice,
 } from './post'
 import {
   statusExpiredUserTokenSlice
@@ -72,6 +74,8 @@ const nonPersistedReducers = {
   checkPendingTransactionState: checkPendingTransactionSlice.reducer,
   checkPendingSubmissionTransactionState: checkPendingSubmissionTransactionSlice.reducer,
   statusExpiredUserTokenState: statusExpiredUserTokenSlice.reducer,
+  paymentGatewayFailedState: paymentGatewayFailedSlice.reducer,
+  changePaymentGatewayFailedState: changePaymentGatewayFailedSlice.reducer,
 }
 
 const rootReducer = combineReducers({

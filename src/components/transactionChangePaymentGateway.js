@@ -127,10 +127,18 @@ const TransactionSubmissionChangePaymentGatewayDashboard = () => {
         }))
     }    
 
-
     const [activeTab, setActiveTab] = useState('pending');
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
+
+    // handle resfresh data
+    const handleRefresh = () => {
+        if (activeTab === 'pending') {
+            dispatch(fetchTransactionSubmissionPending())
+        } else {
+            dispatch(fetchTransactionSubmissionPaid())
+        }
+    }
 
     useEffect(() => {
         if (activeTab === 'pending' && pendingTransactions.length === 0) {
@@ -233,14 +241,10 @@ const TransactionSubmissionChangePaymentGatewayDashboard = () => {
 
                                 <div className="flex items-center space-x-4">
                                     <button
+                                    onClick={() => handleRefresh()}
                                     className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors">
                                         <RefreshCcw className="w-4 h-4 mr-2" />
                                         Refresh
-                                    </button>
-                                    <button
-                                        className="inline-flex items-center px-4 py-2 border border-gray-900 rounded-lg text-sm font-medium text-gray-900 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors"
-                                    >
-                                        Test Deploy
                                     </button>
                                     <button className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors">
                                         <Settings className="w-4 h-4 mr-2" />

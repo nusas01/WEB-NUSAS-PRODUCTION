@@ -13,12 +13,14 @@ import PaymentGatewayDashboard from './components/submissionChangePaymentGateway
 import TransactionDashboard from './components/transaction';
 import TransactionSubmissionChangePaymentGatewayDashboard from './components/transactionChangePaymentGateway';
 import {statusExpiredUserTokenSlice} from './reducers/expToken'
+import {loginStatusSlice} from './reducers/get'
 
 // Pisahkan component yang menggunakan useNavigate
 function AppContent() {
   const dispatch = useDispatch()
-  const navigate = useNavigate() // ✅ Sekarang useNavigate dipanggil di dalam Router context
+  const navigate = useNavigate() 
   
+  const {setLoginStatus} = loginStatusSlice.actions
   const { loggedIn } = useSelector((state) => state.persisted.loginStatus)
   
   useEffect(() => {
@@ -37,6 +39,7 @@ function AppContent() {
     if (statusExpiredUserToken) {
       navigate("/login");
       dispatch(clearStatusExpiredUserToken());
+      dispatch(setLoginStatus(false));
     }
   }, [statusExpiredUserToken, navigate, dispatch]);
 

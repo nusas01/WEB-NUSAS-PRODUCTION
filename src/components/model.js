@@ -42,12 +42,12 @@ export const AccessKeyModal = ({
     }
   };
 
-  const maskKey = (key) => {
-    if (!key) return '';
-    const visiblePart = key.substring(0, 12);
-    const maskedPart = '*'.repeat(key.length - 12);
-    return visiblePart + maskedPart;
-  };
+  // const maskKey = (key) => {
+  //   if (!key) return '';
+  //   const visiblePart = key?.substring(0, 12);
+  //   const maskedPart = '*'.repeat(key.length - 12);
+  //   return visiblePart + maskedPart;
+  // };
 
   if (!isOpen) return null;
 
@@ -136,7 +136,7 @@ export const AccessKeyModal = ({
               <div className="relative">
                 <div className="flex items-center space-x-2 bg-white rounded-lg border border-blue-200 p-3">
                   <code className="flex-1 text-sm font-mono text-gray-900 break-all">
-                    {showKey ? accessKey : maskKey(accessKey)}
+                    {showKey ? accessKey : "************************************" }
                   </code>
                   <button
                     onClick={handleCopyKey}

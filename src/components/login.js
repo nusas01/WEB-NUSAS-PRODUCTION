@@ -149,9 +149,7 @@ const LoginComponent = () => {
                 <div className="bg-white rounded-2xl shadow-xl p-8">
                 {/* Header */}
                 <div className="text-center mb-8">
-                    <div className="mx-auto h-16 w-16 bg-green-500 rounded-full flex items-center justify-center mb-4">
-                    <LogIn className="h-8 w-8 text-white" />
-                    </div>
+                    <img src="/image/logo_nusas_2.png" alt="Logo NUSAS" className="mx-auto h-20 w-20 mb-4" />
                     <h2 className="text-3xl font-bold text-gray-900">
                     Masuk ke Akun Anda
                     </h2>
@@ -182,7 +180,7 @@ const LoginComponent = () => {
                         onBlur={() => handleBlur('email')}
                         className={`
                             w-full pl-10 pr-4 py-3 border rounded-xl text-gray-900 placeholder-gray-500 
-                            focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent
+                            focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent
                             transition-all duration-200 ease-in-out
                             ${isFieldInvalid('email') 
                             ? 'border-red-300 bg-red-50 focus:ring-red-500' 
@@ -219,7 +217,7 @@ const LoginComponent = () => {
                         onBlur={() => handleBlur('password')}
                         className={`
                             w-full pl-10 pr-12 py-3 border rounded-xl text-gray-900 placeholder-gray-500 
-                            focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent
+                            focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent
                             transition-all duration-200 ease-in-out
                             ${isFieldInvalid('password') 
                             ? 'border-red-300 bg-red-50 focus:ring-red-500' 
@@ -257,7 +255,7 @@ const LoginComponent = () => {
                         transition-all duration-200 ease-in-out transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500
                         ${loadingLogin 
                         ? 'bg-gray-400 cursor-not-allowed' 
-                        : 'bg-green-500 hover:bg-green-600 active:bg-green-700 shadow-lg hover:shadow-xl'
+                        : 'bg-gray-900 hover:bg-gray-800 active:bg-gray-950 shadow-lg hover:shadow-xl'
                         }
                     `}
                     >
@@ -279,7 +277,7 @@ const LoginComponent = () => {
                 <div className="mt-8 text-center">
                     <p className="text-sm text-gray-600">
                     Lupa password? 
-                    <button className="ml-1 font-semibold text-green-500 hover:text-green-600 transition-colors duration-200">
+                    <button className="ml-1 font-semibold text-gray-900 hover:text-gray-800 transition-colors duration-200">
                         Reset disini
                     </button>
                     </p>
