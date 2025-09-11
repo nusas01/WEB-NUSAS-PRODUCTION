@@ -228,11 +228,6 @@ const TransactionDashboard = () => {
                                         <RefreshCcw className="w-4 h-4 mr-2" />
                                         Refresh
                                     </button>
-                                    <button
-                                        className="inline-flex items-center px-4 py-2 border border-gray-900 rounded-lg text-sm font-medium text-gray-900 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors"
-                                    >
-                                        Test Deploy
-                                    </button>
                                     <button className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors">
                                         <Settings className="w-4 h-4 mr-2" />
                                         Settings

@@ -17,6 +17,8 @@ import {
     transactionPaidSlice, 
     transactionSubmissionPendingSlice,
     transactionSubmissionPaidSlice,
+    tenantsSlice,
+    tenantStoresSlice,
 } from './get'
 import {
     loginSlice,
@@ -49,6 +51,8 @@ const persistedReducers = combineReducers({
   transactionPending: transactionPendingSlice.reducer,
   transactionSubmissionPending: transactionSubmissionPendingSlice.reducer,
   transactionSubmissionPaid: transactionSubmissionPaidSlice.reducer,
+  tenants: tenantsSlice.reducer,
+  tenantStores: tenantStoresSlice.reducer,
 })
 
 // 2. Konfigurasi persist

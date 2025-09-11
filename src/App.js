@@ -14,6 +14,7 @@ import TransactionDashboard from './components/transaction';
 import TransactionSubmissionChangePaymentGatewayDashboard from './components/transactionChangePaymentGateway';
 import {statusExpiredUserTokenSlice} from './reducers/expToken'
 import {loginStatusSlice} from './reducers/get'
+import TenantManagement from './components/tenants';
 
 // Pisahkan component yang menggunakan useNavigate
 function AppContent() {
@@ -49,6 +50,7 @@ function AppContent() {
       <Routes>
         <Route path="/login" element={<LoginComponent/>}/>
         <Route element={<PrivateRoute/>}>
+          <Route path='/tenants' element={<TenantManagement/>} />
           <Route path="/submission/change/payment/gateway" element={<PaymentGatewayDashboard/>}/>
           <Route path='/transactions' element={<TransactionDashboard/>}/>
           <Route path='/transactions/submission/change/payment/gateway' element={<TransactionSubmissionChangePaymentGatewayDashboard/>}/>

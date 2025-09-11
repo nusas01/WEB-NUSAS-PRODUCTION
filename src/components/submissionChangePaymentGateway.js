@@ -489,10 +489,10 @@ const PaymentGatewayDashboard = () => {
         setLoading({ ...loading, [`changePaymentGatewayFailed_${startAndFinishId}`]: loadingSendEmailUpdateChangePaymentGateway });
     }, [loadingChangePaymentGatewayFailed])
 
-    const handleChangePaymentGatewayFailed = (tenantId, email) => {
-        setStartAndFinishId(tenantId)
+    const handleChangePaymentGatewayFailed = (id, email) => {
+        setStartAndFinishId(id)
         dispatch(changePaymentGatewayFailed({
-            tenant_id: tenantId,
+            id: id,
             email: email,
         }))
     }
@@ -620,14 +620,14 @@ const PaymentGatewayDashboard = () => {
                                         <RefreshCcw className={`w-4 h-4 mr-2 ${loading.refresh ? 'animate-spin' : ''}`} />
                                         {loading.refresh ? 'Refreshing...' : 'Refresh'}
                                     </button>
-                                    <button
+                                    {/* <button
                                         onClick={handleDeployAppTesting}
                                         disabled={loading.deployTesting}
                                         className="inline-flex items-center px-4 py-2 border border-gray-900 rounded-lg text-sm font-medium text-gray-900 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors disabled:opacity-50"
                                     >
                                         <TestTube className="w-4 h-4 mr-2" />
                                         {loading.deployTesting ? 'Deploying...' : 'Test Deploy'}
-                                    </button>
+                                    </button> */}
                                     <button className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors">
                                         <Settings className="w-4 h-4 mr-2" />
                                         Settings
@@ -821,9 +821,9 @@ const PaymentGatewayDashboard = () => {
                                                 {!!loading[`start_${item.id}`] ? 'Starting...' : 'Start'}
                                                 </button>
                                                 <button 
-                                                onClick={() => handleChangePaymentGatewayFailed(item.tenant.id, item.tenant.email)}
-                                                disabled={!!loading[`changePaymentGatewayFailed_${item.tenant.id}`]}
-                                                className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
+                                                onClick={() => handleChangePaymentGatewayFailed(item.id, item.tenant.email)}
+                                                disabled={!!loading[`changePaymentGatewayFailed_${item.id}`]}
+                                                className="flex items-center gap-1 bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors disabled:opacity-50"
                                                 >
                                                 <BadgeAlert className="w-3 h-3" />
                                                 {!!loading[`changePaymentGatewayFailed_${item.tenant.id}`] ? 'Sending...' : 'Credentials Failed'}

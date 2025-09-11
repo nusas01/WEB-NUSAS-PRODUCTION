@@ -307,3 +307,52 @@ export const transactionSubmissionPendingSlice = createSlice({
 })
 
 
+const initialTenantsState = {
+    dataTenants: [],
+    errorTenants: null,
+    loadingTenants: false
+}
+export const tenantsSlice = createSlice({
+    name: "tenants",
+    initialState: initialTenantsState,
+    reducers: {
+        setLoadingTenants: (state, action) => {
+            state.loadingTenants = action.payload
+        },
+        setTenantsSuccess: (state, action) => {
+            state.dataTenants = action.payload || []
+        },
+        setTenantsError: (state, action) => {
+            state.errorTenants = action.payload || null
+        },
+        resetErrortenants: (state) => {
+            state.errorTenants = null
+        }
+    }
+})
+
+const initialTenantStoresState = {
+    dataTenantStores: [],
+    errorTenantStores: null,
+    loadingTenantStores: false
+}
+export const tenantStoresSlice = createSlice({
+    name: "tenantStores",
+    initialState: initialTenantStoresState,
+    reducers: {
+        setLoadingTenantStores: (state, action) => {
+            state.loadingTenantStores = action.payload
+        },
+        setTenantStoresSuccess: (state, action) => {
+            state.dataTenantStores = action.payload || []
+        },
+        setTenantStoresError: (state, action) => {
+            state.errorTenantStores = action.payload || null
+        },
+        resetErrorTenantStores: (state) => {
+            state.errorTenantStores = null
+        }
+    }
+})
+
+

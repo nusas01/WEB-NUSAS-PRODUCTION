@@ -12,6 +12,8 @@ import {
     accessKeyStoreTestingSlice,
     transactionSubmissionPaidSlice,
     transactionSubmissionPendingSlice,
+    tenantsSlice, 
+    tenantStoresSlice,
 } from '../reducers/get'
 import { statusExpiredUserTokenSlice } from '../reducers/expToken'
 
@@ -296,6 +298,53 @@ export const fetchTransactionSubmissionPending = () => {
             dispatch(setTransctionSubmissionPendingError(error.response?.data?.error || 'Terjadi kesalahan'))
         } finally {
             dispatch(setLoadingTransactionSubmissionPending(false))
+        }
+    }
+}
+
+const { setTenantsSuccess, setTenantsError, setLoadingTenants } = tenantsSlice.actions
+export const fetchTenants = () => {
+    return async (dispatch) => {
+        dispatch(setLoadingTenants(true))
+        try {
+            const response = await axiosInstance.get(`${process.env.REACT_APP_TENANTS}`, {
+                headers: {
+                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                },
+                withCredentials: true
+            })
+            dispatch(setTenantsSuccess(response?.data))
+        } catch (error) {
+            if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
+                dispatch(setStatusExpiredUserToken(true));
+            }
+            dispatch(setTenantsError(error.response?.data?.error))
+        } finally {
+            dispatch(setLoadingTenants(false))
+        }
+    }
+}
+
+const { setTenantStoresSuccess, setTenantStoresError, setLoadingTenantStores } = tenantStoresSlice.actions
+export const fetchTenantStores = (data) => {
+    return async (dispatch) => {
+        dispatch(setLoadingTenantStores(true))
+        try {
+            const response = await axiosInstance.get(`${process.env.REACT_APP_TENANT_STORES}`, {
+                headers: {
+                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                },
+                withCredentials: true,
+                params: data,
+            })
+            dispatch(setTenantStoresSuccess(response?.data))
+        } catch (error) {
+            if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
+                dispatch(setStatusExpiredUserToken(true));
+            }
+            dispatch(setTenantStoresError(error.response?.data?.error))
+        } finally {
+            dispatch(setLoadingTenantStores(false))
         }
     }
 }
