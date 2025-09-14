@@ -31,6 +31,7 @@ export const loginSlice = createSlice({
 const initialForgotPassword = {
     succesForgotPassword: false,
     errorForgotPassword: null, 
+    errorFieldPassword: null,
     loadingForgotPassword: false,
 }
 export const forgotPasswordSlice = createSlice({
@@ -44,11 +45,13 @@ export const forgotPasswordSlice = createSlice({
             state.succesForgotPassword = action.payload
         },
         setErrorForgotPassword: (state, action) => {
-            state.errorForgotPassword = action.payload
+            state.errorForgotPassword = action.payload.error 
+            state.errorFieldPassword = action.payload.errorField
         },
         resetForgotPassword: (state) => {
             state.errorForgotPassword = null
             state.succesForgotPassword = false
+            state.errorFieldPassword = null
         }
     }
 })
@@ -358,3 +361,33 @@ export const changePaymentGatewayFailedSlice = createSlice({
         }
     }
 })
+
+
+const initialSignupState = {
+    signupSuccess: null,
+    signupError: null,
+    signupErrorField: [],
+    loadingSignup: false
+}
+export const signupSlice = createSlice({
+    name: "signup",
+    initialState: initialSignupState,
+    reducers: {
+        setLoadingSignup: (state, action) => {
+            state.loadingSignup = action.payload
+        },
+        setSignupSuccess: (state, action) => {
+            state.signupSuccess = action.payload
+        },
+        setSignupError: (state, action) => {
+            state.signupError = action.payload.error || null
+            state.signupErrorField = action.payload.errorField || []
+        },
+        resetSignup: (state) => {
+            state.signupSuccess = null
+            state.signupError = null
+            state.signupErrorField = []
+        }
+    }
+})
+

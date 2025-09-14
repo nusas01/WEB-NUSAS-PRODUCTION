@@ -1,9 +1,7 @@
 import { useDispatch } from "react-redux"
 import { navbarSlice } from "../reducers/reducers";
-import { useEffect } from "react";
+import { useEffect, useState, useRef, useLayoutEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { useState,useRef,useLayoutEffect } from "react";
-
 
 export const useDeviceDetection = () => {
   const dispatch = useDispatch();
@@ -113,3 +111,5 @@ export const formatCurrency = (amount) => {
     minimumFractionDigits: 0
     }).format(amount);
 };
+
+

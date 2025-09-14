@@ -34,7 +34,12 @@ import {
     checkPendingSubmissionTransactionSlice,
     paymentGatewayFailedSlice,
     changePaymentGatewayFailedSlice,
+    signupSlice,
+    forgotPasswordSlice,
 } from './post'
+import {
+  signupVerificationSlice
+} from './patch'
 import {
   statusExpiredUserTokenSlice
 } from './expToken'
@@ -65,6 +70,7 @@ const persistConfig = {
 const nonPersistedReducers = {
   loginState: loginSlice.reducer,
   logoutState: logoutSlice.reducer,
+  signupState: signupSlice.reducer,
   sendEmailCredentialsState: sendEmailCredentialsSlice.reducer,
   deployAppState: deployAppSlice.reducer,
   deployFinishedState: deployFinishedSlice.reducer,
@@ -80,6 +86,8 @@ const nonPersistedReducers = {
   statusExpiredUserTokenState: statusExpiredUserTokenSlice.reducer,
   paymentGatewayFailedState: paymentGatewayFailedSlice.reducer,
   changePaymentGatewayFailedState: changePaymentGatewayFailedSlice.reducer,
+  signupVerificationState: signupVerificationSlice.reducer,
+  forgotPasswordState: forgotPasswordSlice.reducer,
 }
 
 const rootReducer = combineReducers({

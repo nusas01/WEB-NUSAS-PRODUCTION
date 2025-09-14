@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { ChevronDown, ChevronRight, Users, RefreshCcw, Menu, Store, Phone, Mail, MapPin, Calendar, Key, Building, Loader2 } from 'lucide-react';
 import {
     Toast,
@@ -15,6 +15,9 @@ import {
 import {
     AccessKeyModal
 } from './model'
+import {
+    loadMoreTenants,
+} from '../reducers/reducers'
 import {
     fetchTenants,
     fetchTenantStores,
@@ -33,6 +36,9 @@ const TenantManagement = () => {
     const [loadingSpesifik, setLoadingSpesifik] = useState(null)
     const [loadingTenantStoresIds, setLoadingTenantStoresIds] = useState(new Set());
 
+    // Refs for intersection observer
+    const tenantsObserverRef = useRef(null);
+
     const { setIsOpen } = navbarSlice.actions
     const { isOpen, isMobileDeviceType } = useSelector((state) => state.persisted.navbar)
 
@@ -45,11 +51,14 @@ const TenantManagement = () => {
         dataTenants: tenantsData,
         errorTenants,
         loadingTenants,
+        hasMore: hasMoreTenants,
     } = useSelector((state) => state.persisted.tenants)
+
+    console.log("data tenants: ", tenantsData)
 
     useEffect(() => {
         if (tenantsData.length === 0) {
-            dispatch(fetchTenants())
+            dispatch(fetchTenants(1, false))
         }
     }, [])
 
@@ -62,6 +71,38 @@ const TenantManagement = () => {
         }
     }, [errorTenants])
 
+    const loadMoreTenantsCallback = useCallback(() => {
+        dispatch(loadMoreTenants())
+    }, [dispatch])
+
+    // Intersection observer for tenants load more
+    useEffect(() => {
+        if (loadingTenants || !hasMoreTenants) return;
+
+        const node = tenantsObserverRef.current;
+        if (!node) return;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                console.log("Tenants entry.isIntersecting:", entry.isIntersecting);
+                if (entry.isIntersecting) {
+                    loadMoreTenantsCallback();
+                }
+            },
+            {
+                root: null,
+                rootMargin: '10px',
+                threshold: 0.5,
+            }
+        );
+
+        observer.observe(node);
+
+        return () => {
+            observer.disconnect();
+        };
+    }, [loadMoreTenantsCallback, loadingTenants, hasMoreTenants]);
+
     // data tenant stores
     const {resetErrorTenantStores} = tenantStoresSlice.actions
     const { 
@@ -70,12 +111,22 @@ const TenantManagement = () => {
         loadingTenantStores,
     } = useSelector((state) => state.persisted.tenantStores)
 
-     const toggleTenant = (tenantId) => {
-        setLoadingTenantStoresIds(prev => new Set(prev).add(tenantId));
-        dispatch(fetchTenantStores({
-            id: tenantId,
-        }))
+    const toggleTenant = (tenantId) => {
+        const newExpanded = new Set();
+        
+        if (expandedTenants.has(tenantId)) {
+            setExpandedTenants(newExpanded);
+        } else {
+            newExpanded.add(tenantId);
+            setExpandedTenants(newExpanded);
+            
+            if (!storesData[tenantId] || storesData[tenantId].length === 0) {
+                setLoadingTenantStoresIds(prev => new Set(prev).add(tenantId));
+                dispatch(fetchTenantStores(tenantId));
+            }
+        }
     };
+
 
     useEffect(() => {
         if (!loadingTenantStores) {
@@ -221,148 +272,176 @@ const TenantManagement = () => {
                         </div> 
 
                         {/* Tenant List */}
-                        <div className="flex items-center justify-center space-y-4 bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 p-6 min-h-[80vh]" style={{marginTop: headerHeight}}>
+                        <div className="flex justify-center space-y-4 bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 p-6 min-h-[80vh]" style={{marginTop: headerHeight}}>
                         
                             {/* Loading Tenants */}
-                            {loadingTenants && (
+                            {loadingTenants && tenantsData.length === 0 && (
                                 <div className="flex flex-col items-center justify-center py-12 space-y-4">
                                     <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
                                     <p className="text-gray-500">Loading tenants...</p>
                                 </div>
                             )}
 
-                            {(!loadingTenants && tenantsData.length > 0) && tenantsData.map((tenant) => {
-                                const isExpanded = expandedTenants.has(tenant.id);
-                                const tenantStores = storesData[tenant.id] || [];
-                                const isLoadingStores = loadingTenantStoresIds.has(tenant.id);
-                                
-                                return (
-                                <div key={tenant.id} className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200">
-                                    {/* Tenant Row */}
-                                    <div 
-                                    className="p-6 cursor-pointer hover:bg-gray-50 transition-colors duration-200"
-                                    onClick={() => toggleTenant(tenant.id)}
-                                    >
-                                    <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-4">
-                                        <div className="flex items-center gap-2">
-                                            {isLoadingStores ? (
-                                                <Loader2 className="h-5 w-5 text-gray-900 animate-spin" />
-                                            ) : isExpanded ? (
-                                                <ChevronDown className="h-5 w-5 text-gray-900" />
-                                            ) : (
-                                                <ChevronRight className="h-5 w-5 text-gray-900" />
-                                            )}
-                                            <div className="p-2 bg-gray-100 rounded-lg">
-                                            <Building className="h-5 w-5 text-gray-900" />
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <h3 className="font-semibold text-gray-900 text-lg">Tenant</h3>
-                                            <div className="flex items-center gap-4 mt-1">
-                                            <div className="flex items-center gap-1 text-gray-600">
-                                                <Mail className="h-4 w-4" />
-                                                <span className="text-sm">{tenant.email}</span>
-                                            </div>
-                                            <div className="flex items-center gap-1 text-gray-600">
-                                                <Phone className="h-4 w-4" />
-                                                <span className="text-sm">{tenant.phone_number}</span>
-                                            </div>
-                                            </div>
-                                        </div>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                        <span className="px-3 py-1 bg-gray-100 text-gray-900 rounded-full text-sm font-medium">
-                                            {tenantStores.length} Store{tenantStores.length !== 1 ? 's' : ''}
-                                        </span>
-                                        </div>
-                                    </div>
-                                    </div>
-
-                                    {/* Loading Stores */}
-                                    {isLoadingStores && (
-                                        <div className="flex items-center space-x-2">
-                                            <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-                                            <span className="text-gray-500">Loading stores...</span>
-                                        </div>
-                                    )}
-
-
-                                    {/* Stores List (Expandable) */}
-                                    {isExpanded && !isLoadingStores && tenantStores.length > 0 && (
-                                    <div className="border-t border-gray-200 bg-gray-50 p-6">
-                                        <div className="flex items-center gap-2 mb-4">
-                                            <Store className="h-5 w-5 text-gray-900" />
-                                            <h4 className="font-semibold text-gray-900">Associated Stores</h4>
-                                        </div>
-                                        <div className="space-y-3">
-                                            {tenantStores.map((store) => {
-                                            const isExpiring = isExpiringSoon(store.expiration_access);
-                                            
-                                            return (
-                                                <div key={store.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow duration-200">
-                                                <div className="flex items-start justify-between">
-                                                    <div className="flex-1">
-                                                    <div className="flex items-center gap-3 mb-3">
-                                                        <h5 className="font-semibold text-gray-900">{store.name}</h5>
-                                                        {isExpiring && (
-                                                        <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
-                                                            Expiring Soon
-                                                        </span>
-                                                        )}
+                            {tenantsData.length > 0 && (
+                                <div className="w-full space-y-4">
+                                    {tenantsData.map((tenant) => {
+                                        const isExpanded = expandedTenants.has(tenant.id);
+                                        
+                                        return (
+                                        <div key={tenant.id} className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200">
+                                            {/* Tenant Row */}
+                                            <div 
+                                            className="p-6 cursor-pointer hover:bg-gray-50 transition-colors duration-200"
+                                            onClick={() => toggleTenant(tenant.id)}
+                                            >
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-4">
+                                                <div className="flex items-center gap-2">
+                                                    {isExpanded ? (
+                                                        <ChevronDown className="h-5 w-5 text-gray-900" />
+                                                    ) : (
+                                                        <ChevronRight className="h-5 w-5 text-gray-900" />
+                                                    )}
+                                                    <div className="p-2 bg-gray-100 rounded-lg">
+                                                    <Building className="h-5 w-5 text-gray-900" />
                                                     </div>
-                                                    
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-600">
-                                                        <div className="flex items-center gap-2">
+                                                </div>
+                                                <div>
+                                                    <h3 className="font-semibold text-gray-900 text-lg">Tenant</h3>
+                                                    <div className="flex items-center gap-4 mt-1">
+                                                    <div className="flex items-center gap-1 text-gray-600">
+                                                        <Mail className="h-4 w-4" />
+                                                        <span className="text-sm">{tenant.email}</span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1 text-gray-600">
                                                         <Phone className="h-4 w-4" />
-                                                        <span>{store.phone_number}</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-2">
-                                                        <Calendar className="h-4 w-4" />
-                                                        <span>Access expires: {store.expiration_access}</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-2">
-                                                        <MapPin className="h-4 w-4" />
-                                                        <span>{store.address}, {store.city}, {store.state} {store.postal_code}</span>
-                                                        </div>
-                                                        <div className="flex items-center gap-2">
-                                                        <Calendar className="h-4 w-4" />
-                                                        <span>Created: {store.creates_at}</span>
-                                                        </div>
+                                                        <span className="text-sm">{tenant.phone_number}</span>
                                                     </div>
-                                                    </div>
-                                                    
-                                                    <div className="ml-4">
-                                                    <button
-                                                        onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleCreateAccessKey(store, tenant.id, store.id);
-                                                        }}
-                                                        className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors duration-200 text-sm font-medium"
-                                                    >
-                                                        {(loadingAccessKey && loadingSpesifik === store.id) ? (
-                                                            <span className="w-3 h-3 mr-1 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                                        ) : (
-                                                            <Key className="w-3 h-3 mr-1" />
-                                                        )}
-                                                        {(loadingAccessKey && loadingSpesifik === store.id) ? 'Creating...' : 'Access Key Testing'}
-                                                    </button>
                                                     </div>
                                                 </div>
                                                 </div>
-                                            );
-                                            })}
-                                        </div>
-                                    </div>
-                                    )}
+                                                <div className="flex items-center gap-2">
+                                                </div>
+                                            </div>
+                                            </div>
 
+                                            {/* Loading Stores */}
+                                            {(loadingSpesifik === tenant.id) && (
+                                                <div className="px-6 pb-6">
+                                                    <div className="flex items-center space-x-2">
+                                                        <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+                                                        <span className="text-gray-500">Loading stores...</span>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Stores List (Expandable) */}
+                                            {isExpanded && !loadingTenantStores && storesData.length > 0 && (
+                                            <div className="border-t border-gray-200 bg-gray-50 p-6">
+                                                <div className="flex items-center gap-2 mb-4">
+                                                    <Store className="h-5 w-5 text-gray-900" />
+                                                    <h4 className="font-semibold text-gray-900">Associated Stores</h4>
+                                                </div>
+                                                <div className="space-y-3">
+                                                    {storesData.map((store) => {
+                                                    const isExpiring = isExpiringSoon(store.expiration_access);
+                                                    
+                                                    return (
+                                                        <div key={store.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow duration-200">
+                                                        <div className="flex items-start justify-between">
+                                                            <div className="flex-1">
+                                                            <div className="flex items-center gap-3 mb-3">
+                                                                <h5 className="font-semibold text-gray-900">{store.name}</h5>
+                                                                {isExpiring && (
+                                                                <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+                                                                    Expiring Soon
+                                                                </span>
+                                                                )}
+                                                            </div>
+                                                            
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-600">
+                                                                <div className="flex items-center gap-2">
+                                                                <Phone className="h-4 w-4" />
+                                                                <span>{store.phone_number}</span>
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                <Calendar className="h-4 w-4" />
+                                                                <span>Access expires: {store.expiration_access}</span>
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                <MapPin className="h-4 w-4" />
+                                                                <span>{store.address}, {store.city}, {store.state} {store.postal_code}</span>
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                <Calendar className="h-4 w-4" />
+                                                                <span>Created: {store.creates_at}</span>
+                                                                </div>
+                                                            </div>
+                                                            </div>
+                                                            
+                                                            <div className="ml-4">
+                                                            <button
+                                                                onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleCreateAccessKey(store, tenant.id, store.id);
+                                                                }}
+                                                                className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors duration-200 text-sm font-medium"
+                                                            >
+                                                                {(loadingAccessKey && loadingSpesifik === store.id) ? (
+                                                                    <span className="w-3 h-3 mr-1 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                                                ) : (
+                                                                    <Key className="w-3 h-3 mr-1" />
+                                                                )}
+                                                                {(loadingAccessKey && loadingSpesifik === store.id) ? 'Creating...' : 'Access Key Testing'}
+                                                            </button>
+                                                            </div>
+                                                        </div>
+                                                        </div>
+                                                    );
+                                                    })}
+                                                </div>
+                                            </div>
+                                            )}
+
+                                            {/* Empty stores state */}
+                                            {isExpanded && !loadingTenantStores && storesData.length === 0 && (
+                                                <div className="border-t border-gray-200 bg-gray-50 p-6">
+                                                    <div className="text-center py-8">
+                                                        <Store className="h-12 w-12 mx-auto text-gray-400 mb-3" />
+                                                        <h4 className="text-lg font-medium text-gray-900 mb-1">No stores found</h4>
+                                                        <p className="text-gray-600">This tenant doesn't have any associated stores yet.</p>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                        </div>
+                                        );
+                                    })}
+
+                                    {/* Load More Trigger for Tenants */}
+                                    {hasMoreTenants && (
+                                        <div
+                                            ref={tenantsObserverRef}
+                                            className="flex items-center justify-center py-8"
+                                        >
+                                            {loadingTenants ? (
+                                                <div className="flex items-center space-x-2">
+                                                    <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                                                    <span className="text-gray-500">Loading more tenants...</span>
+                                                </div>
+                                            ) : (
+                                                <div className="h-6 w-full flex items-center justify-center">
+                                                    <span className="text-sm text-gray-400">Scroll for more tenants</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
-                                );
-                            })}
+                            )}
 
                             {/* Empty State */}
                             {!loadingTenants && tenantsData.length === 0 && (
-                                <div className="text-center py-12 ">
+                                <div className="text-center py-12">
                                     <Users className="h-16 w-16 mx-auto text-gray-400 mb-4" />
                                     <h3 className="text-lg font-semibold text-gray-900 mb-2">No tenants found</h3>
                                     <p className="text-gray-600">There are no tenants to display at the moment.</p>

@@ -1,4 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
+import {
+  fetchTenants,
+  fetchTenantStores
+} from '../actions/get'
 
 export const navbarSlice = createSlice({
   name: "navbarInternal",
@@ -15,3 +19,23 @@ export const navbarSlice = createSlice({
     }
   },
 });
+
+export const loadMoreTenants = () => {
+  return async (dispatch, getState) => {
+    const state = getState().persisted;
+    const { tenants } = state;
+
+    if (
+      !tenants.hasMore || 
+      tenants.isLoadingMore || 
+      tenants.loadingTenants
+    ) {
+      return
+    }
+
+    const nextPage = tenants.page  + 1;
+
+    return dispatch(fetchTenants(nextPage, true))
+  } 
+}
+

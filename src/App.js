@@ -8,13 +8,16 @@ import {
 } from './actions/get'
 import { useDispatch, useSelector } from 'react-redux';
 import LoginComponent from './components/login';
-import { useEffect, useCallback } from 'react';
+import { useEffect } from 'react';
 import PaymentGatewayDashboard from './components/submissionChangePaymentGateway'
 import TransactionDashboard from './components/transaction';
 import TransactionSubmissionChangePaymentGatewayDashboard from './components/transactionChangePaymentGateway';
 import {statusExpiredUserTokenSlice} from './reducers/expToken'
 import {loginStatusSlice} from './reducers/get'
 import TenantManagement from './components/tenants';
+import SignupComponent from './components/signup';
+import VerificationForm from './components/verification';
+import ForgotPasswordComponent from './components/forgotPassword';
 
 // Pisahkan component yang menggunakan useNavigate
 function AppContent() {
@@ -49,6 +52,9 @@ function AppContent() {
       <ScrollToTop/>
       <Routes>
         <Route path="/login" element={<LoginComponent/>}/>
+        <Route path="/signup" element={<SignupComponent/>}/>
+        <Route path='/signup/verification' element={<VerificationForm/>}/>
+        <Route path='/forgot/password' element={<ForgotPasswordComponent/>}/>
         <Route element={<PrivateRoute/>}>
           <Route path='/tenants' element={<TenantManagement/>} />
           <Route path="/submission/change/payment/gateway" element={<PaymentGatewayDashboard/>}/>

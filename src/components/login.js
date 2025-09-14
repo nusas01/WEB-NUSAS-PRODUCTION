@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Mail, Lock, Eye, EyeOff, LogIn, Hourglass } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
 import { loginSlice } from '../reducers/post'
 import { login } from '../actions/post'
 import {
@@ -31,7 +31,7 @@ const LoginComponent = () => {
 
     useEffect(() => {
         if (successLogin) {
-            navigate('/store/required/deploy')
+            navigate('/tenants')
             dispatch(resetLogin())
         }
     }, [successLogin])
@@ -277,7 +277,10 @@ const LoginComponent = () => {
                 <div className="mt-8 text-center">
                     <p className="text-sm text-gray-600">
                     Lupa password? 
-                    <button className="ml-1 font-semibold text-gray-900 hover:text-gray-800 transition-colors duration-200">
+                    <button 
+                    onClick={() => navigate('/forgot/password')}
+                    className="ml-1 font-semibold text-gray-900 hover:text-gray-800 transition-colors duration-200"
+                    >
                         Reset disini
                     </button>
                     </p>

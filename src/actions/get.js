@@ -31,9 +31,9 @@ export const fetchAuthStatusLogin = () => {
             })
             dispatch(setLoginStatus(response?.data.loggedIn))
         } catch (error) {
-            if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
-                dispatch(setStatusExpiredUserToken(true));
-            }
+            // if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
+            //     dispatch(setStatusExpiredUserToken(true));
+            // }
             dispatch(setLoginStatus(false))
         }
     }
@@ -303,30 +303,43 @@ export const fetchTransactionSubmissionPending = () => {
 }
 
 const { setTenantsSuccess, setTenantsError, setLoadingTenants } = tenantsSlice.actions
-export const fetchTenants = () => {
-    return async (dispatch) => {
-        dispatch(setLoadingTenants(true))
+export const fetchTenants = (page, isLoadMore = false) => {
+    return async (dispatch, getState) => {
+        const currentState = getState().persisted.tenants
+
+        if (currentState.isLoadingMore && isLoadMore) {
+            return;
+        }
+
+        dispatch(setLoadingTenants({loading: true, isLoadMore: isLoadMore}))
         try {
             const response = await axiosInstance.get(`${process.env.REACT_APP_TENANTS}`, {
                 headers: {
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
-                withCredentials: true
+                withCredentials: true,
+                params: {
+                    page: page,
+                }
             })
-            dispatch(setTenantsSuccess(response?.data))
+
+            const responseData = {
+                data: response?.data.data, 
+                hasMore: response?.data.hasMore || false,
+                page: page,
+            }
+            dispatch(setTenantsSuccess(responseData))
         } catch (error) {
             if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
                 dispatch(setStatusExpiredUserToken(true));
             }
             dispatch(setTenantsError(error.response?.data?.error))
-        } finally {
-            dispatch(setLoadingTenants(false))
-        }
+        } 
     }
 }
 
 const { setTenantStoresSuccess, setTenantStoresError, setLoadingTenantStores } = tenantStoresSlice.actions
-export const fetchTenantStores = (data) => {
+export const fetchTenantStores = (id) => {
     return async (dispatch) => {
         dispatch(setLoadingTenantStores(true))
         try {
@@ -335,7 +348,9 @@ export const fetchTenantStores = (data) => {
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true,
-                params: data,
+                params: {
+                    id: id,
+                },
             })
             dispatch(setTenantStoresSuccess(response?.data))
         } catch (error) {
@@ -348,4 +363,27 @@ export const fetchTenantStores = (data) => {
         }
     }
 }
+
+export const fetchNonce = async () => {
+  try {
+    const response = await axiosInstance.get(
+      `${process.env.REACT_APP_NONCE}`,
+      {
+        headers: {
+          "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+        },
+        withCredentials: true,
+      }
+    );
+
+    return { data: response?.data, error: null };
+  } catch (error) {
+    // handle khusus kalau token expired
+    if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
+      return { data: null, error: "TOKEN_USER_EXPIRED" };
+    }
+
+    return { data: null, error: error.response?.data?.error || "Unexpected error" };
+  }
+};
 

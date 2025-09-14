@@ -310,31 +310,57 @@ export const transactionSubmissionPendingSlice = createSlice({
 const initialTenantsState = {
     dataTenants: [],
     errorTenants: null,
-    loadingTenants: false
+    loadingTenants: false,
+    page: 1,
+    hasMore: true, 
+    isLoadingMore: false,
 }
 export const tenantsSlice = createSlice({
     name: "tenants",
     initialState: initialTenantsState,
     reducers: {
         setLoadingTenants: (state, action) => {
-            state.loadingTenants = action.payload
+            if (state.page === 1 && !action.payload.isLoadingMore) {
+                state.loadingTenants = action.payload.loading 
+            } else {
+                state.hasMore = action.payload.loading
+            }
         },
         setTenantsSuccess: (state, action) => {
-            state.dataTenants = action.payload || []
+            const { data, hasMore, page} = action.payload;
+
+            if (page === 1) {
+                state.dataTenants = data || []
+            } else {
+                state.dataTenants = [
+                    ...state.dataTenants,
+                    ...data
+                ]
+            }
+
+            state.hasMore = hasMore
+            state.page = page
+            state.loadingTenants = false
+            state.isLoadingMore = false
         },
         setTenantsError: (state, action) => {
             state.errorTenants = action.payload || null
+            state.isLoadingMore = false
+            state.loadingTenants = false
         },
         resetErrortenants: (state) => {
             state.errorTenants = null
-        }
+            state.page = 1
+            state.hasMore = true
+            state.isLoadingMore = false
+        },
     }
 })
 
 const initialTenantStoresState = {
     dataTenantStores: [],
     errorTenantStores: null,
-    loadingTenantStores: false
+    loadingTenantStores: false,
 }
 export const tenantStoresSlice = createSlice({
     name: "tenantStores",
@@ -351,7 +377,7 @@ export const tenantStoresSlice = createSlice({
         },
         resetErrorTenantStores: (state) => {
             state.errorTenantStores = null
-        }
+        },
     }
 })
 

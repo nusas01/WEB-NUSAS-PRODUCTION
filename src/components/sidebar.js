@@ -23,7 +23,7 @@ import {
 } from './alert'
 
 const menuItems = [
-  { Icon: Users, title:'Tenants', path:'/tenants', Key:'Tenants'},
+  { Icon: Users, title: "Tenants", path: '/tenants',  key: 'Tenants'},
   { Icon: Store, title: "Store Required Deploy", path: '/store/required/deploy', key: 'Store Required Deploy'},
   { Icon: User2, title:"Submission Change Credentials", path: '/submission/change/payment/gateway', key:'Submission Change Credentials'},
   { Icon: WalletCards, title:"Transactions", path: '/transactions', key: 'Transactions'},

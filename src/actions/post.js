@@ -13,6 +13,8 @@ import {
     checkPendingSubmissionTransactionSlice,
     paymentGatewayFailedSlice,
     changePaymentGatewayFailedSlice,
+    signupSlice,
+    forgotPasswordSlice,
 } from "../reducers/post"
 import {
     loginStatusSlice,
@@ -21,6 +23,7 @@ import {
     transactionPendingSlice,
 } from "../reducers/get"
 import { statusExpiredUserTokenSlice } from '../reducers/expToken'
+import {collectFingerprintAsync} from '../components/fp.js'
 
 const {setStatusExpiredUserToken} = statusExpiredUserTokenSlice.actions
 
@@ -50,6 +53,29 @@ export const login = (data) => async (dispatch) => {
         dispatch(loginError(response));
     } finally {
         dispatch(setLoadingLogin(false))
+    }
+}
+
+const {setSuccessForgotPassword, setErrorForgotPassword, setLoadingForgotPassword} = forgotPasswordSlice.actions
+export const forgotPassword = (data) => async (dispatch) => {
+    const config = {
+        headers: {
+            "Content-Type": "multipart/form-data",
+            "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+        },
+        withCredentials: true,
+    }
+    dispatch(setLoadingForgotPassword(true))
+    try {
+        const response = await axiosInstance.post(`${process.env.REACT_APP_FORGOT_PASSWORD}`, data, config)
+        dispatch(setSuccessForgotPassword(response?.data?.success))
+    } catch (error) {
+        dispatch(setErrorForgotPassword({ 
+            error: error?.response?.data?.error,
+            errorField: error?.response?.data?.ErrorField
+        }))
+    } finally {
+        dispatch(setLoadingForgotPassword(false))
     }
 }
 
@@ -352,6 +378,44 @@ export const changePaymentGatewayFailed = (data) => {
             dispatch(setChangePaymentGatewayFailedError(error.response?.data?.error || 'Terjadi kesalahan'))
         } finally {
             dispatch(setLoadingChangePaymentGatewayFailed(false))
+        }
+    }
+}
+
+const {setSignupSuccess, setSignupError, setLoadingSignup} = signupSlice.actions
+export const signup = (data) => {
+    return async (dispatch) => {
+        dispatch(setLoadingSignup(true))
+        try {
+            const nonce_data = await collectFingerprintAsync();
+
+            const formData = {
+                ...data,
+                nonce_data,
+            };
+
+            const config = {
+                headers: {
+                    "Content-Type": "application/json",
+                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                },
+                withCredentials: true,
+            }
+
+            const response = await axiosInstance.post(`${process.env.REACT_APP_SIGNUP}`, formData, config)
+
+            dispatch(setSignupSuccess(response?.data?.success))
+        } catch (error) {
+            const errorData = error.response?.data || {};
+
+            const response = {
+                error: errorData?.error,
+                errorField: errorData?.ErrorField,
+            };
+
+            dispatch(setSignupError(response))
+        } finally {
+            dispatch(setLoadingSignup(false))
         }
     }
 }
