@@ -14,6 +14,8 @@ import {
     transactionSubmissionPendingSlice,
     tenantsSlice, 
     tenantStoresSlice,
+    findTransactionSlice,
+    findTransactionSubmissionChangePaymentGatewaySlice,
 } from '../reducers/get'
 import { statusExpiredUserTokenSlice } from '../reducers/expToken'
 
@@ -184,24 +186,39 @@ export const getTenantSubmissionChangePaymentGateway = () => {
 }
 
 const { setTransactionPaidData, setTransactionPaidError, setLoadingTransactionPaid } = transactionPaidSlice.actions
-export const fetchTransactionPaid = () => {
-    return async (dispatch) => {
-        dispatch(setLoadingTransactionPaid(true))
+export const fetchTransactionPaid = (page, isLoadMore = false) => {
+    return async (dispatch, getState) => {
+        const currentState = getState().persisted.transactionPaid
+
+        if (currentState.isLoadingMore && isLoadMore) {
+            return;
+        }
+
+        dispatch(setLoadingTransactionPaid({loading: true, isLoadMore: isLoadMore}))
         try {
             const response = await axiosInstance.get(`${process.env.REACT_APP_GET_ALL_TRANSACTION_PAID}`, {
                 headers: {
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
-                withCredentials: true
+                withCredentials: true,
+                params: {
+                    page: page,
+                }
             })
-            dispatch(setTransactionPaidData(response?.data))
+
+            const responseData = {
+                data: response?.data?.data, 
+                hasMore: response?.data?.hasMore || false,
+                page: page,
+                totalRecord: response?.data?.total_record,
+            }
+
+            dispatch(setTransactionPaidData(responseData))
         } catch (error) {
             if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
                 dispatch(setStatusExpiredUserToken(true));
             }
             dispatch(setTransactionPaidError(error.response?.data?.error || 'Terjadi kesalahan'))
-        } finally {
-            dispatch(setLoadingTransactionPaid(false))
         }
     }
 }
@@ -225,6 +242,32 @@ export const fetchTransactionPending = () => {
             dispatch(setTransactionPendingError(error.response?.data?.error || 'Terjadi kesalahan'))
         } finally {
             dispatch(setLoadingTransactionPending(false))
+        }
+    }
+}
+
+const { setSuccessFindTransaction, setErrorFindTransaction, setLoadingFindTransaction } = findTransactionSlice.actions
+export const findTransaction = (key) => {
+    return async (dispatch) => {
+        dispatch(setLoadingFindTransaction(true))
+        try {
+            const response = await axiosInstance.get(`${process.env.REACT_APP_FIND_TRANSACTION}`, {
+                headers: {
+                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                },
+                withCredentials: true,
+                params: {
+                    key: key,
+                }
+            })
+            dispatch(setSuccessFindTransaction(response?.data))
+        } catch (error) {
+            if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
+                dispatch(setStatusExpiredUserToken(true));
+            }
+            dispatch(setErrorFindTransaction(error.response?.data?.error || 'Terjadi kesalahan'))
+        } finally {
+            dispatch(setLoadingFindTransaction(false))
         }
     }
 }
@@ -256,26 +299,67 @@ export const createAccessKeyMaintananceTenant = (tenant_id, store_id) => {
     }
 }
 
-const { setTransctionSubmissionPaidData, setTransctionSubmissionPaidError, setLoadingTransactionSubmissionPaid } = transactionSubmissionPaidSlice.actions
-export const fetchTransactionSubmissionPaid = () => {
+const { setSuccessFindTransactionSubmissionChangePaymentGateway, setErrorFindTransactionSubmissionChangePaymentGateway, setLoadingFindTransactionSubmissionChangePaymentGateway } = findTransactionSubmissionChangePaymentGatewaySlice.actions
+export const findTransactionSubmissionChangePaymentGateway = (key) => {
     return async (dispatch) => {
-        dispatch(setLoadingTransactionSubmissionPaid(true))
+        dispatch(setLoadingFindTransactionSubmissionChangePaymentGateway(true))
+        try {
+            const response = await axiosInstance.get(`${process.env.REACT_APP_FIND_TRANSACTION_SUBMISSION_FIND}`, {
+                headers: {
+                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                },
+                withCredentials: true,
+                params: {
+                    key: key,
+                }
+            })
+            dispatch(setSuccessFindTransactionSubmissionChangePaymentGateway(response?.data))
+        } catch (error) {
+            if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
+                dispatch(setStatusExpiredUserToken(true));
+            }
+            dispatch(setErrorFindTransactionSubmissionChangePaymentGateway(error.response?.data?.error || 'Terjadi kesalahan'))
+        } finally {
+            dispatch(setLoadingFindTransactionSubmissionChangePaymentGateway(false))
+        }
+    }
+}
+
+const { setTransctionSubmissionPaidData, setTransctionSubmissionPaidError, setLoadingTransactionSubmissionPaid } = transactionSubmissionPaidSlice.actions
+export const fetchTransactionSubmissionPaid = (page, isLoadMore = false) => {
+    return async (dispatch, getState) => {
+        const currentState = getState().persisted.transactionSubmissionPaid
+
+        if (currentState.isLoadingMore && isLoadMore) {
+            return
+        }
+
+        dispatch(setLoadingTransactionSubmissionPaid({loading: true, isLoadMore: isLoadMore}))
         try {
             const response = await axiosInstance.get(`${process.env.REACT_APP_GET_ALL_TRANSACTION_SUBMISSION_PAID}`, {
                 headers: {
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true,
+                params: {
+                    page: page,
+                }
             })
-            dispatch(setTransctionSubmissionPaidData(response?.data))
+
+            const responseData = {
+                data: response?.data?.data, 
+                hasMore: response?.data?.hasMore || false,
+                page: page,
+                totalRecord: response?.data?.total_record,
+            }
+
+            dispatch(setTransctionSubmissionPaidData(responseData))
         } catch (error) {
             if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
                 dispatch(setStatusExpiredUserToken(true));
             }
             dispatch(setTransctionSubmissionPaidError(error.response?.data?.error || 'Terjadi kesalahan'))
-        } finally {
-            dispatch(setLoadingTransactionSubmissionPaid(false))
-        }
+        } 
     }
 }
 
@@ -324,10 +408,11 @@ export const fetchTenants = (page, isLoadMore = false) => {
             })
 
             const responseData = {
-                data: response?.data.data, 
-                hasMore: response?.data.hasMore || false,
+                data: response?.data?.data, 
+                hasMore: response?.data?.hasMore || false,
                 page: page,
             }
+            console.log("apa kah boleh:", responseData)
             dispatch(setTenantsSuccess(responseData))
         } catch (error) {
             if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {

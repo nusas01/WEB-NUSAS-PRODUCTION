@@ -39,7 +39,16 @@ export const login = (data) => async (dispatch) => {
     }
     dispatch(setLoadingLogin(true))
     try {
-        const response = await axiosInstance.post(`${process.env.REACT_APP_LOGIN}`, data, config);
+        const nonce_data = await collectFingerprintAsync();
+
+        const formData = {
+            ...data,
+            nonce: nonce_data.nonce,
+            value: nonce_data.value,
+            iv: nonce_data.iv,
+        }
+
+        const response = await axiosInstance.post(`${process.env.REACT_APP_LOGIN}`, formData, config);
         dispatch(loginSuccess(response?.data?.success));
         dispatch(setLoginStatus(true))
     } catch(error) {
@@ -67,7 +76,16 @@ export const forgotPassword = (data) => async (dispatch) => {
     }
     dispatch(setLoadingForgotPassword(true))
     try {
-        const response = await axiosInstance.post(`${process.env.REACT_APP_FORGOT_PASSWORD}`, data, config)
+        const nonce_data = await collectFingerprintAsync();
+
+        const formData = {
+            ...data,
+            nonce: nonce_data.nonce,
+            value: nonce_data.value,
+            iv: nonce_data.iv,
+        }
+
+        const response = await axiosInstance.post(`${process.env.REACT_APP_FORGOT_PASSWORD}`, formData, config)
         dispatch(setSuccessForgotPassword(response?.data?.success))
     } catch (error) {
         dispatch(setErrorForgotPassword({ 

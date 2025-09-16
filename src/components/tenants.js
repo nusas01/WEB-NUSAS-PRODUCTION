@@ -91,7 +91,7 @@ const TenantManagement = () => {
             },
             {
                 root: null,
-                rootMargin: '10px',
+                rootMargin: '100px',
                 threshold: 0.5,
             }
         );
@@ -249,7 +249,7 @@ const TenantManagement = () => {
 
                                     <div className="flex items-center space-x-4">
                                         <button
-                                        onClick={() => dispatch(fetchTenants())}
+                                        onClick={() => dispatch(fetchTenants(1, false))}
                                         className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors">
                                             <RefreshCcw className="w-4 h-4 mr-2" />
                                             Refresh

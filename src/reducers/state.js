@@ -19,6 +19,8 @@ import {
     transactionSubmissionPaidSlice,
     tenantsSlice,
     tenantStoresSlice,
+    findTransactionSlice,
+    findTransactionSubmissionChangePaymentGatewaySlice,
 } from './get'
 import {
     loginSlice,
@@ -88,6 +90,8 @@ const nonPersistedReducers = {
   changePaymentGatewayFailedState: changePaymentGatewayFailedSlice.reducer,
   signupVerificationState: signupVerificationSlice.reducer,
   forgotPasswordState: forgotPasswordSlice.reducer,
+  findTransactionState: findTransactionSlice.reducer,
+  findTransactionSubmissionChangePaymentGatewayState: findTransactionSubmissionChangePaymentGatewaySlice.reducer,
 }
 
 const rootReducer = combineReducers({

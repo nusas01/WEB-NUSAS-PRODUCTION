@@ -169,23 +169,80 @@ export const tenantSubmissionChangePaymentSlice = createSlice({
 const initialTransactionPaidState = {
     dataTransactionPaid: [],
     errorTransactionPaid: null,
-    loadingTransactionPaid: false
+    loadingTransactionPaid: false,
+    page: 1,
+    totalRecordTransactionPaid: 0,
+    currentPage: 1,
+    hasMore: true, 
+    isLoadingMore: false,
 }
 export const transactionPaidSlice = createSlice({
     name: "transactionPaid",
     initialState: initialTransactionPaidState,
     reducers: {
         setLoadingTransactionPaid: (state, action) => {
-            state.loadingTransactionPaid = action.payload
+            if (state.page === 1 && !action.payload.isLoadingMore) {
+                state.loadingTransactionPaid = action.payload.loading 
+            } else {
+                state.hasMore = action.payload.loading
+            }
         },
         setTransactionPaidData: (state, action) => {
-            state.dataTransactionPaid = action.payload || []
+            const { data, hasMore, page, totalRecord} = action.payload;
+
+            if (page === 1) {
+                // reset kalau page 1
+                state.dataTransactionPaid = [data || []]
+            } else {
+                // simpan data per-page
+                state.dataTransactionPaid = [
+                ...state.dataTransactionPaid,
+                data || []
+                ]
+            }
+
+            state.totalRecordTransactionPaid = totalRecord
+            state.hasMore = hasMore
+            state.page = page
+            state.loadingTransactionPaid = false
+            state.isLoadingMore = false
         },
         setTransactionPaidError: (state, action) => {
             state.errorTransactionPaid = action.payload || null
         },
+        setCurrentPage: (state, action) => {
+            state.currentPage = action.payload
+        },
         resetErrorTransactionPaid: (state) => {
             state.errorTransactionPaid = null
+            state.page = 1
+            state.isLoadingMore = false
+            state.loadingTransactionPaid = false
+        }
+    }
+})
+
+const initialFindTransaction = {
+    dataFindTransaction: null, 
+    errorFindTransaction: null,
+    loadingFindTransaction: false,
+}
+export const findTransactionSlice = createSlice({
+    name: "findTransaction", 
+    initialState: initialFindTransaction, 
+    reducers: {
+        setLoadingFindTransaction: (state, action) => {
+            state.loadingFindTransaction = action.payload
+        },
+        setSuccessFindTransaction: (state, action) => {
+            state.dataFindTransaction = action.payload
+        }, 
+        setErrorFindTransaction: (state, action) => {
+            state.errorFindTransaction = action.payload
+        }, 
+        resetFindTransaction: (state) => {
+            state.errorFindTransaction = null
+            state.dataFindTransaction = null
         }
     }
 })
@@ -250,26 +307,83 @@ export const accessKeyStoreTestingSlice = createSlice({
 })
 
 
+const initialFindTransactionSubmissionChangePaymentGateway = {
+    dataFindTransactionSubmissionChangePaymentGateway: null, 
+    errorFindTransactionSubmissionChangePaymentGateway: null,
+    loadingFindTransactionSubmissionChangePaymentGateway: false,
+}
+export const findTransactionSubmissionChangePaymentGatewaySlice = createSlice({
+    name: "findTransactionSubmissionChangePaymentGateway", 
+    initialState: initialFindTransactionSubmissionChangePaymentGateway, 
+    reducers: {
+        setLoadingFindTransactionSubmissionChangePaymentGateway: (state, action) => {
+            state.loadingFindTransactionSubmissionChangePaymentGateway = action.payload
+        },
+        setSuccessFindTransactionSubmissionChangePaymentGateway: (state, action) => {
+            state.dataFindTransactionSubmissionChangePaymentGateway = action.payload
+        }, 
+        setErrorFindTransactionSubmissionChangePaymentGateway: (state, action) => {
+            state.errorFindTransactionSubmissionChangePaymentGateway = action.payload
+        }, 
+        resetFindTransactionSubmissionChangePaymentGateway: (state) => {
+            state.errorFindTransactionSubmissionChangePaymentGateway = null
+            state.dataFindTransactionSubmissionChangePaymentGateway = null
+        }
+    }
+})
+
 const initialTransactionSubmissionPaidState = {
     dataTransactionSubmissionPaid: [],
     errorTransactionSubmissionPaid: null,
-    loadingTransactionSubmissionPaid: false
+    loadingTransactionSubmissionPaid: false,
+    page: 1,
+    totalRecordTransactionSubmissionPaid: 0,
+    currentPage: 1,
+    hasMore: true, 
+    isLoadingMore: false,
 }
 export const transactionSubmissionPaidSlice = createSlice({
     name: "transactionPaidSubmission",
     initialState: initialTransactionSubmissionPaidState,
     reducers: {
         setLoadingTransactionSubmissionPaid: (state, action) => {
-            state.loadingTransactionSubmissionPaid = action.payload
+            if (state.page === 1 && !action.payload.isLoadingMore) {
+                state.loadingTransactionSubmissionPaid = action.payload.loading 
+            } else {
+                state.hasMore = action.payload.loading
+            }
         },
         setTransctionSubmissionPaidData: (state, action) => {
-            state.dataTransactionSubmissionPaid = action.payload || []
+            const { data, hasMore, page, totalRecord} = action.payload;
+
+            if (page === 1) {
+                // reset kalau page 1
+                state.dataTransactionSubmissionPaid = [data || []]
+            } else {
+                // simpan data per-page
+                state.dataTransactionSubmissionPaid = [
+                ...state.dataTransactionSubmissionPaid,
+                data || []
+                ]
+            }
+
+            state.totalRecordTransactionSubmissionPaid = totalRecord
+            state.hasMore = hasMore
+            state.page = page
+            state.loadingTransactionSubmissionPaid = false
+            state.isLoadingMore = false
         },
         setTransctionSubmissionPaidError: (state, action) => {
             state.errorTransactionSubmissionPaid = action.payload || null
         },
+        setCurrentPage: (state, action) => {
+            state.currentPage = action.payload
+        },
         resetErrorTransctionSubmissionPaid: (state) => {
             state.errorTransactionSubmissionPaid = null
+            state.page = 1
+            state.isLoadingMore = false
+            state.loadingTransactionSubmissionPaid = false
         },
     }
 })
@@ -351,7 +465,6 @@ export const tenantsSlice = createSlice({
         resetErrortenants: (state) => {
             state.errorTenants = null
             state.page = 1
-            state.hasMore = true
             state.isLoadingMore = false
         },
     }

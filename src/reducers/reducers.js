@@ -1,7 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
   fetchTenants,
-  fetchTenantStores
+  fetchTenantStores,
+  fetchTransactionPaid,
+  fetchTransactionSubmissionPaid,
 } from '../actions/get'
 
 export const navbarSlice = createSlice({
@@ -39,3 +41,40 @@ export const loadMoreTenants = () => {
   } 
 }
 
+export const loadMoreTransactionPaid = () => {
+  return async (dispatch, getState) => {
+    const state = getState().persisted;
+    const { transactionPaid } = state;
+
+    if (
+      !transactionPaid.hasMore || 
+      transactionPaid.isLoadingMore || 
+      transactionPaid.loadingTenants
+    ) {
+      return
+    }
+
+    const nextPage = transactionPaid.page  + 1;
+
+    return dispatch(fetchTransactionPaid(nextPage, true))
+  } 
+}
+
+export const loadMoreTransactionSubmissionPaid = () => {
+  return async (dispatch, getState) => {
+    const state = getState().persisted;
+    const { transactionSubmissionPaid } = state;
+
+    if (
+      !transactionSubmissionPaid.hasMore || 
+      transactionSubmissionPaid.isLoadingMore || 
+      transactionSubmissionPaid.loadingTenants
+    ) {
+      return
+    }
+
+    const nextPage = transactionSubmissionPaid.page  + 1;
+
+    return dispatch(fetchTransactionSubmissionPaid(nextPage, true))
+  } 
+}

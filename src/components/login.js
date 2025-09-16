@@ -10,7 +10,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 const LoginComponent = () => {
-    const {toast, setToast} = useState(null)
+    const [toast, setToast] = useState(null)
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
@@ -24,7 +24,7 @@ const LoginComponent = () => {
         if (errorLogin) {
             setToast({
                 type: "error",
-                message: "terjadi kesalahan saat login, silahkan coba lagi nanti."
+                message: errorLogin
             })
         }
     }, [errorLogin])
@@ -32,6 +32,7 @@ const LoginComponent = () => {
     useEffect(() => {
         if (successLogin) {
             navigate('/tenants')
+            setToast(null)
             dispatch(resetLogin())
         }
     }, [successLogin])
