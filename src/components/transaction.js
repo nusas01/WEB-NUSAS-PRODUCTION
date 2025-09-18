@@ -159,9 +159,6 @@ const TransactionDashboard = () => {
 
     const [activeTab, setActiveTab] = useState('pending');
 
-    console.log("data status: ", activeTab) 
-    console.log("pending transaction length: ", dataTransactionPending?.length)
-
     useEffect(() => {
         if (activeTab === 'pending' && dataTransactionPending.length === 0) {
             dispatch(fetchTransactionPending())
@@ -208,7 +205,6 @@ const TransactionDashboard = () => {
         loadingFindTransaction,
     } = useSelector((state) => state.findTransactionState)
 
-    console.log("message error: ", errorFindTransaction)
     useEffect(() => {
         if (errorFindTransaction) {
             setError({
@@ -229,7 +225,6 @@ const TransactionDashboard = () => {
         dispatch(findTransaction(key))
     }
 
-    console.log("data transaction pending", dataTransactionPending)
     return (
         <div className='flex'>
             <SuccessModal
@@ -298,10 +293,6 @@ const TransactionDashboard = () => {
                                     className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors">
                                         <RefreshCcw className="w-4 h-4 mr-2" />
                                         Refresh
-                                    </button>
-                                    <button className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors">
-                                        <Settings className="w-4 h-4 mr-2" />
-                                        Settings
                                     </button>
                                 </div>
 

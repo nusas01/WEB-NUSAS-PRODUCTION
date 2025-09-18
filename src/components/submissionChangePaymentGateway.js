@@ -620,18 +620,6 @@ const PaymentGatewayDashboard = () => {
                                         <RefreshCcw className={`w-4 h-4 mr-2 ${loading.refresh ? 'animate-spin' : ''}`} />
                                         {loading.refresh ? 'Refreshing...' : 'Refresh'}
                                     </button>
-                                    {/* <button
-                                        onClick={handleDeployAppTesting}
-                                        disabled={loading.deployTesting}
-                                        className="inline-flex items-center px-4 py-2 border border-gray-900 rounded-lg text-sm font-medium text-gray-900 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors disabled:opacity-50"
-                                    >
-                                        <TestTube className="w-4 h-4 mr-2" />
-                                        {loading.deployTesting ? 'Deploying...' : 'Test Deploy'}
-                                    </button> */}
-                                    <button className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors">
-                                        <Settings className="w-4 h-4 mr-2" />
-                                        Settings
-                                    </button>
                                 </div>
 
                                 <div className='flex items-center gap-1 sm:gap-2 lg:gap-3 flex-shrink-0'>

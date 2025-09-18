@@ -9,7 +9,7 @@ export const loginStatusSlice = createSlice({
     reducers: {
         setLoginStatus: (state, action) => {
             state.loggedIn = action.payload || false
-        }
+        },
     }
 })
 
@@ -425,9 +425,11 @@ const initialTenantsState = {
     dataTenants: [],
     errorTenants: null,
     loadingTenants: false,
+    totalRecordTenants: 0,
     page: 1,
     hasMore: true, 
     isLoadingMore: false,
+    currentPage: 1,
 }
 export const tenantsSlice = createSlice({
     name: "tenants",
@@ -441,17 +443,18 @@ export const tenantsSlice = createSlice({
             }
         },
         setTenantsSuccess: (state, action) => {
-            const { data, hasMore, page} = action.payload;
+            const { data, hasMore, page, totalRecord} = action.payload;
 
             if (page === 1) {
-                state.dataTenants = data || []
+                state.dataTenants = [data || []]
             } else {
                 state.dataTenants = [
                     ...state.dataTenants,
-                    ...data
+                    data || []
                 ]
             }
 
+            state.totalRecordTenants = totalRecord
             state.hasMore = hasMore
             state.page = page
             state.loadingTenants = false
@@ -462,11 +465,39 @@ export const tenantsSlice = createSlice({
             state.isLoadingMore = false
             state.loadingTenants = false
         },
+        setCurrentPage: (state, action) => {
+            state.currentPage = action.payload
+        },
         resetErrortenants: (state) => {
             state.errorTenants = null
             state.page = 1
             state.isLoadingMore = false
         },
+    }
+})
+
+const initialFindTenant = {
+    dataFindTenant: null, 
+    errorFindTenant: null,
+    loadingFindTenant: false,
+}
+export const findTenantSlice = createSlice({
+    name: "findTenant", 
+    initialState: initialFindTenant, 
+    reducers: {
+        setLoadingFindTenant: (state, action) => {
+            state.loadingFindTenant = action.payload
+        },
+        setSuccessFindTenant: (state, action) => {
+            state.dataFindTenant = action.payload
+        }, 
+        setErrorFindTenant: (state, action) => {
+            state.errorFindTenant = action.payload
+        }, 
+        resetFindTenant: (state) => {
+            state.errorFindTenant = null
+            state.dataFindTenant = null
+        }
     }
 })
 

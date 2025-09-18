@@ -21,6 +21,7 @@ import {
     tenantStoresSlice,
     findTransactionSlice,
     findTransactionSubmissionChangePaymentGatewaySlice,
+    findTenantSlice,
 } from './get'
 import {
     loginSlice,
@@ -92,17 +93,44 @@ const nonPersistedReducers = {
   forgotPasswordState: forgotPasswordSlice.reducer,
   findTransactionState: findTransactionSlice.reducer,
   findTransactionSubmissionChangePaymentGatewayState: findTransactionSubmissionChangePaymentGatewaySlice.reducer,
+  findTenantState: findTenantSlice.reducer
 }
 
-const rootReducer = combineReducers({
+const appReducer = combineReducers({
   persisted: persistReducer(persistConfig, persistedReducers), 
   ...nonPersistedReducers,
-})
+});
+
+const rootReducer = (state, action) => {
+  if (action.type === "RESET_ALL") {
+    state = undefined; // reset semua slice ke initialState
+  }
+  return appReducer(state, action);
+};
 
 export const tenant = configureStore({
   reducer: rootReducer,
-})
+});
 
-export const persistor = persistStore(tenant)
+export const persistor = persistStore(tenant);
+
+export const resetApp = async () => {
+  // Stop sync dengan storage
+  persistor.pause();
+
+  // Hapus semua data redux-persist
+  await persistor.purge();
+
+  // Kosongkan sessionStorage browser
+  window.sessionStorage.clear();
+
+  // Reset state redux di memory
+  tenant.dispatch({ type: "RESET_ALL" });
+
+  // Kalau mau, bisa resume lagi
+  persistor.persist();
+};
+
+
 
 export default tenant

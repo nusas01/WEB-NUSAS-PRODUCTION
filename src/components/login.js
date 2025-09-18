@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Mail, Lock, Eye, EyeOff, LogIn } from 'lucide-react';
-import { loginSlice } from '../reducers/post'
-import { login } from '../actions/post'
+import { loginSlice } from '../reducers/post';
+import { login } from '../actions/post';
+import { resetApp } from '../reducers/state'
+import { logoutSlice } from '../reducers/get';
 import {
     Toast, 
     ToastPortal
 } from './alert'
 import { useNavigate } from 'react-router-dom';
+import { fetchAuthStatusLogin } from '../actions/get';
 
 const LoginComponent = () => {
     const [toast, setToast] = useState(null)
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const { resetLogout } = logoutSlice.actions
     const { resetLogin } = loginSlice.actions
     const { loadingLogin, errorLogin, errorField, successLogin } = useSelector(state => state.loginState);
 
@@ -30,10 +34,11 @@ const LoginComponent = () => {
     }, [errorLogin])
 
     useEffect(() => {
-        if (successLogin) {
-            navigate('/tenants')
+        if (successLogin || successLogin === "Login Successfully") {
             setToast(null)
             dispatch(resetLogin())
+            dispatch(resetLogout())
+            navigate('/tenants')
         }
     }, [successLogin])
 
@@ -60,7 +65,6 @@ const LoginComponent = () => {
         }
     }, [errorField])
 
-    console.log("error field adalah: ", errorField)
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -287,15 +291,6 @@ const LoginComponent = () => {
                     </p>
                 </div>
                 </div>
-
-                {/* Success Demo */}
-                {successLogin && (
-                <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-                    <p className="text-green-700 text-sm font-medium text-center">
-                    Login berhasil! Anda akan dialihkan...
-                    </p>
-                </div>
-                )}
             </div>
         </div>
     );

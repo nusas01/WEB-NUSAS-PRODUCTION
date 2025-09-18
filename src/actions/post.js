@@ -1,4 +1,4 @@
-import axiosInstance from "./axiosInstance.js";
+import axios from "axios"
 import {
     loginSlice,
     sendEmailCredentialsSlice,
@@ -48,7 +48,7 @@ export const login = (data) => async (dispatch) => {
             iv: nonce_data.iv,
         }
 
-        const response = await axiosInstance.post(`${process.env.REACT_APP_LOGIN}`, formData, config);
+        const response = await axios.post(`${process.env.REACT_APP_LOGIN}`, formData, config);
         dispatch(loginSuccess(response?.data?.success));
         dispatch(setLoginStatus(true))
     } catch(error) {
@@ -85,7 +85,7 @@ export const forgotPassword = (data) => async (dispatch) => {
             iv: nonce_data.iv,
         }
 
-        const response = await axiosInstance.post(`${process.env.REACT_APP_FORGOT_PASSWORD}`, formData, config)
+        const response = await axios.post(`${process.env.REACT_APP_FORGOT_PASSWORD}`, formData, config)
         dispatch(setSuccessForgotPassword(response?.data?.success))
     } catch (error) {
         dispatch(setErrorForgotPassword({ 
@@ -109,7 +109,7 @@ export const sendEmailRequiredCredentialsPayment = (data) => {
         }
         dispatch(setLoadingSendEmailCredentials(true))
         try {
-            const response = await axiosInstance.post(`${process.env.REACT_APP_SEND_EMAIL_TENANT_REQUIRED_CREDENTIALS_PAYMENT_GATEWAY}`, data, config)
+            const response = await axios.post(`${process.env.REACT_APP_SEND_EMAIL_TENANT_REQUIRED_CREDENTIALS_PAYMENT_GATEWAY}`, data, config)
             dispatch(setSendEmailCredentialsSuccess(response?.data?.success))
         } catch (error) {
             if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
@@ -135,7 +135,7 @@ export const deployApp = (data) => {
         }
         dispatch(setLoadingDeployApp(true))
         try {
-            const response = await axiosInstance.post(`${process.env.REACT_APP_DEPLOY_APP_STORE}`, data, config)
+            const response = await axios.post(`${process.env.REACT_APP_DEPLOY_APP_STORE}`, data, config)
             dispatch(setDeployAppSuccess(response?.data?.success))
         } catch (error) {
             if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
@@ -161,7 +161,7 @@ export const deployFinished = (data) => {
         }
         dispatch(setLoadingDeployFinished(true))
         try {
-            const response = await axiosInstance.post(`${process.env.REACT_APP_DEPLOY_STORE_FINISHED}`, data, config)
+            const response = await axios.post(`${process.env.REACT_APP_DEPLOY_STORE_FINISHED}`, data, config)
             dispatch(setDeployFinishedSuccess(response?.data?.success))
             dispatch(removeStoresVerificationById(data.store_id))
         } catch (error) {
@@ -187,7 +187,7 @@ export const deployAppTesting = (data) => {
         }
         dispatch(setLoadingDeployAppTesting(true))
         try {
-            const response = await axiosInstance.post(`${process.env.REACT_APP_DEPLOY_APP_STORE_TESTING}`, data, config)
+            const response = await axios.post(`${process.env.REACT_APP_DEPLOY_APP_STORE_TESTING}`, data, config)
             dispatch(setDeployAppTestingSuccess(response?.data?.success))
         } catch (error) {
             if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
@@ -212,7 +212,7 @@ export const createAccountTestingCustomerStore = (data) => {
         }
         dispatch(setLoadingAccountCustomerStoreTesting(true))
         try {
-            const response = await axiosInstance.post(`${process.env.REACT_APP_ACCOUNT_TESTING_CUSTOMER_STORE}`, data, config)
+            const response = await axios.post(`${process.env.REACT_APP_ACCOUNT_TESTING_CUSTOMER_STORE}`, data, config)
             dispatch(setAccountCustomerStoreTestingSuccess(response?.data?.success))
         } catch (error) {
             if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
@@ -237,7 +237,7 @@ export const sendEmailUpdateChangePaymentGateway = (data) => {
         }
         dispatch(setLoadingSendEmailUpdateChangePaymentGateway(true))
         try {
-            const response = await axiosInstance.post(`${process.env.REACT_APP_SEND_EMAIL_UPDATE_CHANGE_PAYMENT_GATEWAY}`, data, config)
+            const response = await axios.post(`${process.env.REACT_APP_SEND_EMAIL_UPDATE_CHANGE_PAYMENT_GATEWAY}`, data, config)
             dispatch(setSendEmailUpdateChangePaymentGatewaySuccess(response?.data?.message || 'Email berhasil dikirim'))
         } catch (error) {
             if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
@@ -262,7 +262,7 @@ export const startChangePaymentGatewayTenant = (data) => {
         }
         dispatch(setLoadingStartChangePaymentGateway(true))
         try {
-            const response = await axiosInstance.post(`${process.env.REACT_APP_START_CHANGE_PAYMENT_GATEWAY}`, data, config)
+            const response = await axios.post(`${process.env.REACT_APP_START_CHANGE_PAYMENT_GATEWAY}`, data, config)
             dispatch(setStartChangePaymentGatewaySuccess(response?.data?.message || 'Perubahan payment gateway dimulai'))
         } catch (error) {
             if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
@@ -280,7 +280,7 @@ export const finishedChangePaymentGatewayTenant = (data) => {
     return async (dispatch) => {
         dispatch(setLoadingFinishedChangePaymentGateway(true))
         try {
-            const response = await axiosInstance.post(`${process.env.REACT_APP_FINISHED_CHANGE_PAYMENT_GATEWAY}`, data, {
+            const response = await axios.post(`${process.env.REACT_APP_FINISHED_CHANGE_PAYMENT_GATEWAY}`, data, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
@@ -305,7 +305,7 @@ export const checkPendingTransactionPaymentGateway = (data) => {
     return async (dispatch) => {
         dispatch(setLoadingCheckPendingTransaction(true))
         try {
-            const response = await axiosInstance.post(`${process.env.REACT_APP_CHECK_PENDING_TRANSACTION_PAYMENT_GATEWAY}`, data, {
+            const response = await axios.post(`${process.env.REACT_APP_CHECK_PENDING_TRANSACTION_PAYMENT_GATEWAY}`, data, {
                 headers: {
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
@@ -331,7 +331,7 @@ export const checkPendingTransactionSubmissionPaymentGateway = (data) => {
     return async (dispatch) => {
         dispatch(setLoadingCheckPendingSubmissionTransaction(true))
         try {
-            const response = await axiosInstance.post(`${process.env.REACT_APP_CHECK_PENDING_SUBMISSION_TRANSACTION_PAYMENT_GATEWAY}`, data, {
+            const response = await axios.post(`${process.env.REACT_APP_CHECK_PENDING_SUBMISSION_TRANSACTION_PAYMENT_GATEWAY}`, data, {
                 headers: {
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
@@ -356,7 +356,7 @@ export const paymentGatewayFailed = (data) => {
     return async (dispatch) => {
         dispatch(setLoadingPaymentGatewayFailed(true))
         try {
-            const response = await axiosInstance.post(`${process.env.REACT_APP_PAYMENT_GATEWAY_FAILED}`, data, {
+            const response = await axios.post(`${process.env.REACT_APP_PAYMENT_GATEWAY_FAILED}`, data, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
@@ -381,7 +381,7 @@ export const changePaymentGatewayFailed = (data) => {
     return async (dispatch) => {
         dispatch(setLoadingChangePaymentGatewayFailed(true))
         try {
-            const response = await axiosInstance.post(`${process.env.REACT_APP_SUBMISSION_CHANGE_PAYMENT_GATEWAY}`, data, {
+            const response = await axios.post(`${process.env.REACT_APP_SUBMISSION_CHANGE_PAYMENT_GATEWAY}`, data, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
@@ -420,7 +420,7 @@ export const signup = (data) => {
                 withCredentials: true,
             }
 
-            const response = await axiosInstance.post(`${process.env.REACT_APP_SIGNUP}`, formData, config)
+            const response = await axios.post(`${process.env.REACT_APP_SIGNUP}`, formData, config)
 
             dispatch(setSignupSuccess(response?.data?.success))
         } catch (error) {

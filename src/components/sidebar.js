@@ -15,8 +15,10 @@ import { useNavigate } from "react-router-dom";
 import { useDeviceDetection } from "./helper";
 import { useSelector, useDispatch } from "react-redux";
 import { navbarSlice } from "../reducers/reducers";
+import { resetApp } from "../reducers/state"
 import { fetchLogout } from "../actions/get";
 import { logoutSlice } from "../reducers/get";
+import { loginSlice } from "../reducers/post";
 import { 
   Toast,
   ToastPortal, 
@@ -48,13 +50,17 @@ const Sidebar = ({activeMenu}) => {
   }
 
   // handle logout
+  const { resetLogin } = loginSlice.actions
   const { resetLogout } = logoutSlice.actions
   const { logoutSuccess, logoutError, loadingLogout } = useSelector((state) => state.logoutState)
 
   useEffect(() => {
     if (logoutSuccess) {
-      navigate('/login')
-      dispatch(resetLogout())
+      (async () => {
+        dispatch(resetLogout())
+        await resetApp()
+        navigate('/login')
+      })()
     }
   }, [logoutSuccess])
 
@@ -62,7 +68,7 @@ const Sidebar = ({activeMenu}) => {
     if (logoutError) {
       setToast({
         type: 'error',
-        message: 'Terjadi kesalahan saat mendaftarkan akun. Silahkan coba lagi nanti.'
+        message: logoutError
       })
 
       const timer = setTimeout(() => {
@@ -240,7 +246,7 @@ const Sidebar = ({activeMenu}) => {
     <>
       {toast && (
           <ToastPortal> 
-              <div className='fixed top-8 left-1/2 transform -translate-x-1/2 z-100'>
+              <div className='fixed top-8 left-1/2 transform -translate-x-1/2 z-[9999]'>
               <Toast 
               message={toast.message} 
               type={toast.type} 

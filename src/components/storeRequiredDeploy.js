@@ -96,7 +96,7 @@ const StoreDeploymentDashboard = () => {
         if (storesVerificationError) {
             setToast({
                 type: "error",
-                message: "Terjadi kesalahan memuat data store required deploy, silahkan coba lagi nanti, silahkan coba lagi nanti."
+                message: storesVerificationError
             })
         }
     }, [storesVerificationError])
@@ -111,7 +111,7 @@ const StoreDeploymentDashboard = () => {
         if (sendEmailCredentialsSuccess) {
             setToast({
                 type: 'success',
-                message: "Berhasil mengirim email berisi kredensial payment gateway kepada tenant.",
+                message: sendEmailCredentialsSuccess,
             })
         }
     }, [sendEmailCredentialsSuccess])
@@ -120,7 +120,7 @@ const StoreDeploymentDashboard = () => {
         if (sendEmailCredentialsError) {
             setToast({
                 type: 'error',
-                message: '"Gagal mengirim email berisi kredensial payment gateway kepada tenant, silahkan coba lagi nanti."',
+                message: sendEmailCredentialsError,
             })
         }
     }, [sendEmailCredentialsError])
@@ -139,7 +139,6 @@ const StoreDeploymentDashboard = () => {
     };
 
 
-
     // handle create access key app store
     const [dataStoreCreateAccessKey, setDataStoreCreateAccessKey] = useState(null)
     const {resetAccessKey} = accessKeySlice.actions
@@ -149,7 +148,7 @@ const StoreDeploymentDashboard = () => {
         if (accessKeyError) {
             setToast({
                 type: 'error',
-                message: 'Gagal membuat access key store, silahkan coba lagi nanti',
+                message: accessKeyError,
             })
         }
     }, [accessKeyError])
@@ -181,7 +180,7 @@ const StoreDeploymentDashboard = () => {
         if (errorAccessKeyStoreTesting) {
             setToast({
                 type: 'error',
-                message: 'Gagal membuat access key maintanance store, silahkan coba lagi nanti',
+                message: errorAccessKeyStoreTesting,
             })
             dispatch(resetErrorAccessKeyStoreTesting());
             setDataStoreCreateAccessKey(null);
@@ -210,7 +209,7 @@ const StoreDeploymentDashboard = () => {
         if (deployAppSuccess) {
             setToast({
                 type: 'success',
-                message: 'Berhasil deploy app store.',
+                message: deployAppSuccess,
             })
         }
     }, [deployAppSuccess])
@@ -219,7 +218,7 @@ const StoreDeploymentDashboard = () => {
         if (deployAppError) {
             setToast({
                 type: 'error',
-                message: 'Gagal deploy app store, silahkan coba lagi nanti.',
+                message: deployAppError,
             })
         }
     }, [deployAppError])
@@ -247,7 +246,7 @@ const StoreDeploymentDashboard = () => {
         if (deployFinishedSuccess) {
             setToast({
                 type: 'success',
-                message: 'Berhasil finished deploy app store.',
+                message: deployFinishedSuccess,
             })
         }
     }, [deployFinishedSuccess])
@@ -256,7 +255,7 @@ const StoreDeploymentDashboard = () => {
         if (deployFinishedError) {
             setToast({
                 type: 'error',
-                message: 'Gagal finished deploy app store.',
+                message: deployFinishedError,
             })
         }
     }, [deployFinishedError])
@@ -282,7 +281,7 @@ const StoreDeploymentDashboard = () => {
         if (deployAppTestingSuccess) {
             setToast({
                 type: 'success',
-                message: 'Berhasil deploy app testing store.',
+                message: deployAppTestingSuccess,
             })
         }
     }, [deployAppTestingSuccess])
@@ -291,7 +290,7 @@ const StoreDeploymentDashboard = () => {
         if (deployAppTestingError) {
             setToast({
                 type: 'error',
-                message: 'Gagal deploy app testing store.',
+                message: deployAppTestingError,
             })
         }
     }, [deployAppTestingError])
@@ -310,7 +309,7 @@ const StoreDeploymentDashboard = () => {
         if (errorAccountTestingCustomerStore) {
             setToast({
                 type: "error",
-                message: "terjadi kesalahan memuat data account testing customer store, silahkan coba lagi nanti, silahkan coba lagi nanti."
+                message: errorAccountTestingCustomerStore
             })
         }
     }, [errorAccountTestingCustomerStore])
@@ -325,7 +324,7 @@ const StoreDeploymentDashboard = () => {
         if (accountCustomerStoreTestingSuccess) {
             setToast({
                 type: "success",
-                message: "Berhasil membuat account testing customer store."
+                message: accountCustomerStoreTestingSuccess
             })
             dispatch(fetchAccountTestingCustomerStore())
         }
@@ -500,23 +499,6 @@ const StoreDeploymentDashboard = () => {
                                         className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors">
                                             <RefreshCcw className="w-4 h-4 mr-2" />
                                             Refresh
-                                        </button>
-                                        {/* <button
-                                            disabled={loadingDeployAppTesting}
-                                            onClick={handleTestDeploy}
-                                            className="inline-flex items-center px-4 py-2 border border-gray-900 rounded-lg text-sm font-medium text-gray-900 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors"
-                                        >
-                                            { loadingDeployAppTesting ? (
-                                                <span className="w-3 h-3 mr-1 border-2 border-green-500 border-t-transparent rounded-full animate-spin" />
-                                            ) : (
-                                                <TestTube className="w-4 h-4 mr-2" />
-                                            )}
-
-                                            { loadingDeployAppTesting ? 'Deploying...' : 'Test Deploy'}
-                                        </button> */}
-                                        <button className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors">
-                                            <Settings className="w-4 h-4 mr-2" />
-                                            Settings
                                         </button>
                                     </div>
 

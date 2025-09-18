@@ -1,4 +1,4 @@
-import axiosInstance from "./axiosInstance.js";
+import axios from "axios"
 import {
     signupVerificationSlice
 } from '../reducers/patch.js'
@@ -14,7 +14,7 @@ export const signupVerification = (data) => async (dispatch) => {
     }
     dispatch(setLoadingSignupVerification(true))
     try {
-        const response = await axiosInstance.patch(`${process.env.REACT_APP_SIGNUP_VERIFICATION}`, data, config)
+        const response = await axios.patch(`${process.env.REACT_APP_SIGNUP_VERIFICATION}`, data, config)
         dispatch(setSuccessSignupVerification(response?.data?.success))
      } catch (error) {
         dispatch(setErrorSignupVerification({ 

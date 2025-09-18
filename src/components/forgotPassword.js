@@ -45,7 +45,7 @@ const ForgotPasswordComponent = () => {
     if (succesForgotPassword) {
       setToast({
         type: 'success',
-        message: 'Cek email kamu! Kami sudah kirimkan link untuk reset kata sandi.'
+        message: succesForgotPassword
       })
       setIsSubmitted(true)
       dispatch(resetForgotPassword())

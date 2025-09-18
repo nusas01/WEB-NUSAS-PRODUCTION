@@ -33,8 +33,6 @@ function AppContent() {
     }
   }, [loggedIn, dispatch])
   
-  console.log("status login: ", loggedIn)
-  
   // hanndle expired token user
   const {clearStatusExpiredUserToken} = statusExpiredUserTokenSlice.actions 
   const {statusExpiredUserToken} = useSelector((state) => state.statusExpiredUserTokenState)

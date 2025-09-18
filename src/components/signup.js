@@ -98,9 +98,7 @@ export default function SignupComponent() {
       password: validatePassword(formData.password),
       code_verification_internal: validateCode(formData.code_verification_internal)
     };
-
-    console.log("apakah ada error: ", newErrors);
-
+    
     // Cek kalau semua value error kosong/falsy
     const hasError = Object.values(newErrors).some(err => err);
 

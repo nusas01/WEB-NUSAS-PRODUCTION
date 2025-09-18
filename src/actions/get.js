@@ -1,4 +1,4 @@
-import axiosInstance from './axiosInstance'
+import axios from "axios";
 import {
    loginStatusSlice,
     logoutSlice,
@@ -16,6 +16,7 @@ import {
     tenantStoresSlice,
     findTransactionSlice,
     findTransactionSubmissionChangePaymentGatewaySlice,
+    findTenantSlice,
 } from '../reducers/get'
 import { statusExpiredUserTokenSlice } from '../reducers/expToken'
 
@@ -25,7 +26,7 @@ const {setLoginStatus} = loginStatusSlice.actions
 export const fetchAuthStatusLogin = () => {
     return async (dispatch) => {
         try {
-            const response = await axiosInstance.get(`${process.env.REACT_APP_AUTH_STATUS_LOGIN}`,{
+            const response = await  axios.get(`${process.env.REACT_APP_AUTH_STATUS_LOGIN}`,{
                 headers: {
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
@@ -46,14 +47,13 @@ export const fetchLogout = () => {
     return async (dispatch) => {
       dispatch(setLoadingLogout(true))
       try{
-          const response = await axiosInstance.get(`${process.env.REACT_APP_LOGOUT}`, {
+          const response = await  axios.get(`${process.env.REACT_APP_LOGOUT}`, {
               headers: {
                   "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
               },
               withCredentials: true
           })
           dispatch(setSuccessLogout(response?.data.success))
-          dispatch(setLoginStatus(false))
           // reset data customer ketika sudah di buat endpoint
       } catch(error) {
             if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
@@ -71,7 +71,7 @@ export const fetchStoresVerificationRequired = () => {
     return async (dispatch) => {
         dispatch(setLoadingStoresVerification(true))
         try {
-            const response = await axiosInstance.get(`${process.env.REACT_APP_VERIFICATION_DEPLOY_REQUIRED}`, {
+            const response = await  axios.get(`${process.env.REACT_APP_VERIFICATION_DEPLOY_REQUIRED}`, {
                 headers: {
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
@@ -94,7 +94,7 @@ export const createAccessKeyStore = (store_id, tenant_id) => {
     return async (dispatch) => {
         dispatch(setLoadingAccessKey(true))
         try {
-            const response = await axiosInstance.get(`${process.env.REACT_APP_CREATE_ACCESS_KEY_STORE}`, {
+            const response = await  axios.get(`${process.env.REACT_APP_CREATE_ACCESS_KEY_STORE}`, {
                 headers: {
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
@@ -121,7 +121,7 @@ export const fetchAccountTestingCustomerStore = () => {
     return async (dispatch) => {
         dispatch(setLoadingAccountTestingCustomerStore(true))
         try {
-            const response = await axiosInstance.get(`${process.env.REACT_APP_ACCOUNT_TESTING_CUSTOMER_STORE}`, {
+            const response = await  axios.get(`${process.env.REACT_APP_ACCOUNT_TESTING_CUSTOMER_STORE}`, {
                 headers: {
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
@@ -144,7 +144,7 @@ export const getAllStoreRequiredVerified = () => {
     return async (dispatch) => {
         dispatch(setLoadingStoreRequiredVerified(true))
         try {
-            const response = await axiosInstance.get(`${process.env.REACT_APP_GET_ALL_STORE_REQUIRED_VERIFIED}`, {
+            const response = await  axios.get(`${process.env.REACT_APP_GET_ALL_STORE_REQUIRED_VERIFIED}`, {
                 headers: {
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
@@ -167,7 +167,7 @@ export const getTenantSubmissionChangePaymentGateway = () => {
     return async (dispatch) => {
         dispatch(setLoadingTenantSubmissionChangePayment(true))
         try {
-            const response = await axiosInstance.get(`${process.env.REACT_APP_GET_TENANT_SUBMISSION_CHANGE_PAYMENT_GATEWAY}`, {
+            const response = await  axios.get(`${process.env.REACT_APP_GET_TENANT_SUBMISSION_CHANGE_PAYMENT_GATEWAY}`, {
                 headers: {
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
@@ -196,7 +196,7 @@ export const fetchTransactionPaid = (page, isLoadMore = false) => {
 
         dispatch(setLoadingTransactionPaid({loading: true, isLoadMore: isLoadMore}))
         try {
-            const response = await axiosInstance.get(`${process.env.REACT_APP_GET_ALL_TRANSACTION_PAID}`, {
+            const response = await  axios.get(`${process.env.REACT_APP_GET_ALL_TRANSACTION_PAID}`, {
                 headers: {
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
@@ -228,7 +228,7 @@ export const fetchTransactionPending = () => {
     return async (dispatch) => {
         dispatch(setLoadingTransactionPending(true))
         try {
-            const response = await axiosInstance.get(`${process.env.REACT_APP_GET_ALL_TRANSACTION_PENDING}`, {
+            const response = await  axios.get(`${process.env.REACT_APP_GET_ALL_TRANSACTION_PENDING}`, {
                 headers: {
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
@@ -251,7 +251,7 @@ export const findTransaction = (key) => {
     return async (dispatch) => {
         dispatch(setLoadingFindTransaction(true))
         try {
-            const response = await axiosInstance.get(`${process.env.REACT_APP_FIND_TRANSACTION}`, {
+            const response = await  axios.get(`${process.env.REACT_APP_FIND_TRANSACTION}`, {
                 headers: {
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
@@ -277,7 +277,7 @@ export const createAccessKeyMaintananceTenant = (tenant_id, store_id) => {
     return async (dispatch) => {
         dispatch(setLoadingAccessKeyStoreTesting(true))
         try {
-            const response = await axiosInstance.get(`${process.env.REACT_APP_CREATE_ACCESS_KEY_STORE}`, {
+            const response = await  axios.get(`${process.env.REACT_APP_CREATE_ACCESS_KEY_STORE}`, {
                 headers: {
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
@@ -304,7 +304,7 @@ export const findTransactionSubmissionChangePaymentGateway = (key) => {
     return async (dispatch) => {
         dispatch(setLoadingFindTransactionSubmissionChangePaymentGateway(true))
         try {
-            const response = await axiosInstance.get(`${process.env.REACT_APP_FIND_TRANSACTION_SUBMISSION_FIND}`, {
+            const response = await  axios.get(`${process.env.REACT_APP_FIND_TRANSACTION_SUBMISSION_FIND}`, {
                 headers: {
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
@@ -336,7 +336,7 @@ export const fetchTransactionSubmissionPaid = (page, isLoadMore = false) => {
 
         dispatch(setLoadingTransactionSubmissionPaid({loading: true, isLoadMore: isLoadMore}))
         try {
-            const response = await axiosInstance.get(`${process.env.REACT_APP_GET_ALL_TRANSACTION_SUBMISSION_PAID}`, {
+            const response = await  axios.get(`${process.env.REACT_APP_GET_ALL_TRANSACTION_SUBMISSION_PAID}`, {
                 headers: {
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
@@ -368,7 +368,7 @@ export const fetchTransactionSubmissionPending = () => {
     return async (dispatch) => {
         dispatch(setLoadingTransactionSubmissionPending(true))
         try {
-            const response = await axiosInstance.get(`${process.env.REACT_APP_GET_ALL_TRANSACTION_SUBMISSION_PENDING}`, {
+            const response = await  axios.get(`${process.env.REACT_APP_GET_ALL_TRANSACTION_SUBMISSION_PENDING}`, {
                 headers: {
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
@@ -386,6 +386,32 @@ export const fetchTransactionSubmissionPending = () => {
     }
 }
 
+const { setSuccessFindTenant, setErrorFindTenant, setLoadingFindTenant } = findTenantSlice.actions
+export const findTenant = (key) => {
+    return async (dispatch) => {
+        dispatch(setLoadingFindTenant(true))
+        try {
+            const response = await  axios.get(`${process.env.REACT_APP_FINDTENANT}`, {
+                headers: {
+                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                },
+                withCredentials: true,
+                params: {
+                    key: key,
+                }
+            })
+            dispatch(setSuccessFindTenant(response?.data))
+        } catch (error) {
+            if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
+                dispatch(setStatusExpiredUserToken(true));
+            }
+            dispatch(setErrorFindTenant(error.response?.data?.error || 'Terjadi kesalahan'))
+        } finally {
+            dispatch(setLoadingFindTenant(false))
+        }
+    }
+}
+
 const { setTenantsSuccess, setTenantsError, setLoadingTenants } = tenantsSlice.actions
 export const fetchTenants = (page, isLoadMore = false) => {
     return async (dispatch, getState) => {
@@ -397,7 +423,7 @@ export const fetchTenants = (page, isLoadMore = false) => {
 
         dispatch(setLoadingTenants({loading: true, isLoadMore: isLoadMore}))
         try {
-            const response = await axiosInstance.get(`${process.env.REACT_APP_TENANTS}`, {
+            const response = await  axios.get(`${process.env.REACT_APP_TENANTS}`, {
                 headers: {
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
@@ -411,8 +437,8 @@ export const fetchTenants = (page, isLoadMore = false) => {
                 data: response?.data?.data, 
                 hasMore: response?.data?.hasMore || false,
                 page: page,
+                totalRecord: response?.data?.total_record,
             }
-            console.log("apa kah boleh:", responseData)
             dispatch(setTenantsSuccess(responseData))
         } catch (error) {
             if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
@@ -428,7 +454,7 @@ export const fetchTenantStores = (id) => {
     return async (dispatch) => {
         dispatch(setLoadingTenantStores(true))
         try {
-            const response = await axiosInstance.get(`${process.env.REACT_APP_TENANT_STORES}`, {
+            const response = await  axios.get(`${process.env.REACT_APP_TENANT_STORES}`, {
                 headers: {
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
@@ -451,7 +477,7 @@ export const fetchTenantStores = (id) => {
 
 export const fetchNonce = async () => {
   try {
-    const response = await axiosInstance.get(
+    const response = await  axios.get(
       `${process.env.REACT_APP_NONCE}`,
       {
         headers: {

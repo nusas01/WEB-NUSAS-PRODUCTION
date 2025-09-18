@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
-import { ChevronDown, ChevronRight, Users, RefreshCcw, Menu, Store, Phone, Mail, MapPin, Calendar, Key, Building, Loader2 } from 'lucide-react';
+import { ChevronDown, ChevronRight, Users, Search, X, RefreshCcw, Menu, Store, Phone, Mail, MapPin, Calendar, Key, Building, Loader2 } from 'lucide-react';
 import {
     Toast,
     ToastPortal,
@@ -13,7 +13,8 @@ import {
     useElementHeight,
 } from './helper';
 import {
-    AccessKeyModal
+    AccessKeyModal,
+    TableLoadingSkeleton
 } from './model'
 import {
     loadMoreTenants,
@@ -22,12 +23,17 @@ import {
     fetchTenants,
     fetchTenantStores,
     createAccessKeyStore,
+    findTenant,
 } from '../actions/get'
 import {
     tenantsSlice,
     tenantStoresSlice,
     accessKeySlice,
+    findTenantSlice,
 } from '../reducers/get'
+import {
+    loginSlice
+} from '../reducers/post'
 
 const TenantManagement = () => {
     const dispatch = useDispatch()
@@ -36,9 +42,6 @@ const TenantManagement = () => {
     const [loadingSpesifik, setLoadingSpesifik] = useState(null)
     const [loadingTenantStoresIds, setLoadingTenantStoresIds] = useState(new Set());
 
-    // Refs for intersection observer
-    const tenantsObserverRef = useRef(null);
-
     const { setIsOpen } = navbarSlice.actions
     const { isOpen, isMobileDeviceType } = useSelector((state) => state.persisted.navbar)
 
@@ -46,15 +49,16 @@ const TenantManagement = () => {
     
 
     // data tenants
-    const {resetErrortenants} = tenantsSlice.actions
+    const {resetErrortenants, setCurrentPage} = tenantsSlice.actions
     const {
         dataTenants: tenantsData,
         errorTenants,
         loadingTenants,
+        totalRecordTenants,
         hasMore: hasMoreTenants,
+        page,
+        currentPage,
     } = useSelector((state) => state.persisted.tenants)
-
-    console.log("data tenants: ", tenantsData)
 
     useEffect(() => {
         if (tenantsData.length === 0) {
@@ -75,33 +79,18 @@ const TenantManagement = () => {
         dispatch(loadMoreTenants())
     }, [dispatch])
 
-    // Intersection observer for tenants load more
-    useEffect(() => {
-        if (loadingTenants || !hasMoreTenants) return;
+    const handlePageTenantsInc = (value) => {
+        if (value > page && hasMoreTenants) {
+            loadMoreTenantsCallback()
+            dispatch(setCurrentPage(value))
+        } else {
+            dispatch(setCurrentPage(value))
+        }
+    }
 
-        const node = tenantsObserverRef.current;
-        if (!node) return;
-
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                console.log("Tenants entry.isIntersecting:", entry.isIntersecting);
-                if (entry.isIntersecting) {
-                    loadMoreTenantsCallback();
-                }
-            },
-            {
-                root: null,
-                rootMargin: '100px',
-                threshold: 0.5,
-            }
-        );
-
-        observer.observe(node);
-
-        return () => {
-            observer.disconnect();
-        };
-    }, [loadMoreTenantsCallback, loadingTenants, hasMoreTenants]);
+    const handleTenantsDec = (value) => {
+        dispatch(setCurrentPage(value))
+    }
 
     // data tenant stores
     const {resetErrorTenantStores} = tenantStoresSlice.actions
@@ -153,7 +142,7 @@ const TenantManagement = () => {
         if (accessKeyError) {
             setToast({
                 type: 'error',
-                message: 'Gagal membuat access key store, silahkan coba lagi nanti',
+                message: accessKeyError,
             })
         }
     }, [accessKeyError])
@@ -181,6 +170,51 @@ const TenantManagement = () => {
         return diffDays <= 30;
     };
 
+
+    // handle search query
+    const [query, setQuery] = useState('')
+    const {resetFindTenant} = findTenantSlice.actions
+    const {
+        dataFindTenant, 
+        errorFindTenant,
+        loadingFindTenant,
+    } = useSelector((state) => state.findTenantState)
+
+    useEffect(() => {
+        if (errorFindTenant) {
+            setToast({
+                type: 'error',
+                message: errorFindTenant,
+            })
+        }
+    }, [errorFindTenant])
+
+    useEffect(() => {
+        if (query === '') {
+            dispatch(resetFindTenant())
+        }
+    }, [query])
+
+    const handleSearchTenant = (key) => {
+        setQuery(key)
+        dispatch(findTenant(key))
+    }
+
+
+    // handle login reset
+    // const { resetLogin } = loginSlice.actions
+    // const { successLogin } = useSelector(state => state.loginState);
+
+    // useEffect(() => {
+    //     if (successLogin) {
+    //         const timer = setTimeout(() => {
+    //             dispatch(resetLogin()) 
+    //         }, 1000)
+
+    //         return () => clearTimeout(timer)
+    //     }
+    // }, [successLogin])
+
     return (
         <div className='flex'>
             {((isMobileDeviceType && isOpen) || !isMobileDeviceType) && (
@@ -203,6 +237,7 @@ const TenantManagement = () => {
                                 setToast(null)
                                 dispatch(resetErrorTenantStores())
                                 dispatch(resetErrortenants())
+                                dispatch(resetFindTenant())
                             }} 
                             duration={10000}
                             />
@@ -249,7 +284,10 @@ const TenantManagement = () => {
 
                                     <div className="flex items-center space-x-4">
                                         <button
-                                        onClick={() => dispatch(fetchTenants(1, false))}
+                                        onClick={() => { 
+                                            dispatch(fetchTenants(1, false))
+                                            dispatch(setCurrentPage(1))
+                                        }}
                                         className="inline-flex items-center px-4 py-2 border border-transparent rounded-lg text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors">
                                             <RefreshCcw className="w-4 h-4 mr-2" />
                                             Refresh
@@ -271,183 +309,375 @@ const TenantManagement = () => {
                             </div>
                         </div> 
 
-                        {/* Tenant List */}
-                        <div className="flex justify-center space-y-4 bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 p-6 min-h-[80vh]" style={{marginTop: headerHeight}}>
-                        
-                            {/* Loading Tenants */}
-                            {loadingTenants && tenantsData.length === 0 && (
-                                <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                                    <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-                                    <p className="text-gray-500">Loading tenants...</p>
-                                </div>
-                            )}
+                        {/* Search Bar */}
+                        { !loadingTenants && (
+                            <div className="bg-white shadow-sm rounded-lg border border-gray-200 mb-6" style={{marginTop: headerHeight}}>
+                                <div className="p-4">
+                                    <div className="relative w-full">
+                                        {/* Ikon Search di kiri */}
+                                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
 
-                            {tenantsData.length > 0 && (
-                                <div className="w-full space-y-4">
-                                    {tenantsData.map((tenant) => {
-                                        const isExpanded = expandedTenants.has(tenant.id);
-                                        
-                                        return (
-                                        <div key={tenant.id} className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200">
-                                            {/* Tenant Row */}
-                                            <div 
-                                            className="p-6 cursor-pointer hover:bg-gray-50 transition-colors duration-200"
-                                            onClick={() => toggleTenant(tenant.id)}
+                                        {/* Input */}
+                                        <input
+                                            type="text"
+                                            placeholder="Search by Tenant ID, or Email..."
+                                            value={query}
+                                            onChange={(e) => setQuery(e.target.value)}
+                                            onKeyDown={(e) => {
+                                            if (e.key === "Enter" && query.trim() !== "") {
+                                                handleSearchTenant(query)
+                                            }
+                                            }}
+                                            className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg
+                                                    focus:ring-2 focus:ring-gray-900 focus:border-transparent 
+                                                    bg-white shadow-sm"
+                                        />
+
+                                        {/* Ikon X di kanan input */}
+                                        {query && (
+                                            <button
+                                            type="button"
+                                            onClick={() => {
+                                                setQuery("")
+                                                dispatch(resetFindTenant())
+                                            }}
+                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                                             >
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-4">
-                                                <div className="flex items-center gap-2">
-                                                    {isExpanded ? (
-                                                        <ChevronDown className="h-5 w-5 text-gray-900" />
-                                                    ) : (
-                                                        <ChevronRight className="h-5 w-5 text-gray-900" />
-                                                    )}
-                                                    <div className="p-2 bg-gray-100 rounded-lg">
-                                                    <Building className="h-5 w-5 text-gray-900" />
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <h3 className="font-semibold text-gray-900 text-lg">Tenant</h3>
-                                                    <div className="flex items-center gap-4 mt-1">
-                                                    <div className="flex items-center gap-1 text-gray-600">
-                                                        <Mail className="h-4 w-4" />
-                                                        <span className="text-sm">{tenant.email}</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-1 text-gray-600">
-                                                        <Phone className="h-4 w-4" />
-                                                        <span className="text-sm">{tenant.phone_number}</span>
-                                                    </div>
-                                                    </div>
-                                                </div>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                </div>
-                                            </div>
-                                            </div>
+                                            <X className="w-5 h-5" />
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
 
-                                            {/* Loading Stores */}
-                                            {(loadingSpesifik === tenant.id) && (
-                                                <div className="px-6 pb-6">
-                                                    <div className="flex items-center space-x-2">
-                                                        <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
-                                                        <span className="text-gray-500">Loading stores...</span>
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            {/* Stores List (Expandable) */}
-                                            {isExpanded && !loadingTenantStores && storesData.length > 0 && (
-                                            <div className="border-t border-gray-200 bg-gray-50 p-6">
-                                                <div className="flex items-center gap-2 mb-4">
-                                                    <Store className="h-5 w-5 text-gray-900" />
-                                                    <h4 className="font-semibold text-gray-900">Associated Stores</h4>
-                                                </div>
-                                                <div className="space-y-3">
-                                                    {storesData.map((store) => {
-                                                    const isExpiring = isExpiringSoon(store.expiration_access);
-                                                    
-                                                    return (
-                                                        <div key={store.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow duration-200">
-                                                        <div className="flex items-start justify-between">
-                                                            <div className="flex-1">
-                                                            <div className="flex items-center gap-3 mb-3">
-                                                                <h5 className="font-semibold text-gray-900">{store.name}</h5>
-                                                                {isExpiring && (
-                                                                <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
-                                                                    Expiring Soon
-                                                                </span>
-                                                                )}
-                                                            </div>
-                                                            
-                                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-600">
-                                                                <div className="flex items-center gap-2">
-                                                                <Phone className="h-4 w-4" />
-                                                                <span>{store.phone_number}</span>
-                                                                </div>
-                                                                <div className="flex items-center gap-2">
-                                                                <Calendar className="h-4 w-4" />
-                                                                <span>Access expires: {store.expiration_access}</span>
-                                                                </div>
-                                                                <div className="flex items-center gap-2">
-                                                                <MapPin className="h-4 w-4" />
-                                                                <span>{store.address}, {store.city}, {store.state} {store.postal_code}</span>
-                                                                </div>
-                                                                <div className="flex items-center gap-2">
-                                                                <Calendar className="h-4 w-4" />
-                                                                <span>Created: {store.creates_at}</span>
-                                                                </div>
-                                                            </div>
-                                                            </div>
-                                                            
-                                                            <div className="ml-4">
-                                                            <button
-                                                                onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleCreateAccessKey(store, tenant.id, store.id);
-                                                                }}
-                                                                className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors duration-200 text-sm font-medium"
-                                                            >
-                                                                {(loadingAccessKey && loadingSpesifik === store.id) ? (
-                                                                    <span className="w-3 h-3 mr-1 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        {/* hasil search tenant */}
+                        {loadingFindTenant ? (
+                            <TableLoadingSkeleton />
+                        ) : dataFindTenant ? (
+                            <div className="flex justify-center space-y-4 bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 p-6">
+                                <div className="w-full space-y-4">
+                                    {(() => {
+                                        const isExpanded = expandedTenants.has(dataFindTenant.id);
+                                        return (
+                                            <div key={dataFindTenant.id} className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200">
+                                                {/* Tenant Row */}
+                                                <div 
+                                                    className="p-6 cursor-pointer hover:bg-gray-50 transition-colors duration-200"
+                                                    onClick={() => toggleTenant(dataFindTenant.id)}
+                                                >
+                                                    <div className="flex items-center justify-between">
+                                                        <div className="flex items-center gap-4">
+                                                            <div className="flex items-center gap-2">
+                                                                {isExpanded ? (
+                                                                    <ChevronDown className="h-5 w-5 text-gray-900" />
                                                                 ) : (
-                                                                    <Key className="w-3 h-3 mr-1" />
+                                                                    <ChevronRight className="h-5 w-5 text-gray-900" />
                                                                 )}
-                                                                {(loadingAccessKey && loadingSpesifik === store.id) ? 'Creating...' : 'Access Key Testing'}
-                                                            </button>
+                                                                <div className="p-2 bg-gray-100 rounded-lg">
+                                                                    <Building className="h-5 w-5 text-gray-900" />
+                                                                </div>
+                                                            </div>
+                                                            <div>
+                                                                <h3 className="font-semibold text-gray-900 text-lg">Tenant</h3>
+                                                                <div className="flex items-center gap-4 mt-1">
+                                                                    <div className="flex items-center gap-1 text-gray-600">
+                                                                        <Mail className="h-4 w-4" />
+                                                                        <span className="text-sm">{dataFindTenant.email}</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-1 text-gray-600">
+                                                                        <Phone className="h-4 w-4" />
+                                                                        <span className="text-sm">{dataFindTenant.phone_number}</span>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
+                                                        <div className="flex items-center gap-2">
                                                         </div>
-                                                    );
-                                                    })}
-                                                </div>
-                                            </div>
-                                            )}
-
-                                            {/* Empty stores state */}
-                                            {isExpanded && !loadingTenantStores && storesData.length === 0 && (
-                                                <div className="border-t border-gray-200 bg-gray-50 p-6">
-                                                    <div className="text-center py-8">
-                                                        <Store className="h-12 w-12 mx-auto text-gray-400 mb-3" />
-                                                        <h4 className="text-lg font-medium text-gray-900 mb-1">No stores found</h4>
-                                                        <p className="text-gray-600">This tenant doesn't have any associated stores yet.</p>
                                                     </div>
                                                 </div>
-                                            )}
 
-                                        </div>
+                                                {/* Loading Stores */}
+                                                {(loadingSpesifik === dataFindTenant.id) && (
+                                                    <div className="px-6 pb-6">
+                                                        <div className="flex items-center space-x-2">
+                                                            <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+                                                            <span className="text-gray-500">Loading stores...</span>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Stores List (Expandable) */}
+                                                {isExpanded && !loadingTenantStores && storesData && storesData.length > 0 && (
+                                                    <div className="border-t border-gray-200 bg-gray-50 p-6">
+                                                        <div className="flex items-center gap-2 mb-4">
+                                                            <Store className="h-5 w-5 text-gray-900" />
+                                                            <h4 className="font-semibold text-gray-900">Associated Stores</h4>
+                                                        </div>
+                                                        <div className="space-y-3">
+                                                            {storesData.map((store) => {
+                                                                const isExpiring = isExpiringSoon(store.expiration_access);
+                                                                
+                                                                return (
+                                                                    <div key={store.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow duration-200">
+                                                                        <div className="flex items-start justify-between">
+                                                                            <div className="flex-1">
+                                                                                <div className="flex items-center gap-3 mb-3">
+                                                                                    <h5 className="font-semibold text-gray-900">{store.name}</h5>
+                                                                                    {isExpiring && (
+                                                                                        <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+                                                                                            Expiring Soon
+                                                                                        </span>
+                                                                                    )}
+                                                                                </div>
+                                                                                
+                                                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-600">
+                                                                                    <div className="flex items-center gap-2">
+                                                                                        <Phone className="h-4 w-4" />
+                                                                                        <span>{store.phone_number}</span>
+                                                                                    </div>
+                                                                                    <div className="flex items-center gap-2">
+                                                                                        <Calendar className="h-4 w-4" />
+                                                                                        <span>Access expires: {store.expiration_access}</span>
+                                                                                    </div>
+                                                                                    <div className="flex items-center gap-2">
+                                                                                        <MapPin className="h-4 w-4" />
+                                                                                        <span>{store.address}, {store.city}, {store.state} {store.postal_code}</span>
+                                                                                    </div>
+                                                                                    <div className="flex items-center gap-2">
+                                                                                        <Calendar className="h-4 w-4" />
+                                                                                        <span>Created: {store.creates_at}</span>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                            
+                                                                            <div className="ml-4">
+                                                                                <button
+                                                                                    onClick={(e) => {
+                                                                                        e.stopPropagation();
+                                                                                        handleCreateAccessKey(store, dataFindTenant.id, store.id);
+                                                                                    }}
+                                                                                    className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors duration-200 text-sm font-medium"
+                                                                                >
+                                                                                    {(loadingAccessKey && loadingSpesifik === store.id) ? (
+                                                                                        <span className="w-3 h-3 mr-1 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                                                                    ) : (
+                                                                                        <Key className="w-3 h-3 mr-1" />
+                                                                                    )}
+                                                                                    {(loadingAccessKey && loadingSpesifik === store.id) ? 'Creating...' : 'Access Key'}
+                                                                                </button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Empty stores state */}
+                                                {isExpanded && !loadingTenantStores && (!storesData || storesData.length === 0) && (
+                                                    <div className="border-t border-gray-200 bg-gray-50 p-6">
+                                                        <div className="text-center py-8">
+                                                            <Store className="h-12 w-12 mx-auto text-gray-400 mb-3" />
+                                                            <h4 className="text-lg font-medium text-gray-900 mb-1">No stores found</h4>
+                                                            <p className="text-gray-600">This tenant doesn't have any associated stores yet.</p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
                                         );
-                                    })}
-
-                                    {/* Load More Trigger for Tenants */}
-                                    {hasMoreTenants && (
-                                        <div
-                                            ref={tenantsObserverRef}
-                                            className="flex items-center justify-center py-8"
-                                        >
-                                            {loadingTenants ? (
-                                                <div className="flex items-center space-x-2">
-                                                    <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-                                                    <span className="text-gray-500">Loading more tenants...</span>
-                                                </div>
-                                            ) : (
-                                                <div className="h-6 w-full flex items-center justify-center">
-                                                    <span className="text-sm text-gray-400">Scroll for more tenants</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
+                                    })()}
                                 </div>
-                            )}
+                            </div>
+                        ) : (
+                            <></>
+                        )}
 
-                            {/* Empty State */}
-                            {!loadingTenants && tenantsData.length === 0 && (
-                                <div className="text-center py-12">
-                                    <Users className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-                                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No tenants found</h3>
-                                    <p className="text-gray-600">There are no tenants to display at the moment.</p>
+                        {/* Tenant List */}
+                        { !dataFindTenant && (
+                            <>
+                            <div className="flex justify-center space-y-4 bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 p-6">
+                                {/* Loading Tenants */}
+                                {loadingTenants && tenantsData.length === 0 && (
+                                    <TableLoadingSkeleton />
+                                )}
+
+                                {tenantsData.length > 0 && (
+                                    <div className="w-full space-y-4">
+                                        {tenantsData[currentPage-1]?.map((tenant) => {
+                                            const isExpanded = expandedTenants.has(tenant.id);
+                                            
+                                            return (
+                                            <div key={tenant.id} className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200">
+                                                {/* Tenant Row */}
+                                                <div 
+                                                className="p-6 cursor-pointer hover:bg-gray-50 transition-colors duration-200"
+                                                onClick={() => toggleTenant(tenant.id)}
+                                                >
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-4">
+                                                    <div className="flex items-center gap-2">
+                                                        {isExpanded ? (
+                                                            <ChevronDown className="h-5 w-5 text-gray-900" />
+                                                        ) : (
+                                                            <ChevronRight className="h-5 w-5 text-gray-900" />
+                                                        )}
+                                                        <div className="p-2 bg-gray-100 rounded-lg">
+                                                        <Building className="h-5 w-5 text-gray-900" />
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="font-semibold text-gray-900 text-lg">Tenant</h3>
+                                                        <div className="flex items-center gap-4 mt-1">
+                                                        <div className="flex items-center gap-1 text-gray-600">
+                                                            <Mail className="h-4 w-4" />
+                                                            <span className="text-sm">{tenant.email}</span>
+                                                        </div>
+                                                        <div className="flex items-center gap-1 text-gray-600">
+                                                            <Phone className="h-4 w-4" />
+                                                            <span className="text-sm">{tenant.phone_number}</span>
+                                                        </div>
+                                                        </div>
+                                                    </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-2">
+                                                    </div>
+                                                </div>
+                                                </div>
+
+                                                {/* Loading Stores */}
+                                                {(loadingSpesifik === tenant.id) && (
+                                                    <div className="px-6 pb-6">
+                                                        <div className="flex items-center space-x-2">
+                                                            <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+                                                            <span className="text-gray-500">Loading stores...</span>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Stores List (Expandable) */}
+                                                {isExpanded && !loadingTenantStores && storesData.length > 0 && (
+                                                <div className="border-t border-gray-200 bg-gray-50 p-6">
+                                                    <div className="flex items-center gap-2 mb-4">
+                                                        <Store className="h-5 w-5 text-gray-900" />
+                                                        <h4 className="font-semibold text-gray-900">Associated Stores</h4>
+                                                    </div>
+                                                    <div className="space-y-3">
+                                                        {storesData.map((store) => {
+                                                        const isExpiring = isExpiringSoon(store.expiration_access);
+                                                        
+                                                        return (
+                                                            <div key={store.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow duration-200">
+                                                            <div className="flex items-start justify-between">
+                                                                <div className="flex-1">
+                                                                <div className="flex items-center gap-3 mb-3">
+                                                                    <h5 className="font-semibold text-gray-900">{store.name}</h5>
+                                                                    {isExpiring && (
+                                                                    <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+                                                                        Expiring Soon
+                                                                    </span>
+                                                                    )}
+                                                                </div>
+                                                                
+                                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-600">
+                                                                    <div className="flex items-center gap-2">
+                                                                    <Phone className="h-4 w-4" />
+                                                                    <span>{store.phone_number}</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-2">
+                                                                    <Calendar className="h-4 w-4" />
+                                                                    <span>Access expires: {store.expiration_access}</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-2">
+                                                                    <MapPin className="h-4 w-4" />
+                                                                    <span>{store.address}, {store.city}, {store.state} {store.postal_code}</span>
+                                                                    </div>
+                                                                    <div className="flex items-center gap-2">
+                                                                    <Calendar className="h-4 w-4" />
+                                                                    <span>Created: {store.creates_at}</span>
+                                                                    </div>
+                                                                </div>
+                                                                </div>
+                                                                
+                                                                <div className="ml-4">
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleCreateAccessKey(store, tenant.id, store.id);
+                                                                    }}
+                                                                    className="flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors duration-200 text-sm font-medium"
+                                                                >
+                                                                    {(loadingAccessKey && loadingSpesifik === store.id) ? (
+                                                                        <span className="w-3 h-3 mr-1 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                                                    ) : (
+                                                                        <Key className="w-3 h-3 mr-1" />
+                                                                    )}
+                                                                    {(loadingAccessKey && loadingSpesifik === store.id) ? 'Creating...' : 'Access Key Testing'}
+                                                                </button>
+                                                                </div>
+                                                            </div>
+                                                            </div>
+                                                        );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                                )}
+
+                                                {/* Empty stores state */}
+                                                {isExpanded && !loadingTenantStores && storesData.length === 0 && (
+                                                    <div className="border-t border-gray-200 bg-gray-50 p-6">
+                                                        <div className="text-center py-8">
+                                                            <Store className="h-12 w-12 mx-auto text-gray-400 mb-3" />
+                                                            <h4 className="text-lg font-medium text-gray-900 mb-1">No stores found</h4>
+                                                            <p className="text-gray-600">This tenant doesn't have any associated stores yet.</p>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                            </div>
+                                            );
+                                        })}
+                                    </div>
+                                )}
+
+                                {/* Empty State */}
+                                {!loadingTenants && tenantsData.length === 0 && (
+                                    <div className="text-center py-12">
+                                        <Users className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+                                        <h3 className="text-lg font-semibold text-gray-900 mb-2">No tenants found</h3>
+                                        <p className="text-gray-600">There are no tenants to display at the moment.</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Pagination */}
+                            <div className="mt-6 flex items-center justify-between">
+                                <div className="flex items-center text-sm text-gray-700">
+                                    Showing {tenantsData[currentPage-1]?.length} results
                                 </div>
-                            )}
-                        </div>
+                                <div className="flex items-center gap-2">
+                                    <button 
+                                    onClick={() => handleTenantsDec(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                    >
+                                    Previous
+                                    </button>
+                                    <span className="px-3 py-2 text-sm font-medium text-gray-900">
+                                    Page {currentPage}
+                                    </span>
+                                    <button 
+                                    disabled={(!hasMoreTenants && currentPage === tenantsData.length) || loadingTenants}
+                                    onClick={() => handlePageTenantsInc(currentPage + 1)}
+                                    className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                    Next
+                                    </button>
+                                </div>
+                            </div>
+                        </>
+                        )}
                     </div>
                 </div>
             </div>
