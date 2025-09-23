@@ -583,6 +583,7 @@ const TransactionSubmissionChangePaymentGatewayDashboard = () => {
                                     <th className="px-6 py-4 text-left text-sm font-semibold">Amount & Fees</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold">Product & Channel</th>
                                     <th className="px-6 py-4 text-left text-sm font-semibold">Tenant Info</th>
+                                    <th className="px-6 py-4 text-left text-sm font-semibold">Actions</th>
                                 </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-200">

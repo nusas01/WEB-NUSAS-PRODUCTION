@@ -463,7 +463,7 @@ const StoreDeploymentDashboard = () => {
                             dispatch(resetAccessKeyStoreTesting())
                             setDataStoreCreateAccessKey(null)
                         }}
-                        accessKey={accessKeyData?.secret_access_key || dataAccessKeyStoreTesting?.secret_access_key}
+                        accessKey={accessKeyData || dataAccessKeyStoreTesting}
                         data={dataStoreCreateAccessKey}
                         />
                     )}

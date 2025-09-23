@@ -104,7 +104,7 @@ export const createAccessKeyStore = (store_id, tenant_id) => {
                     tenant_id: tenant_id,
                 },
             })
-            dispatch(setAccessKeyData(response?.data))
+            dispatch(setAccessKeyData(response?.data?.secret_access_key))
         } catch (error) {
             if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
                 dispatch(setStatusExpiredUserToken(true));
@@ -277,7 +277,7 @@ export const createAccessKeyMaintananceTenant = (tenant_id, store_id) => {
     return async (dispatch) => {
         dispatch(setLoadingAccessKeyStoreTesting(true))
         try {
-            const response = await  axios.get(`${process.env.REACT_APP_CREATE_ACCESS_KEY_STORE}`, {
+            const response = await  axios.get(`${process.env.REACT_APP_CREATE_ACCESS_KEY_TESTING_STORE}`, {
                 headers: {
                     "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
@@ -287,7 +287,7 @@ export const createAccessKeyMaintananceTenant = (tenant_id, store_id) => {
                     store_id: store_id,
                 }
             })
-            dispatch(setAccessKeyStoreTestingData(response?.data))
+            dispatch(setAccessKeyStoreTestingData(response?.data?.access_key_maintanance))
         } catch (error) {
             if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
                 dispatch(setStatusExpiredUserToken(true));
@@ -489,11 +489,6 @@ export const fetchNonce = async () => {
 
     return { data: response?.data, error: null };
   } catch (error) {
-    // handle khusus kalau token expired
-    if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
-      return { data: null, error: "TOKEN_USER_EXPIRED" };
-    }
-
     return { data: null, error: error.response?.data?.error || "Unexpected error" };
   }
 };

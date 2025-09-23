@@ -252,7 +252,7 @@ const TenantManagement = () => {
                             dispatch(resetAccessKey())
                             setDataStoreCreateAccessKey(null)
                         }}
-                        accessKey={accessKeyData?.secret_access_key}
+                        accessKey={accessKeyData}
                         data={dataStoreCreateAccessKey}
                         />
                     )}
