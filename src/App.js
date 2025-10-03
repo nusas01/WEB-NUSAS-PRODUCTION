@@ -18,6 +18,7 @@ import TenantManagement from './components/tenants';
 import SignupComponent from './components/signup';
 import VerificationForm from './components/verification';
 import ForgotPasswordComponent from './components/forgotPassword';
+import ExpiredStoresDashboard from './components/storeExpired'
 
 // Pisahkan component yang menggunakan useNavigate
 function AppContent() {
@@ -59,6 +60,7 @@ function AppContent() {
           <Route path='/transactions' element={<TransactionDashboard/>}/>
           <Route path='/transactions/submission/change/payment/gateway' element={<TransactionSubmissionChangePaymentGatewayDashboard/>}/>
           <Route path='/store/required/deploy' element={<StoreDeploymentDashboard/>}/>
+          <Route path='/store/expired' element={<ExpiredStoresDashboard/>}/>
         </Route>
       </Routes>
     </div>

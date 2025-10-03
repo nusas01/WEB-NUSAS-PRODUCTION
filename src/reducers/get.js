@@ -526,3 +526,34 @@ export const tenantStoresSlice = createSlice({
 })
 
 
+const initialStoresExpiredState = {
+    dataStoresExpired: [],
+    errorStoresExpired: null,
+    loadingStoresExpired: false,
+}
+export const storesExpiredSlice = createSlice({
+    name: "storesExpired",
+    initialState: initialStoresExpiredState,
+    reducers: {
+        setLoadingStoresExpired: (state, action) => {
+            state.loadingStoresExpired = action.payload
+        },
+        setStoresExpiredSuccess: (state, action) => {
+            state.dataStoresExpired = action.payload || []
+        },
+        setStoresExpiredError: (state, action) => {
+            state.errorStoresExpired = action.payload || null
+        },
+        resetErrorStoresExpired: (state) => {
+            state.errorStoresExpired = null
+        },
+        deleteStoresExpiredById: (state, action) => {
+            const idToDelete = action.payload
+            state.dataStoresExpired = state.dataStoresExpired.filter(
+                (item) => item.id !== idToDelete
+            )
+        },
+    }
+})
+
+

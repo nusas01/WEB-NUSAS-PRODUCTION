@@ -15,6 +15,7 @@ import {
     tenantsSlice, 
     tenantStoresSlice,
     findTransactionSlice,
+    storesExpiredSlice,
     findTransactionSubmissionChangePaymentGatewaySlice,
     findTenantSlice,
 } from '../reducers/get'
@@ -471,6 +472,32 @@ export const fetchTenantStores = (id) => {
             dispatch(setTenantStoresError(error.response?.data?.error))
         } finally {
             dispatch(setLoadingTenantStores(false))
+        }
+    }
+}
+
+const {setStoresExpiredSuccess, setStoresExpiredError, setLoadingStoresExpired} = storesExpiredSlice.actions
+export const fetchStoresExpired = (id) => {
+    return async (dispatch) => {
+        dispatch(setLoadingStoresExpired(true))
+        try {
+            const response = await  axios.get(`${process.env.REACT_APP_STORES_EXPIRED}`, {
+                headers: {
+                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                },
+                withCredentials: true,
+                params: {
+                    id: id,
+                },
+            })
+            dispatch(setStoresExpiredSuccess(response?.data))
+        } catch (error) {
+            if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
+                dispatch(setStatusExpiredUserToken(true));
+            }
+            dispatch(setStoresExpiredError(error.response?.data?.error))
+        } finally {
+            dispatch(setLoadingStoresExpired(false))
         }
     }
 }

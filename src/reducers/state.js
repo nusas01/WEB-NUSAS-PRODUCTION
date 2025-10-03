@@ -22,6 +22,7 @@ import {
     findTransactionSlice,
     findTransactionSubmissionChangePaymentGatewaySlice,
     findTenantSlice,
+    storesExpiredSlice,
 } from './get'
 import {
     loginSlice,
@@ -39,6 +40,8 @@ import {
     changePaymentGatewayFailedSlice,
     signupSlice,
     forgotPasswordSlice,
+    nonActiveWebStoreSlice,
+    warningDeletedWebStoreSlice,
 } from './post'
 import {
   signupVerificationSlice
@@ -61,6 +64,7 @@ const persistedReducers = combineReducers({
   transactionSubmissionPaid: transactionSubmissionPaidSlice.reducer,
   tenants: tenantsSlice.reducer,
   tenantStores: tenantStoresSlice.reducer,
+  storesExpired: storesExpiredSlice.reducer,
 })
 
 // 2. Konfigurasi persist
@@ -93,7 +97,9 @@ const nonPersistedReducers = {
   forgotPasswordState: forgotPasswordSlice.reducer,
   findTransactionState: findTransactionSlice.reducer,
   findTransactionSubmissionChangePaymentGatewayState: findTransactionSubmissionChangePaymentGatewaySlice.reducer,
-  findTenantState: findTenantSlice.reducer
+  findTenantState: findTenantSlice.reducer,
+  nonActiveWebStoreState: nonActiveWebStoreSlice.reducer,
+  warningDeletedWebStoreState: warningDeletedWebStoreSlice.reducer,
 }
 
 const appReducer = combineReducers({

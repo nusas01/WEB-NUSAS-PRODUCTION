@@ -15,12 +15,15 @@ import {
     changePaymentGatewayFailedSlice,
     signupSlice,
     forgotPasswordSlice,
+    nonActiveWebStoreSlice,
+    warningDeletedWebStoreSlice,
 } from "../reducers/post"
 import {
     loginStatusSlice,
     storesVerificationSlice,
     transactionSubmissionPendingSlice,
     transactionPendingSlice,
+    storesExpiredSlice,
 } from "../reducers/get"
 import { statusExpiredUserTokenSlice } from '../reducers/expToken'
 import {collectFingerprintAsync} from '../components/fp.js'
@@ -434,6 +437,57 @@ export const signup = (data) => {
             dispatch(setSignupError(response))
         } finally {
             dispatch(setLoadingSignup(false))
+        }
+    }
+}
+
+const {deleteStoresExpiredById} = storesExpiredSlice.actions
+const {setNonActiveWebStoreSuccess, setNonActiveWebStoreError, setLoadingNonActiveWebStore} = nonActiveWebStoreSlice.actions
+export const nonActiveWebStore = (data) => {
+    return async (dispatch) => {
+        dispatch(setLoadingNonActiveWebStore(true))
+        try {
+            const config = {
+                headers: {
+                    "Content-Type": "application/json",
+                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                },
+                withCredentials: true,
+            }
+
+            const response = await axios.post(`${process.env.REACT_APP_NON_ACTIVE_WEB_STORE}`, data, config)
+
+            dispatch(setNonActiveWebStoreSuccess(response?.data?.success))
+            dispatch(deleteStoresExpiredById(data.store_id))
+        } catch (error) {
+            dispatch(setNonActiveWebStoreError(error.response?.data?.error))
+        } finally {
+            dispatch(setLoadingNonActiveWebStore(false))
+        }
+    }
+}
+
+
+const {setWarningDeletedWebStoreSuccess, setWarningDeletedWebStoreError, setLoadingWarningDeletedWebStore} = warningDeletedWebStoreSlice.actions
+export const warningDeletedWebStore = (data) => {
+    return async (dispatch) => {
+        dispatch(setLoadingWarningDeletedWebStore(true))
+        try {
+            const config = {
+                headers: {
+                    "Content-Type": "application/json",
+                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                },
+                withCredentials: true,
+            }
+
+            const response = await axios.post(`${process.env.REACT_APP_WARNING_DELETED_WEB_STORE}`, data, config)
+
+            dispatch(setWarningDeletedWebStoreSuccess(response?.data?.success))
+        } catch (error) {
+            dispatch(setWarningDeletedWebStoreError(error.response?.data?.error))
+        } finally {
+            dispatch(setLoadingWarningDeletedWebStore(false))
         }
     }
 }

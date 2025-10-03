@@ -10,7 +10,6 @@ import {
   User,
   Calendar,
   Settings,
-  TestTube,
   RefreshCcw,
   Menu,
   UserPlus,
@@ -75,8 +74,6 @@ const StoreDeploymentDashboard = () => {
     const { isOpen, isMobileDeviceType } = useSelector((state) => state.persisted.navbar)
 
     const { ref: headerRef, height: headerHeight } = useElementHeight();
-
-
 
     // Mock data based on your structure
     const {resetErrorStoresVerification, removeStoresVerificationById} = storesVerificationSlice.actions
@@ -470,15 +467,15 @@ const StoreDeploymentDashboard = () => {
 
                     <div className="max-w-7xl">
                         {/* Header */}
-                            <div
-                            ref={headerRef}
-                            className={`fixed top-0 z-10 bg-white border-b border-gray-200 ${isMobileDeviceType && isOpen ? 'hidden' : ''}`}
-                            style={{
-                                left: (isMobileDeviceType) ? '0' : '288px',
-                                width: isMobileDeviceType ? '100%' : 'calc(100% - 288px)',
-                                height: '64px'
-                            }}
-                            >
+                        <div
+                        ref={headerRef}
+                        className={`fixed top-0 z-10 bg-white border-b border-gray-200 ${isMobileDeviceType && isOpen ? 'hidden' : ''}`}
+                        style={{
+                            left: (isMobileDeviceType) ? '0' : '288px',
+                            width: isMobileDeviceType ? '100%' : 'calc(100% - 288px)',
+                            height: '64px'
+                        }}
+                        >
                             <div className="h-full mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
                                 <div className="flex items-center justify-between h-full gap-2 sm:gap-4">
                                     { !isMobileDeviceType && (

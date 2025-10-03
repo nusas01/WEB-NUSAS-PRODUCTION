@@ -391,3 +391,52 @@ export const signupSlice = createSlice({
     }
 })
 
+const initialNonActiveWebStoreState = {
+    nonActiveWebStoreSuccess: null,
+    nonActiveWebStoreError: null,
+    loadingnonActiveWebStore: false
+}
+export const nonActiveWebStoreSlice = createSlice({
+    name: "nonActiveWebStore",
+    initialState: initialNonActiveWebStoreState,
+    reducers: {
+        setLoadingNonActiveWebStore: (state, action) => {
+            state.loadingnonActiveWebStore = action.payload
+        },
+        setNonActiveWebStoreSuccess: (state, action) => {
+            state.nonActiveWebStoreSuccess = action.payload
+        },
+        setNonActiveWebStoreError: (state, action) => {
+            state.nonActiveWebStoreError = action.payload || null
+        },
+        resetNonActiveWebStore: (state) => {
+            state.nonActiveWebStoreSuccess = null
+            state.nonActiveWebStoreError = null
+        }
+    }
+})
+
+const initialWarningDeletedWebStoreState = {
+    warningDeletedWebStoreSuccess: null,
+    warningDeletedWebStoreError: null,
+    loadingWarningDeletedWebStore: false
+}
+export const warningDeletedWebStoreSlice = createSlice({
+    name: "warningDeletedWebStore",
+    initialState: initialWarningDeletedWebStoreState,
+    reducers: {
+        setLoadingWarningDeletedWebStore: (state, action) => {
+            state.loadingWarningDeletedWebStore = action.payload
+        },
+        setWarningDeletedWebStoreSuccess: (state, action) => {
+            state.warningDeletedWebStoreSuccess = action.payload
+        },
+        setWarningDeletedWebStoreError: (state, action) => {
+            state.warningDeletedWebStoreError = action.payload || null
+        },
+        resetWarningDeletedWebStore: (state) => {
+            state.warningDeletedWebStoreSuccess = null
+            state.warningDeletedWebStoreError = null
+        }
+    }
+})

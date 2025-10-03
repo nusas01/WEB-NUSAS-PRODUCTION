@@ -10,6 +10,7 @@ import {
   WalletCards,
   Coins,
   Users,
+  AlertTriangle,
 } from "lucide-react"
 import { useNavigate } from "react-router-dom";
 import { useDeviceDetection } from "./helper";
@@ -30,6 +31,7 @@ const menuItems = [
   { Icon: User2, title:"Submission Change Credentials", path: '/submission/change/payment/gateway', key:'Submission Change Credentials'},
   { Icon: WalletCards, title:"Transactions", path: '/transactions', key: 'Transactions'},
   { Icon: Coins, title:"Transactions Change Payment Gateway", path:'/transactions/submission/change/payment/gateway', key:'Transactions Change Payment Gateway'},
+  { Icon: AlertTriangle, title:"Store Expired", path: '/store/expired', key:"Store Expired"},
 ];
 
 const Sidebar = ({activeMenu}) => {
