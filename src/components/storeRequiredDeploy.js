@@ -17,6 +17,7 @@ import {
   AlertCircle,
   Shield,
   BadgeAlert,
+  RotateCcw,
 } from 'lucide-react';
 import {
     Toast,
@@ -36,6 +37,7 @@ import {
     deployAppTestingSlice,
     createAccountCustomerStoreTestingSlice,
     paymentGatewayFailedSlice,
+    storeRequiredDeployRefundSlice,
 } from '../reducers/post'
 import {
     sendEmailRequiredCredentialsPayment,
@@ -44,6 +46,7 @@ import {
     deployAppTesting,
     createAccountTestingCustomerStore,
     paymentGatewayFailed,
+    storeRequiredDeployRefund,
 } from '../actions/post'
 import {
     navbarSlice
@@ -61,7 +64,8 @@ import {
 } from '../actions/get'
 import { type } from '@testing-library/user-event/dist/type';
 import {
-    AccessKeyModal
+    AccessKeyModal,
+    ConfirmationModal,
 } from './model'
 
 const StoreDeploymentDashboard = () => {
@@ -70,6 +74,7 @@ const StoreDeploymentDashboard = () => {
     const [filterStatus, setFilterStatus] = useState('all');
     const [toast, setToast] = useState(null)
     const [loadingSpesifik, setLoadingSpesifik] = useState(null)
+    const [confirmModelRefund, setConfirmModelRefund] = useState(false)
     const { setIsOpen } = navbarSlice.actions
     const { isOpen, isMobileDeviceType } = useSelector((state) => state.persisted.navbar)
 
@@ -87,7 +92,7 @@ const StoreDeploymentDashboard = () => {
         if (storeData.length === 0) {
             dispatch(fetchStoresVerificationRequired())
         }
-    }, [storeData])
+    }, [])
 
     useEffect(() => {
         if (storesVerificationError) {
@@ -98,7 +103,34 @@ const StoreDeploymentDashboard = () => {
         }
     }, [storesVerificationError])
 
+    // handle refund 
+    const {resetStoreRequiredDeployRefund} = storeRequiredDeployRefundSlice.actions
+    const { 
+        storeRequiredDeployRefundSuccess,
+        storeRequiredDeployRefundError,
+        loadingStoreRequiredDeployRefund,
+    } = useSelector((state) => state.storeRequiredDeployRefundState)
 
+    useEffect(() => {
+        if (storeRequiredDeployRefundSuccess) {
+            setToast({
+                type: "success",
+                message: storeRequiredDeployRefundSuccess
+            })
+            dispatch(resetStoreRequiredDeployRefund())
+            dispatch(fetchStoresVerificationRequired())
+        }
+    }, [storeRequiredDeployRefundSuccess])
+
+    useEffect(() => {
+        if (storeRequiredDeployRefundError) {
+            setToast({
+                type: "error",
+                message: storeRequiredDeployRefundError
+            })
+            dispatch(resetStoreRequiredDeployRefund())
+        }
+    }, [storeRequiredDeployRefundError])
 
     // handle send email when credintials payment gateway empty
     const {resetSendEmailCredentials} = sendEmailCredentialsSlice.actions
@@ -465,6 +497,24 @@ const StoreDeploymentDashboard = () => {
                         />
                     )}
 
+                    { confirmModelRefund && (
+                        <ConfirmationModal
+                            isOpen={confirmModelRefund}
+                            onClose={() => {
+                                setConfirmModelRefund(false)
+                            }}
+                            onConfirm={() => {
+                                dispatch(storeRequiredDeployRefund({
+                                store_id: loadingSpesifik
+                                }))
+                                setConfirmModelRefund(false)
+                            }}
+                            title={"Refund"}
+                            message={"This action will permanently refund the store transaction and cannot be undone. Do you want to continue?"}
+                            type='danger'
+                        />
+                    )}
+
                     <div className="max-w-7xl">
                         {/* Header */}
                         <div
@@ -738,6 +788,24 @@ const StoreDeploymentDashboard = () => {
                                                     <Key className="w-3 h-3 mr-1" />
                                                 )}
                                                 {(loadingAccessKey && loadingSpesifik === store.store_id) ? 'Creating...' : 'Access Key'}
+                                                </button>
+
+                                                {/* Refund */}
+                                                <button
+                                                    disabled={loadingStoreRequiredDeployRefund && loadingSpesifik === store.store_id}
+                                                    onClick={() => {
+                                                        setConfirmModelRefund(true)
+                                                        setLoadingSpesifik(store.store_id)
+                                                    }}
+                                                    className="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-rose-100 text-rose-700 border-rose-300 hover:bg-rose-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                                                    title="Create Access Key"
+                                                >
+                                                {(loadingStoreRequiredDeployRefund && loadingSpesifik === store.store_id) ? (
+                                                    <span className="w-3 h-3 mr-1 border-2 border-gray-500 border-t-transparent rounded-full animate-spin" />
+                                                ) : (
+                                                    <RotateCcw className="w-3 h-3 mr-1" />
+                                                )}
+                                                {(loadingStoreRequiredDeployRefund && loadingSpesifik === store.store_id) ? 'Refunding...' : 'Refund'}
                                                 </button>
 
                                                 {/* credentials payment gateway invalid */}

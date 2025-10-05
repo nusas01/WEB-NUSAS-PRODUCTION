@@ -41,6 +41,7 @@ import {
     signupSlice,
     forgotPasswordSlice,
     nonActiveWebStoreSlice,
+    storeRequiredDeployRefundSlice,
     warningDeletedWebStoreSlice,
 } from './post'
 import {
@@ -100,6 +101,7 @@ const nonPersistedReducers = {
   findTenantState: findTenantSlice.reducer,
   nonActiveWebStoreState: nonActiveWebStoreSlice.reducer,
   warningDeletedWebStoreState: warningDeletedWebStoreSlice.reducer,
+  storeRequiredDeployRefundState: storeRequiredDeployRefundSlice.reducer,
 }
 
 const appReducer = combineReducers({

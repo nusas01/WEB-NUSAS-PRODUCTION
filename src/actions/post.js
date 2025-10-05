@@ -17,6 +17,7 @@ import {
     forgotPasswordSlice,
     nonActiveWebStoreSlice,
     warningDeletedWebStoreSlice,
+    storeRequiredDeployRefundSlice,
 } from "../reducers/post"
 import {
     loginStatusSlice,
@@ -488,6 +489,31 @@ export const warningDeletedWebStore = (data) => {
             dispatch(setWarningDeletedWebStoreError(error.response?.data?.error))
         } finally {
             dispatch(setLoadingWarningDeletedWebStore(false))
+        }
+    }
+}
+
+
+const {setStoreRequiredDeployRefundSuccess, setStoreRequiredDeployRefundError, setLoadingStoreRequiredDeployRefund} = storeRequiredDeployRefundSlice.actions
+export const storeRequiredDeployRefund = (data) => {
+    return async (dispatch) => {
+        dispatch(setLoadingStoreRequiredDeployRefund(true))
+        try {
+            const config = {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                },
+                withCredentials: true,
+            }
+
+            const response = await axios.post(`${process.env.REACT_APP_VERIFICATION_DEPLOY_REQUIRED_REFUND}`, data, config)
+
+            dispatch(setStoreRequiredDeployRefundSuccess(response?.data?.success))
+        } catch (error) {
+            dispatch(setStoreRequiredDeployRefundError(error.response?.data?.error))
+        } finally {
+            dispatch(setLoadingStoreRequiredDeployRefund(false))
         }
     }
 }

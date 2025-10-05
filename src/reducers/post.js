@@ -440,3 +440,28 @@ export const warningDeletedWebStoreSlice = createSlice({
         }
     }
 })
+
+const initialStoreRequiredDeployRefundState = {
+    storeRequiredDeployRefundSuccess: null,
+    storeRequiredDeployRefundError: null,
+    loadingStoreRequiredDeployRefund: false
+}
+export const storeRequiredDeployRefundSlice = createSlice({
+    name: "storeRequiredDeployRefund",
+    initialState: initialStoreRequiredDeployRefundState,
+    reducers: {
+        setLoadingStoreRequiredDeployRefund: (state, action) => {
+            state.loadingStoreRequiredDeployRefund = action.payload
+        },
+        setStoreRequiredDeployRefundSuccess: (state, action) => {
+            state.storeRequiredDeployRefundSuccess = action.payload
+        },
+        setStoreRequiredDeployRefundError: (state, action) => {
+            state.storeRequiredDeployRefundError = action.payload || null
+        },
+        resetStoreRequiredDeployRefund: (state) => {
+            state.storeRequiredDeployRefundSuccess = null
+            state.storeRequiredDeployRefundError = null
+        }
+    }
+})

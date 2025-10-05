@@ -222,7 +222,7 @@ export const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, 
   const IconComponent = styles.icon;
 
   return (
-    <div className="fixed inset-0 z-[999999] overflow-y-auto">
+    <div className="fixed inset-0 z-[99999] overflow-y-auto">
       <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" />
       <div className="flex min-h-full items-center justify-center p-4">
         <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md transform transition-all">
