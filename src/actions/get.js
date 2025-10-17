@@ -29,7 +29,7 @@ export const fetchAuthStatusLogin = () => {
         try {
             const response = await  axios.get(`${process.env.REACT_APP_AUTH_STATUS_LOGIN}`,{
                 headers: {
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true, 
             })
@@ -50,7 +50,7 @@ export const fetchLogout = () => {
       try{
           const response = await  axios.get(`${process.env.REACT_APP_LOGOUT}`, {
               headers: {
-                  "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                  "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
               },
               withCredentials: true
           })
@@ -74,7 +74,7 @@ export const fetchStoresVerificationRequired = () => {
         try {
             const response = await  axios.get(`${process.env.REACT_APP_VERIFICATION_DEPLOY_REQUIRED}`, {
                 headers: {
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true
             })
@@ -97,7 +97,7 @@ export const createAccessKeyStore = (store_id, tenant_id) => {
         try {
             const response = await  axios.get(`${process.env.REACT_APP_CREATE_ACCESS_KEY_STORE}`, {
                 headers: {
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true,
                 params: {
@@ -124,7 +124,7 @@ export const fetchAccountTestingCustomerStore = () => {
         try {
             const response = await  axios.get(`${process.env.REACT_APP_ACCOUNT_TESTING_CUSTOMER_STORE}`, {
                 headers: {
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true
             })
@@ -147,7 +147,7 @@ export const getAllStoreRequiredVerified = () => {
         try {
             const response = await  axios.get(`${process.env.REACT_APP_GET_ALL_STORE_REQUIRED_VERIFIED}`, {
                 headers: {
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true
             })
@@ -170,7 +170,7 @@ export const getTenantSubmissionChangePaymentGateway = () => {
         try {
             const response = await  axios.get(`${process.env.REACT_APP_GET_TENANT_SUBMISSION_CHANGE_PAYMENT_GATEWAY}`, {
                 headers: {
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true
             })
@@ -199,7 +199,7 @@ export const fetchTransactionPaid = (page, isLoadMore = false) => {
         try {
             const response = await  axios.get(`${process.env.REACT_APP_GET_ALL_TRANSACTION_PAID}`, {
                 headers: {
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true,
                 params: {
@@ -231,7 +231,7 @@ export const fetchTransactionPending = () => {
         try {
             const response = await  axios.get(`${process.env.REACT_APP_GET_ALL_TRANSACTION_PENDING}`, {
                 headers: {
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true
             })
@@ -254,7 +254,7 @@ export const findTransaction = (key) => {
         try {
             const response = await  axios.get(`${process.env.REACT_APP_FIND_TRANSACTION}`, {
                 headers: {
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true,
                 params: {
@@ -280,7 +280,7 @@ export const createAccessKeyMaintananceTenant = (tenant_id, store_id) => {
         try {
             const response = await  axios.get(`${process.env.REACT_APP_CREATE_ACCESS_KEY_TESTING_STORE}`, {
                 headers: {
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true,
                 params: {
@@ -307,7 +307,7 @@ export const findTransactionSubmissionChangePaymentGateway = (key) => {
         try {
             const response = await  axios.get(`${process.env.REACT_APP_FIND_TRANSACTION_SUBMISSION_FIND}`, {
                 headers: {
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true,
                 params: {
@@ -339,7 +339,7 @@ export const fetchTransactionSubmissionPaid = (page, isLoadMore = false) => {
         try {
             const response = await  axios.get(`${process.env.REACT_APP_GET_ALL_TRANSACTION_SUBMISSION_PAID}`, {
                 headers: {
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true,
                 params: {
@@ -371,7 +371,7 @@ export const fetchTransactionSubmissionPending = () => {
         try {
             const response = await  axios.get(`${process.env.REACT_APP_GET_ALL_TRANSACTION_SUBMISSION_PENDING}`, {
                 headers: {
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true,
             })
@@ -394,7 +394,7 @@ export const findTenant = (key) => {
         try {
             const response = await  axios.get(`${process.env.REACT_APP_FINDTENANT}`, {
                 headers: {
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true,
                 params: {
@@ -426,7 +426,7 @@ export const fetchTenants = (page, isLoadMore = false) => {
         try {
             const response = await  axios.get(`${process.env.REACT_APP_TENANTS}`, {
                 headers: {
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true,
                 params: {
@@ -457,7 +457,7 @@ export const fetchTenantStores = (id) => {
         try {
             const response = await  axios.get(`${process.env.REACT_APP_TENANT_STORES}`, {
                 headers: {
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true,
                 params: {
@@ -483,7 +483,7 @@ export const fetchStoresExpired = (id) => {
         try {
             const response = await  axios.get(`${process.env.REACT_APP_STORES_EXPIRED}`, {
                 headers: {
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true,
                 params: {
@@ -508,7 +508,7 @@ export const fetchNonce = async () => {
       `${process.env.REACT_APP_NONCE}`,
       {
         headers: {
-          "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+          "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
         },
         withCredentials: true,
       }

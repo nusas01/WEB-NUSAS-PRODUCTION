@@ -8,7 +8,7 @@ export const signupVerification = (data) => async (dispatch) => {
     const config = {
         headers: {
             "Content-Type": "multipart/form-data",
-            "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+            "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
         },
         withCredentials: true,
     }

@@ -37,7 +37,7 @@ export const login = (data) => async (dispatch) => {
     const config = {
         headers: {
             "Content-Type": "multipart/form-data",
-            "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+            "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
         }, 
         withCredentials: true,
     }
@@ -74,7 +74,7 @@ export const forgotPassword = (data) => async (dispatch) => {
     const config = {
         headers: {
             "Content-Type": "multipart/form-data",
-            "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+            "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
         },
         withCredentials: true,
     }
@@ -107,7 +107,7 @@ export const sendEmailRequiredCredentialsPayment = (data) => {
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
-                "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
             },
             withCredentials: true,
         }
@@ -133,7 +133,7 @@ export const deployApp = (data) => {
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
-                "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
             },
             withCredentials: true,
         }
@@ -159,7 +159,7 @@ export const deployFinished = (data) => {
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
-                "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
             },
             withCredentials: true,
         }
@@ -185,7 +185,7 @@ export const deployAppTesting = (data) => {
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
-                "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
             },
             withCredentials: true,
         }
@@ -210,7 +210,7 @@ export const createAccountTestingCustomerStore = (data) => {
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
-                "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
             },
             withCredentials: true,
         }
@@ -235,7 +235,7 @@ export const sendEmailUpdateChangePaymentGateway = (data) => {
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
-                "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
             },
             withCredentials: true,
         }
@@ -260,7 +260,7 @@ export const startChangePaymentGatewayTenant = (data) => {
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
-                "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
             },
             withCredentials: true,
         }
@@ -287,7 +287,7 @@ export const finishedChangePaymentGatewayTenant = (data) => {
             const response = await axios.post(`${process.env.REACT_APP_FINISHED_CHANGE_PAYMENT_GATEWAY}`, data, {
                 headers: {
                     "Content-Type": "multipart/form-data",
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true
             })
@@ -311,7 +311,7 @@ export const checkPendingTransactionPaymentGateway = (data) => {
         try {
             const response = await axios.post(`${process.env.REACT_APP_CHECK_PENDING_TRANSACTION_PAYMENT_GATEWAY}`, data, {
                 headers: {
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true
             })
@@ -337,7 +337,7 @@ export const checkPendingTransactionSubmissionPaymentGateway = (data) => {
         try {
             const response = await axios.post(`${process.env.REACT_APP_CHECK_PENDING_SUBMISSION_TRANSACTION_PAYMENT_GATEWAY}`, data, {
                 headers: {
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true
             })
@@ -363,7 +363,7 @@ export const paymentGatewayFailed = (data) => {
             const response = await axios.post(`${process.env.REACT_APP_PAYMENT_GATEWAY_FAILED}`, data, {
                 headers: {
                     "Content-Type": "multipart/form-data",
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true
             })
@@ -388,7 +388,7 @@ export const changePaymentGatewayFailed = (data) => {
             const response = await axios.post(`${process.env.REACT_APP_SUBMISSION_CHANGE_PAYMENT_GATEWAY}`, data, {
                 headers: {
                     "Content-Type": "multipart/form-data",
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true
             })
@@ -419,7 +419,7 @@ export const signup = (data) => {
             const config = {
                 headers: {
                     "Content-Type": "application/json",
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true,
             }
@@ -451,7 +451,7 @@ export const nonActiveWebStore = (data) => {
             const config = {
                 headers: {
                     "Content-Type": "application/json",
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true,
             }
@@ -477,7 +477,7 @@ export const warningDeletedWebStore = (data) => {
             const config = {
                 headers: {
                     "Content-Type": "application/json",
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true,
             }
@@ -502,7 +502,7 @@ export const storeRequiredDeployRefund = (data) => {
             const config = {
                 headers: {
                     "Content-Type": "multipart/form-data",
-                    "API_KEY_INTERNAL_NUSAS": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
                 },
                 withCredentials: true,
             }
