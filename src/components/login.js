@@ -62,6 +62,7 @@ const LoginComponent = () => {
                 ...prev,
                 ...normalizedErrors
             }));
+            dispatch(resetLogin())
         }
     }, [errorField])
 
