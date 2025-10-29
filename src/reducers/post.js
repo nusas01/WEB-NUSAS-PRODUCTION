@@ -83,27 +83,27 @@ export const sendEmailCredentialsSlice = createSlice({
 })
 
 
-const initialDeployAppState = {
-    deployAppSuccess: false,
-    deployAppError: null,
-    loadingDeployApp: false
+const initialCreateEmployeeTestingState = {
+    createEmployeeTestingSuccess: false,
+    createEmployeeTestingError: null,
+    loadingCreateEmployeeTesting: false
 }
-export const deployAppSlice = createSlice({
-    name: "deployApp",
-    initialState: initialDeployAppState,
+export const createEmployeeTestingSlice = createSlice({
+    name: "createEmployeeTesting",
+    initialState: initialCreateEmployeeTestingState,
     reducers: {
-        setLoadingDeployApp: (state, action) => {
-            state.loadingDeployApp = action.payload
+        setLoadingCreateEmployeeTesting: (state, action) => {
+            state.loadingCreateEmployeeTesting = action.payload
         },
-        setDeployAppSuccess: (state, action) => {
-            state.deployAppSuccess = action.payload
+        setCreateEmployeeTestingSuccess: (state, action) => {
+            state.createEmployeeTestingSuccess = action.payload
         },
-        setDeployAppError: (state, action) => {
-            state.deployAppError = action.payload || null
+        setCreateEmployeeTestingError: (state, action) => {
+            state.createEmployeeTestingError = action.payload || null
         },
-        resetDeployApp: (state) => {
-            state.deployAppSuccess = false
-            state.deployAppError = null
+        resetCreateEmployeeTesting: (state) => {
+            state.createEmployeeTestingSuccess = false
+            state.createEmployeeTestingError = null
         }
     }
 })
@@ -462,6 +462,31 @@ export const storeRequiredDeployRefundSlice = createSlice({
         resetStoreRequiredDeployRefund: (state) => {
             state.storeRequiredDeployRefundSuccess = null
             state.storeRequiredDeployRefundError = null
+        }
+    }
+})
+
+const initialDeployAppState = {
+    deployAppSuccess: false,
+    deployAppError: null,
+    loadingDeployApp: false
+}
+export const deployAppSlice = createSlice({
+    name: "deployApp",
+    initialState: initialDeployAppState,
+    reducers: {
+        setLoadingDeployApp: (state, action) => {
+            state.loadingDeployApp = action.payload
+        },
+        setDeployAppSuccess: (state, action) => {
+            state.deployAppSuccess = action.payload
+        },
+        setDeployAppError: (state, action) => {
+            state.deployAppError = action.payload || null
+        },
+        resetDeployApp: (state) => {
+            state.deployAppSuccess = false
+            state.deployAppError = null
         }
     }
 })

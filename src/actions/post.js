@@ -18,6 +18,7 @@ import {
     nonActiveWebStoreSlice,
     warningDeletedWebStoreSlice,
     storeRequiredDeployRefundSlice,
+    createEmployeeTestingSlice,
 } from "../reducers/post"
 import {
     loginStatusSlice,
@@ -514,6 +515,31 @@ export const storeRequiredDeployRefund = (data) => {
             dispatch(setStoreRequiredDeployRefundError(error.response?.data?.error))
         } finally {
             dispatch(setLoadingStoreRequiredDeployRefund(false))
+        }
+    }
+}
+
+const {setCreateEmployeeTestingSuccess, setCreateEmployeeTestingError, setLoadingCreateEmployeeTesting} = createEmployeeTestingSlice.actions
+export const createEmployeeTesting = (data) => {
+    return async (dispatch) => {
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+            },
+            withCredentials: true,
+        }
+        dispatch(setLoadingCreateEmployeeTesting(true))
+        try {
+            const response = await axios.post(`${process.env.REACT_APP_CREATE_EMPLOYEE_TESTING}`, data, config)
+            dispatch(setCreateEmployeeTestingSuccess(response?.data?.success))
+        } catch (error) {
+            if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
+                dispatch(setStatusExpiredUserToken(true));
+            }
+            dispatch(setCreateEmployeeTestingError(error.response?.data?.error))
+        } finally {
+            dispatch(setLoadingCreateEmployeeTesting(false))
         }
     }
 }

@@ -18,6 +18,7 @@ import {
     storesExpiredSlice,
     findTransactionSubmissionChangePaymentGatewaySlice,
     findTenantSlice,
+    employeTestingStoreSlice,
 } from '../reducers/get'
 import { statusExpiredUserTokenSlice } from '../reducers/expToken'
 
@@ -519,4 +520,32 @@ export const fetchNonce = async () => {
     return { data: null, error: error.response?.data?.error || "Unexpected error" };
   }
 };
+
+const {setEmployeTestingStoreData, setEmployeTestingStoreError, setLoadingEmployeTestingStore} = employeTestingStoreSlice.actions
+export const fetchEmployeTestingStore = (id) => {
+    return async (dispatch) => {
+        dispatch(setLoadingEmployeTestingStore(true))
+        try {
+            const response = await  axios.get(`${process.env.REACT_APP_EMPLOYE_TESTING_STORE}`, {
+                headers: {
+                    "x-api-key-internal-nusas": process.env.REACT_APP_API_KEY_INTERNAL_NUSAS,
+                },
+                withCredentials: true,
+                params: {
+                    store_id: id,
+                },
+            })
+            dispatch(setEmployeTestingStoreData(response?.data?.id))
+        } catch (error) {
+            if (error.response?.data?.code === "TOKEN_USER_EXPIRED") {
+                dispatch(setStatusExpiredUserToken(true));
+            }
+            dispatch(setEmployeTestingStoreError(error.response?.data?.error))
+        } finally {
+            dispatch(setLoadingEmployeTestingStore(false))
+        }
+    }
+}
+
+
 

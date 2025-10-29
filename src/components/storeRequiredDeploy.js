@@ -66,6 +66,7 @@ import { type } from '@testing-library/user-event/dist/type';
 import {
     AccessKeyModal,
     ConfirmationModal,
+    ConfirmationModalDeleteCredential,
 } from './model'
 
 const StoreDeploymentDashboard = () => {
@@ -403,6 +404,9 @@ const StoreDeploymentDashboard = () => {
         } 
     }, [loadingPaymentGatewayFailed])
 
+    const [showConfirmModal, setShowConfirmModal] = useState(false)
+    const [selectedStore, setSelectedStore] = useState(null)
+
     const handlePaymentGatewayFailed = (tenantId, storeId, email) => {
         setLoadingSpesifik(storeId)
         dispatch(paymentGatewayFailed({
@@ -411,6 +415,23 @@ const StoreDeploymentDashboard = () => {
         }))
     }
 
+    const handleConfirmDelete = () => {
+        if (selectedStore) {
+            handlePaymentGatewayFailed(
+                selectedStore.tenantId,
+                selectedStore.storeId,
+                selectedStore.email
+            );
+        }
+        setShowConfirmModal(false);
+        setSelectedStore(null);
+    };
+
+    const handleCloseModal = () => {
+        setShowConfirmModal(false);
+        setSelectedStore(null);
+    };
+    
 
     const isCredentialsEmpty = (tenant) => {
         return !tenant.bussnes_id || !tenant.api_key || !tenant.secret_key_webhook;
@@ -514,6 +535,18 @@ const StoreDeploymentDashboard = () => {
                             type='danger'
                         />
                     )}
+
+                    <ConfirmationModalDeleteCredential
+                        isOpen={showConfirmModal}
+                        onClose={handleCloseModal}
+                        onConfirm={handleConfirmDelete}
+                        title="Konfirmasi Penghapusan Kredensial"
+                        message="Apakah Anda yakin ingin menghapus kredensial payment gateway untuk akun ini?"
+                        warningMessage="Kredensial payment gateway yang dihapus tidak dapat dikembalikan dan dapat mengganggu proses pembayaran yang sedang berjalan."
+                        confirmText="Ya, Hapus Kredensial"
+                        cancelText="Batal"
+                        isDangerous={true}
+                    />
 
                     <div className="max-w-7xl">
                         {/* Header */}
@@ -812,16 +845,23 @@ const StoreDeploymentDashboard = () => {
                                                 {isCredentialsFilled(store.tenant) && (
                                                     <button
                                                         disabled={loadingPaymentGatewayFailed && loadingSpesifik === store.store_id}
-                                                        onClick={() => handlePaymentGatewayFailed(store.tenant_id, store.store_id, store.tenant.email)}
+                                                        onClick={() => {
+                                                            setSelectedStore({
+                                                                tenantId: store.tenant_id,
+                                                                storeId: store.store_id,
+                                                                email: store.tenant.email
+                                                            });
+                                                            setShowConfirmModal(true);
+                                                        }}
                                                         className="inline-flex items-center px-3 py-1.5 border border-red-300 rounded-md text-xs font-medium text-red-700 bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
                                                         title="Create Access Key"
                                                     >
-                                                    {(loadingPaymentGatewayFailed && loadingSpesifik === store.store_id) ? (
-                                                        <span className="w-3 h-3 mr-1 border-2 border-gray-500 border-t-transparent rounded-full animate-spin" />
-                                                    ) : (
-                                                        <BadgeAlert className="w-3 h-3 mr-1" />
-                                                    )}
-                                                    {(loadingPaymentGatewayFailed && loadingSpesifik === store.store_id) ? 'Sending...' : 'Credentials Failed'}
+                                                        {(loadingPaymentGatewayFailed && loadingSpesifik === store.store_id) ? (
+                                                            <span className="w-3 h-3 mr-1 border-2 border-gray-500 border-t-transparent rounded-full animate-spin" />
+                                                        ) : (
+                                                            <BadgeAlert className="w-3 h-3 mr-1" />
+                                                        )}
+                                                        {(loadingPaymentGatewayFailed && loadingSpesifik === store.store_id) ? 'Sending...' : 'Credentials Failed'}
                                                     </button>
                                                 )}
 

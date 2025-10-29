@@ -556,4 +556,31 @@ export const storesExpiredSlice = createSlice({
     }
 })
 
+const initialEmployeTestingStoreState = {
+    employeTestingStoreId: null,
+    employeTestingStoreError: null,
+    loadingEmployeTestingStore: false
+}
+export const employeTestingStoreSlice = createSlice({
+    name: "employeTestingStore",
+    initialState: initialEmployeTestingStoreState,
+    reducers: {
+        setLoadingEmployeTestingStore: (state, action) => {
+            state.loadingEmployeTestingStore = action.payload
+        },
+        setEmployeTestingStoreData: (state, action) => {
+            state.employeTestingStoreId = action.payload || null
+        },
+        setEmployeTestingStoreError: (state, action) => {
+            state.employeTestingStoreError = action.payload || null
+        },
+        resetErrorEmployeTestingStore: (state) => {
+            state.employeTestingStoreError = null
+        },
+        resetEmployeTestingStore: (state) => {
+            state.employeTestingStoreId = null
+        },
+    }
+})
+
 

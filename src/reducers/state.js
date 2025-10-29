@@ -23,6 +23,7 @@ import {
     findTransactionSubmissionChangePaymentGatewaySlice,
     findTenantSlice,
     storesExpiredSlice,
+    employeTestingStoreSlice,
 } from './get'
 import {
     loginSlice,
@@ -43,7 +44,11 @@ import {
     nonActiveWebStoreSlice,
     storeRequiredDeployRefundSlice,
     warningDeletedWebStoreSlice,
+    createEmployeeTestingSlice,
 } from './post'
+import {
+  deleteEmployeeTestingStoreSlice
+} from './delete'
 import {
   signupVerificationSlice
 } from './patch'
@@ -102,6 +107,9 @@ const nonPersistedReducers = {
   nonActiveWebStoreState: nonActiveWebStoreSlice.reducer,
   warningDeletedWebStoreState: warningDeletedWebStoreSlice.reducer,
   storeRequiredDeployRefundState: storeRequiredDeployRefundSlice.reducer,
+  employeTestingStoreState: employeTestingStoreSlice.reducer,
+  createEmployeeTestingState: createEmployeeTestingSlice.reducer,
+  deleteEmployeeTestingStoreState: deleteEmployeeTestingStoreSlice.reducer,
 }
 
 const appReducer = combineReducers({

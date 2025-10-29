@@ -403,3 +403,66 @@ export const TableLoadingSkeleton = () => (
     ))}
   </div>
 );
+
+
+export const ConfirmationModalDeleteCredential = ({ 
+    isOpen, 
+    onClose, 
+    onConfirm, 
+    title = "Konfirmasi Penghapusan", 
+    message = "Apakah Anda yakin ingin melanjutkan?", 
+    warningMessage = "Tindakan ini tidak dapat dibatalkan!", 
+    confirmText = "Ya, Lanjutkan", 
+    cancelText = "Batal", 
+    isDangerous = true 
+}) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
+                <div className="flex items-center mb-4">
+                    <div className={`flex-shrink-0 w-12 h-12 rounded-full ${isDangerous ? 'bg-red-100' : 'bg-yellow-100'} flex items-center justify-center`}>
+                        <AlertTriangle className={`w-6 h-6 ${isDangerous ? 'text-red-600' : 'text-yellow-600'}`} />
+                    </div>
+                    <h3 className="ml-4 text-lg font-semibold text-gray-900">
+                        {title}
+                    </h3>
+                </div>
+                
+                <div className="mb-6">
+                    <p className="text-sm text-gray-600 mb-2">
+                        {message}
+                    </p>
+                    <div className={`${isDangerous ? 'bg-red-50 border-red-200' : 'bg-yellow-50 border-yellow-200'} border rounded-md p-3 mt-3`}>
+                        <p className={`text-sm font-semibold ${isDangerous ? 'text-red-800' : 'text-yellow-800'}`}>
+                            ⚠️ Peringatan: {isDangerous ? 'Tindakan ini sangat berbahaya!' : 'Harap berhati-hati!'}
+                        </p>
+                        <p className={`text-xs ${isDangerous ? 'text-red-700' : 'text-yellow-700'} mt-1`}>
+                            {warningMessage}
+                        </p>
+                    </div>
+                </div>
+
+                <div className="flex gap-3 justify-end">
+                    <button
+                        onClick={onClose}
+                        className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                    >
+                        {cancelText}
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        className={`px-4 py-2 text-sm font-medium text-white border border-transparent rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${
+                            isDangerous 
+                                ? 'bg-red-600 hover:bg-red-700 focus:ring-red-500' 
+                                : 'bg-yellow-600 hover:bg-yellow-700 focus:ring-yellow-500'
+                        }`}
+                    >
+                        {confirmText}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
